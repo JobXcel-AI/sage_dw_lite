@@ -1,0 +1,5 @@
+SELECT
+	recnum as code, 
+	lngnme as name, 
+	endbal as opening_balance
+FROM lgract

@@ -1,0 +1,320 @@
+id: string
+name: string
+parent_id: string (if parent_id is an item in the csv file, it needs to precede anything referencing it)
+type: string (on of ["contact", "invoice", "delivery", "other"])
+    - Contact: Use this to organize the contact details of employees of a given company (e.g. CEO, CFO, ...).\n
+    - Invoice Address: Preferred address for all invoices. Selected by default when you invoice an order that belongs to this company.\nrec
+    - Delivery Address: Preferred address for all deliveries. Selected by default when you deliver an order that belongs to this company.\n
+    - Other: Other address for the company (e.g. subsidiary, ...)
+street: string
+zip: string
+city: string
+state: string (this can either be the full name of the state, or the state abbreviation i.e. California or CA)
+country: string (this can either be the full name of the country, or the country abbreviation as defined here: https://github.com/odoo/odoo/blob/17.0/odoo/addons/base/data/res_country_data.xml)
+email: string
+phone: string
+is_company: boolean (if true, the contact is a company, otherwise it is a person/address)
+####################################################################################################################
+columns:
+id,name,parent_id,type,street,zip,city,state,country,email,phone,is_company
+
+
+
+
+questions on INVOICE vs DELIVERY (billing address vs delivery address, and how to import both)
+
+
+CONTACTS
+
+
+DECLARE @us_states TABLE (abbreviated_state_name VARCHAR(2) PRIMARY KEY,full_state_name VARCHAR(50));
+
+INSERT INTO @us_states VALUES 
+('AL', 'Alabama'),
+('AK', 'Alaska'),
+('AZ', 'Arizona'),
+('AR', 'Arkansas'),
+('CA', 'California'),
+('CO', 'Colorado'),
+('CT', 'Connecticut'),
+('DE', 'Delaware'),
+('FL', 'Florida (US)'),
+('GA', 'Georgia'),
+('HI', 'Hawaii'),
+('ID', 'Idaho'),
+('IL', 'Illinois'),
+('IN', 'Indiana'),
+('IA', 'Iowa'),
+('KS', 'Kansas'),
+('KY', 'Kentucky'),
+('LA', 'Louisiana'),
+('ME', 'Maine'),
+('MD', 'Maryland'),
+('MA', 'Massachusetts'),
+('MI', 'Michigan'),
+('MN', 'Minnesota'),
+('MS', 'Mississippi'),
+('MO', 'Missouri'),
+('MT', 'Montana'),
+('NE', 'Nebraska'),
+('NV', 'Nevada'),
+('NH', 'New Hampshire'),
+('NJ', 'New Jersey'),
+('NM', 'New Mexico'),
+('NY', 'New York'),
+('NC', 'North Carolina'),
+('ND', 'North Dakota'),
+('OH', 'Ohio'),
+('OK', 'Oklahoma'),
+('OR', 'Oregon'),
+('PA', 'Pennsylvania'),
+('RI', 'Rhode Island'),
+('SC', 'South Carolina'),
+('SD', 'South Dakota'),
+('TN', 'Tennessee'),
+('TX', 'Texas'),
+('UT', 'Utah'),
+('VT', 'Vermont'),
+('VA', 'Virginia'),
+('WA', 'Washington'),
+('WV', 'West Virginia'),
+('WI', 'Wisconsin'),
+('WY', 'Wyoming');
+
+SELECT 
+	CONCAT('reccln.',recnum) as id,
+	clnnme as name,
+	'' as parent_id,
+	'contact' as type,
+	CONCAT(
+		addrs1,
+		CASE WHEN addrs2 != '' THEN ' ' ELSE '' END,
+		addrs2
+	) as street,
+	zipcde as zip,
+	ctynme as city,
+	ISNULL(full_state_name,'') as state,
+	'us' as country,
+	e_mail as email,
+	phnnum as phone,
+	1 as is_company
+FROM [Rivers Electrical Services].[dbo].[reccln]
+LEFT JOIN @us_states on state_ = abbreviated_state_name
+
+UNION ALL 
+
+SELECT
+	CONCAT('jobcnt.',c.recnum) as id,
+	c.cntnme as name,
+	CONCAT('reccln.',act.clnnum) as parent_id,
+	'contact' as type,
+	CONCAT(
+		client.addrs1,
+		CASE WHEN ISNULL(client.addrs2,'') != '' THEN ' ' ELSE '' END,
+		client.addrs2
+	) as street,
+	client.zipcde as zip,
+	client.ctynme as city,
+	ISNULL(full_state_name,'') as state,
+	'us' as country,
+	c.e_mail as email,
+	c.phnnum as phone,
+	0 as is_company
+FROM [Rivers Electrical Services].dbo.actrec AS act 
+INNER JOIN [Rivers Electrical Services].dbo.jobcnt AS c ON act.recnum = c.recnum
+INNER JOIN [Rivers Electrical Services].dbo.reccln AS client ON client.recnum = act.clnnum
+LEFT JOIN @us_states on client.state_ = abbreviated_state_name
+
+
+
+DECLARE @us_states TABLE (abbreviated_state_name VARCHAR(2) PRIMARY KEY,full_state_name VARCHAR(50));
+
+INSERT INTO @us_states VALUES 
+('AL', 'Alabama'),
+('AK', 'Alaska'),
+('AZ', 'Arizona'),
+('AR', 'Arkansas'),
+('CA', 'California'),
+('CO', 'Colorado'),
+('CT', 'Connecticut'),
+('DE', 'Delaware'),
+('FL', 'Florida (US)'),
+('GA', 'Georgia'),
+('HI', 'Hawaii'),
+('ID', 'Idaho'),
+('IL', 'Illinois'),
+('IN', 'Indiana'),
+('IA', 'Iowa'),
+('KS', 'Kansas'),
+('KY', 'Kentucky'),
+('LA', 'Louisiana'),
+('ME', 'Maine'),
+('MD', 'Maryland'),
+('MA', 'Massachusetts'),
+('MI', 'Michigan'),
+('MN', 'Minnesota'),
+('MS', 'Mississippi'),
+('MO', 'Missouri'),
+('MT', 'Montana'),
+('NE', 'Nebraska'),
+('NV', 'Nevada'),
+('NH', 'New Hampshire'),
+('NJ', 'New Jersey'),
+('NM', 'New Mexico'),
+('NY', 'New York'),
+('NC', 'North Carolina'),
+('ND', 'North Dakota'),
+('OH', 'Ohio'),
+('OK', 'Oklahoma'),
+('OR', 'Oregon'),
+('PA', 'Pennsylvania'),
+('RI', 'Rhode Island'),
+('SC', 'South Carolina'),
+('SD', 'South Dakota'),
+('TN', 'Tennessee'),
+('TX', 'Texas'),
+('UT', 'Utah'),
+('VT', 'Vermont'),
+('VA', 'Virginia'),
+('WA', 'Washington'),
+('WV', 'West Virginia'),
+('WI', 'Wisconsin'),
+('WY', 'Wyoming');
+
+SELECT 
+	CONCAT('reccln.',recnum) as parent_id,
+	'delivery' as type,
+	CONCAT(
+		addrs1,
+		CASE WHEN addrs2 != '' THEN ' ' ELSE '' END,
+		addrs2
+	) as street,
+	zipcde as zip,
+	ctynme as city,
+	ISNULL(full_state_name,'') as state,
+	'us' as country
+FROM [Rivers Electrical Services].[dbo].[reccln]
+LEFT JOIN @us_states on state_ = abbreviated_state_name
+
+UNION ALL 
+
+SELECT 
+	CONCAT('reccln.',recnum) as parent_id,
+	'invoice' as type,
+	CONCAT(
+		addrs1,
+		CASE WHEN addrs2 != '' THEN ' ' ELSE '' END,
+		addrs2
+	) as street,
+	CASE WHEN ISNULL(bilzip,'') = '' THEN zipcde ELSE bilzip END as zip,
+	CASE WHEN ISNULL(bilcty,'') = '' THEN ctynme ELSE bilcty END as city,
+	ISNULL(full_state_name,'') as state,
+	'us' as country
+FROM [Rivers Electrical Services].[dbo].[reccln]
+LEFT JOIN @us_states on CASE WHEN ISNULL(bilste,'') = '' THEN state_ ELSE bilste END = abbreviated_state_name
+
+
+
+
+
+VENDORS
+
+
+
+DECLARE @us_states TABLE (abbreviated_state_name VARCHAR(2) PRIMARY KEY,full_state_name VARCHAR(50));
+
+INSERT INTO @us_states VALUES 
+('AL', 'Alabama'),
+('AK', 'Alaska'),
+('AZ', 'Arizona'),
+('AR', 'Arkansas'),
+('CA', 'California'),
+('CO', 'Colorado'),
+('CT', 'Connecticut'),
+('DE', 'Delaware'),
+('FL', 'Florida'),
+('GA', 'Georgia'),
+('HI', 'Hawaii'),
+('ID', 'Idaho'),
+('IL', 'Illinois'),
+('IN', 'Indiana'),
+('IA', 'Iowa'),
+('KS', 'Kansas'),
+('KY', 'Kentucky'),
+('LA', 'Louisiana'),
+('ME', 'Maine'),
+('MD', 'Maryland'),
+('MA', 'Massachusetts'),
+('MI', 'Michigan'),
+('MN', 'Minnesota'),
+('MS', 'Mississippi'),
+('MO', 'Missouri'),
+('MT', 'Montana'),
+('NE', 'Nebraska'),
+('NV', 'Nevada'),
+('NH', 'New Hampshire'),
+('NJ', 'New Jersey'),
+('NM', 'New Mexico'),
+('NY', 'New York'),
+('NC', 'North Carolina'),
+('ND', 'North Dakota'),
+('OH', 'Ohio'),
+('OK', 'Oklahoma'),
+('OR', 'Oregon'),
+('PA', 'Pennsylvania'),
+('RI', 'Rhode Island'),
+('SC', 'South Carolina'),
+('SD', 'South Dakota'),
+('TN', 'Tennessee'),
+('TX', 'Texas'),
+('UT', 'Utah'),
+('VT', 'Vermont'),
+('VA', 'Virginia'),
+('WA', 'Washington'),
+('WV', 'West Virginia'),
+('WI', 'Wisconsin'),
+('WY', 'Wyoming');
+
+
+SELECT 
+	CONCAT('actpay.',recnum) as id,
+	vndnme as name,
+	'' as parent_id,
+	'contact' as type,
+	CONCAT(
+		addrs1,
+		CASE WHEN ISNULL(addrs2,'') != '' THEN ' ' ELSE '' END,
+		addrs2
+	) as street,
+	zipcde as zip,
+	ctynme as city,
+	ISNULL(full_state_name,'') as state,
+	'us' as country,
+	e_mail as email,
+	phnnum as phone,
+	1 as is_company
+FROM [Rivers Electrical Services].dbo.actpay
+LEFT JOIN @us_states on state_ = abbreviated_state_name
+
+UNION ALL 
+
+SELECT
+	CONCAT('vndcnt.',c.recnum) as id,
+	c.cntnme as name,
+	CONCAT('actpay.',act.recnum) as parent_id,
+	'contact' as type,
+	CONCAT(
+		act.addrs1,
+		CASE WHEN ISNULL(act.addrs2,'') != '' THEN ' ' ELSE '' END,
+		act.addrs2
+	) as street,
+	act.zipcde as zip,
+	act.ctynme as city,
+	ISNULL(full_state_name,'') as state,
+	'us' as country,
+	c.e_mail as email,
+	c.phnnum as phone,
+	0 as is_company
+FROM [Rivers Electrical Services].dbo.actpay AS act 
+INNER JOIN [Rivers Electrical Services].dbo.vndcnt AS c ON act.recnum = c.recnum
+LEFT JOIN @us_states on state_ = abbreviated_state_name

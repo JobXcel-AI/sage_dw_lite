@@ -1,0 +1,27 @@
+SELECT 
+	CONCAT(a.recnum,' - ',a.jobnme) as job_name,
+	ltl.dscrpt as invoice_line_description,
+	ltl.recnum as record_number,
+	lgr.trnnum as transaction_number,
+	acrinv.invdte as invoice_date,
+	--j.trndte as transaction_date,
+	lgr.dscrpt as description,
+	ltl.dbtamt as debit_amount,
+	ltl.crdamt as credit_amount,
+	tax.dstnme as tax_district,
+	jt.typnme as job_type,
+	a.ntetxt,
+	CONCAT(a.shtnme, ' ', a.addrs1, ' ', a.addrs2, ' ', a.ctynme, ', ', a.state_, ' ', a.zipcde) as notes
+FROM actrec a
+INNER JOIN acrinv acrinv on acrinv.jobnum = a.recnum
+INNER JOIN taxdst tax on tax.recnum = acrinv.taxdst
+INNER JOIN jobtyp jt on jt.recnum = a.jobtyp
+INNER JOIN lgrtrn lgr on lgr.recnum = acrinv.lgrrec
+INNER JOIN lgtnln ltl on ltl.recnum = lgr.recnum
+LEFT JOIN lgract al on al.recnum = ltl.lgract
+WHERE
+	--lgr.trnnum in ('3200364','3200397') AND 
+	ltl.lgract = 24001 AND 
+	DATEPART(YEAR,acrinv.invdte) >= 2023
+ORDER BY job_name
+

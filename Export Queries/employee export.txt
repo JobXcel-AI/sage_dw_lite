@@ -1,0 +1,73 @@
+####################################################################################################################
+# COLUMN names and types
+# Depends on:
+# - contacts.csv
+# - departments.csv
+####################################################################################################################
+id: string
+name: string (the name of the employee; usually in the format "First Last")
+department_id: string (the department the employee belongs to; must match the department name defined in Odoo or be included in the CSV file before any employee that references it)
+private_street: string (the street address of the employee's residence)
+private_city: string (the city of the employee's residence)
+private_state_id: string (the state of the employee's residence; this can either be the full name of the state or the state abbreviation as defined in Odoo)
+private_country: string (the country of the employee's residence; this can either be the full name of the country or the country abbreviation as defined in Odoo)
+private_zip: string (the ZIP code of the employee's residence)
+private_phone: string (the phone number of the employee's residence)
+private_email: string (the email address of the employee's residence)
+gender: string (one of ["male", "female", "other"])
+birthday: date (the birthdate of the employee in the format YYYY-MM-DD)
+work_email: string (the employee's work email address)
+work_phone: string (the employee's work phone number)
+mobile_phone: string (the employee's mobile phone number)
+job_id: string (the job position of the employee; must match the job name defined in Odoo or be included in the CSV file before any employee that references it)
+parent_id: string (the direct manager of the employee; should reference another employee's id)
+address_id: string (the address of the employee, typically linked to the company or the employee's residence; should reference a contact ID)
+####################################################################################################################
+columns:
+id,name,department_id,private_street,private_city,private_state_id,private_country,private_zip,private_phone,private_email,gender,birthday,work_email,work_phone,mobile_phone,job_id,parent_id,address_id
+
+
+
+in Sage, it appears jobs (actrec) contain the supervisors, and the employees are assigned to the job in Daily Payroll (dlypyr) / schedules the employee is assigned to for that job.
+
+Should employees have contact records??? (address_id)
+
+
+select recnum, pstnme from paypst
+
+
+SELECT 
+	employ.recnum as id,
+	CONCAT(
+		fstnme,
+		' ',
+		lstnme 
+	) as name,
+	'' as department_id,
+	CONCAT(
+		addrs1,
+		CASE WHEN ISNULL(addrs2,'') != '' THEN ' ' ELSE '' END,
+		addrs2
+	) as private_street,
+	ctynme as private_city,
+	state_ as private_state_id,
+	'us' as private_country,
+	zipcde as private_zip,
+	phnnum as private_phone,
+	e_mail as private_email,
+	CASE 
+		WHEN gender = 1 THEN 'male'
+		WHEN gender = 2 THEN 'female'
+		ELSE 'other'
+	END as gender,
+	dtebth as birthday,
+	'' as work_email,
+	phnnum as work_phone,
+	cllphn as mobile_phone,
+	paypst as job_id,
+	'' as parent_id,
+	'' as address_id,
+	pstnme as position
+FROM employ
+LEFT JOIN paypst ON paypst.recnum = employ.paypst
+WHERE employ.status = 1
