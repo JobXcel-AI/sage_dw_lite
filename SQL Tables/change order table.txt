@@ -1,0 +1,28 @@
+SELECT 
+	c.recnum as change_order_id,
+	chgnum as change_order_number,
+	chgdte as change_order_date,
+	jobnum as job_number,
+	a.jobnme as job_name,
+	c.phsnum as job_phase_number,
+	CASE c.status
+		WHEN 1 THEN 'Approved'
+		WHEN 2 THEN 'Open'
+		WHEN 3 THEN 'Review'
+		WHEN 4 THEN 'Disputed'
+		WHEN 5 THEN 'Void'
+		WHen 6 THEN 'Rejected'
+	END as status,
+	dscrpt as change_order_description,
+	ct.typnme as change_type,
+	reason,
+	subdte as submitted_date,
+	aprdte as approved_date,
+	invdte as invoice_date,
+	c.pchord as purchase_order_number,
+	reqamt as requested_amount,
+	appamt as approved_amount
+FROM prmchg c
+LEFT JOIN actrec a on a.recnum = c.jobnum
+--LEFT JOIN jobphs jp on jp.phsnum = c.phsnum
+LEFT JOIN chgtyp ct on ct.recnum = c.chgtyp
