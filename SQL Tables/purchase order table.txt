@@ -1,0 +1,35 @@
+SELECT
+	p.recnum as purchase_order_id,
+	ordnum as purchase_order_number,
+	p.dscrpt as purchase_order_description,
+	orddte as purchase_order_date,
+	deldte as delivery_date,
+	p.ordtyp,
+	CASE
+		WHEN p.status = 1 THEN 'Open'
+		WHEN p.status = 2 THEN 'Review'
+		WHEN p.status = 3 THEN 'Dispute'
+		WHEN p.status = 4 THEN 'Closed'
+		WHEN p.status = 5 THEN 'Void'
+		WHEN p.status = 6 THEN 'Master'
+	END as purchase_order_status,
+	e.eqpnme as equipment,
+	p.rcvdte as received,
+	p.currnt as 'current',
+	p.cancel as canceled,
+	p.subttl as subtotal,
+	p.slstax as sales_tax,
+	p.pchttl as total,
+	p.pchbal as balance,
+	p.jobnum as job_number,
+	CASE WHEN p.hotlst = 0 THEN 'FALSE' ELSE 'TRUE' END as hot_list,
+	a.recnum as vendor_id,
+	a.vndnme as vendor_name,
+	a.actnum as vendor_account_number,
+	vt.typnme as vendor_type,
+	a.e_mail as vendor_email,
+	a.phnnum as vendor_phone_number
+FROM pchord p
+LEFT JOIN actpay a on a.recnum = p.vndnum
+LEFT JOIN vndtyp vt on vt.recnum = a.vndtyp
+LEFT JOIN eqpmnt e on e.recnum = p.eqpmnt

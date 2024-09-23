@@ -1,0 +1,24 @@
+SELECT 
+	j.recnum as job_id,
+	jobnum as job_number,
+	cd.cdenme as job_cost_code,
+	ct.typnme as cost_type,
+	j.wrkord as work_order_number,
+	trnnum as transaction_number,
+	dscrpt as job_cost_description,
+	s.srcnme as job_cost_source,
+	v.recnum as vendor_id,
+	v.vndnme as vendor,
+	csthrs as cost_in_hours,
+	cstamt as cost_amount,
+	j.blgqty as billing_quantity,
+	j.blgamt as billing_amount,
+	CASE j.status
+		WHEN 1 THEN 'Open'
+		WHEN 2 THEN 'Void'
+	END as job_cost_status
+FROM jobcst j
+LEFT JOIN csttyp ct on ct.recnum = j.csttyp
+LEFT JOIN source s on s.recnum = j.srcnum
+LEFT JOIN cstcde cd on cd.recnum = j.cstcde
+LEFT JOIN actpay v on v.recnum = j.vndnum

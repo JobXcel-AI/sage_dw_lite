@@ -1,0 +1,93 @@
+SELECT
+	job as 'Job # and Job Name',
+	Client,
+	Job_Type as 'Job Type',
+	Contract_Amount as 'Contract Amount',
+	Payments,
+	Final_Payment_Date as 'Final Payment Date',
+	Sales_Tax as 'Sales_Tax',
+	Direct_Materials as 'Direct Materials',
+	Direct_Labor_Costs as 'Direct Labor Costs',
+	Profit,
+	Margin,
+	Commission,
+	Sales_Commission,
+	Senior_Sales_Associate as 'Senior Sales Associate',
+	Assisting_Sales_Associate as 'Assisting Sales Associate'
+FROM (
+	SELECT 
+		job,
+		Client,
+		Job_Type,
+		Contract_Amount,
+		Payments,
+		Final_Payment_Date,
+		Sales_Tax,
+		Direct_Materials,
+		Direct_Labor_Costs,
+		Profit,
+		Profit / (Contract_Amount - Sales_Tax) as Margin,
+		CASE 
+			WHEN Profit / (Contract_Amount - Sales_Tax) < .15 THEN 0
+			WHEN Profit / (Contract_Amount - Sales_Tax) > .6 THEN .06
+			ELSE (Profit / (Contract_Amount - Sales_Tax)) * .1
+		END as Commission,
+		(Contract_Amount - Sales_Tax) * 
+		CASE 
+			WHEN Profit / (Contract_Amount - Sales_Tax) < .15 THEN 0
+			WHEN Profit / (Contract_Amount - Sales_Tax) > .6 THEN .06
+			ELSE (Profit / (Contract_Amount - Sales_Tax)) * .1
+		END as Sales_Commission,
+		Senior_Sales_Associate,
+		Assisting_Sales_Associate
+	FROM (
+		select 
+			CONCAT(a.recnum, ' - ', a.jobnme) as job,
+			r.clnnme as Client,
+			j.typnme as Job_Type,
+			i.invttl as Contract_Amount,
+			i.amtpad as Payments,
+			a.lenrls as Final_Payment_Date,
+			i.slstax as Sales_Tax,
+			ISNULL(p.materials,0) as Direct_Materials,
+			ISNULL(l.labor,0) as Direct_Labor_Costs,
+			i.invttl - i.slstax - ISNULL(p.materials,0) - ISNULL(l.labor,0)  as Profit,
+			CONCAT(es.fstnme, ' ', es.lstnme) as Assisting_Sales_Associate,
+			CONCAT(e.fstnme, ' ', e.lstnme) as Senior_Sales_Associate
+		from actrec a
+		left join jobtyp j on j.recnum = a.jobtyp
+		left join reccln r on r.recnum = a.clnnum
+		left join employ es on es.recnum = a.sprvsr 
+		left join employ e on e.recnum = a.slsemp
+		left join (
+			SELECT 
+				jobnum, 
+				SUM(rcvdte) as Materials
+			FROM pchord
+			GROUP BY jobnum
+		) p on p.jobnum = a.recnum
+		inner join (
+			SELECT 
+				jobnum,
+				SUM(invttl) as invttl,
+				SUM(amtpad) as amtpad,
+				SUM(slstax) as slstax
+			FROM acrinv 
+			WHERE 
+				invtyp = 1
+				AND taxdst IS NOT NULL
+			GROUP BY jobnum
+		) as i on a.recnum = i.jobnum
+		left join (
+			select jobnum, sum(cstamt) * 2.6 as labor
+			from jobcst j 
+			left join csttyp c on c.recnum = j.csttyp
+			where csttyp = 2
+			group by jobnum
+		) l on l.jobnum = a.recnum
+		WHERE a.status = 6
+			AND DATEPART(YEAR,a.lenrls) = 2024
+			AND DATEPART(MONTH,a.lenrls) = 6
+	) q
+) q2
+ORDER BY job

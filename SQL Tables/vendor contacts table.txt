@@ -1,0 +1,23 @@
+SELECT
+	c.cntnme as contact_name,
+	c.e_mail as contact_email,
+	c.phnnum as contact_phone,
+	c.jobttl as job_title,
+	act.recnum as vendor_id,
+	act.vndnme as vendor_name,
+	vt.typnme as vendor_type,
+	act.addrs1 as address1,
+	act.addrs2 as address2,
+	act.zipcde as zip,
+	act.ctynme as city,
+	act.state_ as state,
+	act.actnum as vendor_account_number,
+	act.resnum as vendor_resale_number,
+	act.licnum as vendor_license_number,
+	cst.cdenme as cost_code,
+	ct.typnme as cost_type
+FROM actpay AS act 
+INNER JOIN vndcnt AS c ON act.recnum = c.recnum
+LEFT JOIN cstcde cst on cst.recnum = act.cdedft
+LEFT JOIN csttyp ct on ct.recnum = act.typdft
+LEFT JOIN vndtyp vt on vt.recnum = act.vndtyp
