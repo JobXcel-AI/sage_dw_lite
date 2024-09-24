@@ -1,3 +1,4 @@
+
 SELECT 
 	a.recnum as job_number,
 	a.jobnme as job_name,
@@ -25,6 +26,11 @@ SELECT
 	acrinv.invttl as ar_invoice_invoice_total,
 	acrinv.slstax as ar_invoice_sales_tax,
 	acrinv.amtpad as ar_invoice_amount_paid,
+	CASE acrinv.invtyp 
+		WHEN 1 THEN 'Contract'
+		WHEN 2 THEN 'Memo'
+		ELSE 'Other'
+	END as ar_invoice_type,
 	r.clnnme as client_name,
 	CONCAT(es.fstnme, ' ', es.lstnme) as job_supervisor,
 	CONCAT(e.fstnme, ' ', e.lstnme) as job_salesperson

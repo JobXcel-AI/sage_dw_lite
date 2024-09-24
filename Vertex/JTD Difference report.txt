@@ -1,0 +1,77 @@
+SELECT 
+	j.recnum as job_id,
+	j.jobnum as job_number,
+	ar.jobnme as job_name,
+	CASE ar.status 
+		WHEN 1 THEN 'Bid'
+		WHEN 2 THEN 'Refused'
+		WHEN 3 THEN 'Contract'
+		WHEN 4 THEN 'Current'
+		WHEN 5 THEN 'Complete'
+		WHEN 6 THEN 'Closed'
+	END as job_status,
+	cd.cdenme as job_cost_code,
+	j.wrkord as work_order_number,
+	trnnum as transaction_number,
+	j.dscrpt as job_cost_description,
+	s.srcnme as job_cost_source,
+	v.recnum as vendor_id,
+	v.vndnme as vendor,
+	ct.typnme as cost_type,
+	csthrs as cost_in_hours,
+	cstamt as cost_amount,
+	CASE 
+		WHEN ct.typnme = 'Material' THEN cstamt 
+		ELSE 0 
+	END as material_cost,
+	CASE 
+		WHEN ct.typnme = 'Labor' THEN cstamt 
+		ELSE 0 
+	END as labor_cost,
+	CASE 
+		WHEN ct.typnme = 'Equipment' THEN cstamt 
+		ELSE 0 
+	END as equipment_cost,
+	CASE 
+		WHEN ct.typnme = 'Other' THEN cstamt 
+		ELSE 0 
+	END as other_cost,
+	j.blgqty as billing_quantity,
+	j.blgamt as billing_amount,
+	CASE j.status
+		WHEN 1 THEN 'Open'
+		WHEN 2 THEN 'Void'
+	END as job_cost_status,
+	ar.cntrct as original_contract_amount,
+	co.appamt as approved_changes,
+	co.appamt + ar.cntrct as current_contract,
+	i.invttl as billed_to_date,
+	co.ovhamt as change_order_overhead_amount,
+	i.invttl * .3 as current_contract_30_pct
+FROM jobcst j
+LEFT JOIN csttyp ct on ct.recnum = j.csttyp
+LEFT JOIN source s on s.recnum = j.srcnum
+LEFT JOIN cstcde cd on cd.recnum = j.cstcde
+LEFT JOIN actpay v on v.recnum = j.vndnum
+LEFT JOIN actrec ar on ar.recnum = j.jobnum
+LEFT JOIN (
+	SELECT 
+		jobnum,
+		SUM(appamt) as appamt,
+		SUM(ovhamt) as ovhamt,
+		SUM(estovh) as estovh
+	FROM prmchg
+	WHERE 
+		status = 1
+	GROUP BY jobnum
+) co on co.jobnum = j.jobnum
+LEFT JOIN (
+	SELECT 
+		jobnum,
+		SUM(invttl) as invttl
+	FROM acrinv 
+	WHERE 
+		status < 5 
+		AND invtyp = 1
+	GROUP BY jobnum
+) i on i.jobnum = j.jobnum
