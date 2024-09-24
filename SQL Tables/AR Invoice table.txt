@@ -1,4 +1,3 @@
-
 SELECT 
 	a.recnum as job_number,
 	a.jobnme as job_name,
@@ -11,19 +10,34 @@ SELECT
 	a.zipcde as job_zip_code,
 	j_t.dstnme as job_tax_district,
 	jt.typnme as job_type,
-	a.status as job_status,
+	CASE a.status 
+		WHEN 1 THEN 'Bid'
+		WHEN 2 THEN 'Refused'
+		WHEN 3 THEN 'Contract'
+		WHEN 4 THEN 'Current'
+		WHEN 5 THEN 'Complete'
+		WHEN 6 THEN 'Closed'
+		ELSE 'Other'
+	END as job_status,
 	acrinv.recnum as ar_invoice_id,
 	acrinv.invdte as ar_invoice_date,
 	acrinv.dscrpt as ar_invoice_description,
 	acrinv.invnum as ar_invoice_number,
-	acrinv.status as ar_invoice_status,
+	CASE acrinv.status 
+		WHEN 1 THEN 'Open'
+		WHEN 2 THEN 'Review'
+		WHEN 3 THEN 'Dispute'
+		WHEN 4 THEN 'Paid'
+		WHEN 5 THEN 'Void'
+		ELSE 'Other'
+	END as ar_invoice_status,
 	tax.dstnme as ar_invoice_tax_district,
 	te.entnme as tax_entity1,
 	te.taxrt1 as tax_entity1_rate,
 	te2.entnme as tax_entity2,
 	te2.taxrt1 as tax_entity2_rate,
 	acrinv.duedte as ar_invoice_due_date,
-	acrinv.invttl as ar_invoice_invoice_total,
+	acrinv.invttl as ar_invoice_total,
 	acrinv.slstax as ar_invoice_sales_tax,
 	acrinv.amtpad as ar_invoice_amount_paid,
 	CASE acrinv.invtyp 
@@ -34,13 +48,13 @@ SELECT
 	r.clnnme as client_name,
 	CONCAT(es.fstnme, ' ', es.lstnme) as job_supervisor,
 	CONCAT(e.fstnme, ' ', e.lstnme) as job_salesperson
-FROM actrec a
-INNER JOIN acrinv acrinv on acrinv.jobnum = a.recnum
-INNER JOIN taxdst tax on tax.recnum = acrinv.taxdst
-INNER JOIN taxdst j_t on j_t.recnum = a.slstax
-INNER JOIN jobtyp jt on jt.recnum = a.jobtyp
-LEFT JOIN reccln r on r.recnum = a.clnnum
-LEFT JOIN taxent te on te.recnum = tax.entty1
-LEFT JOIN taxent te2 on te2.recnum = tax.entty2
-LEFT JOIN employ es on es.recnum = a.sprvsr 
-LEFT JOIN employ e on e.recnum = a.slsemp
+FROM @Client_DB_Name.dbo.actrec a
+INNER JOIN @Client_DB_Name.dbo.acrinv acrinv on acrinv.jobnum = a.recnum
+INNER JOIN @Client_DB_Name.dbo.taxdst tax on tax.recnum = acrinv.taxdst
+INNER JOIN @Client_DB_Name.dbo.taxdst j_t on j_t.recnum = a.slstax
+INNER JOIN @Client_DB_Name.dbo.jobtyp jt on jt.recnum = a.jobtyp
+LEFT JOIN @Client_DB_Name.dbo.reccln r on r.recnum = a.clnnum
+LEFT JOIN @Client_DB_Name.dbo.taxent te on te.recnum = tax.entty1
+LEFT JOIN @Client_DB_Name.dbo.taxent te2 on te2.recnum = tax.entty2
+LEFT JOIN @Client_DB_Name.dbo.employ es on es.recnum = a.sprvsr 
+LEFT JOIN @Client_DB_Name.dbo.employ e on e.recnum = a.slsemp
