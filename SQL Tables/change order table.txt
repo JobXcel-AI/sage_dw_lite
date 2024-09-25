@@ -21,7 +21,8 @@ SELECT
 	invdte as invoice_date,
 	c.pchord as purchase_order_number,
 	reqamt as requested_amount,
-	appamt as approved_amount
+	appamt as approved_amount,
+	ovhamt as overhead_amount
 FROM prmchg c
 LEFT JOIN actrec a on a.recnum = c.jobnum
 --LEFT JOIN jobphs jp on jp.phsnum = c.phsnum
