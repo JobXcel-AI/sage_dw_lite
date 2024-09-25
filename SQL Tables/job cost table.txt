@@ -1,18 +1,44 @@
 SELECT 
 	j.recnum as job_id,
-	jobnum as job_number,
+	j.jobnum as job_number,
+	ar.jobnme as job_name,
+	CASE ar.status 
+		WHEN 1 THEN 'Bid'
+		WHEN 2 THEN 'Refused'
+		WHEN 3 THEN 'Contract'
+		WHEN 4 THEN 'Current'
+		WHEN 5 THEN 'Complete'
+		WHEN 6 THEN 'Closed'
+	END as job_status,
 	cd.cdenme as job_cost_code,
-	ct.typnme as cost_type,
 	j.wrkord as work_order_number,
 	trnnum as transaction_number,
-	dscrpt as job_cost_description,
+	j.dscrpt as job_cost_description,
 	s.srcnme as job_cost_source,
 	v.recnum as vendor_id,
 	v.vndnme as vendor,
+	ct.typnme as cost_type,
 	csthrs as cost_in_hours,
 	cstamt as cost_amount,
+	CASE 
+		WHEN ct.typnme = 'Material' THEN cstamt 
+		ELSE 0 
+	END as material_cost,
+	CASE 
+		WHEN ct.typnme = 'Labor' THEN cstamt 
+		ELSE 0 
+	END as labor_cost,
+	CASE 
+		WHEN ct.typnme = 'Equipment' THEN cstamt 
+		ELSE 0 
+	END as equipment_cost,
+	CASE 
+		WHEN ct.typnme = 'Other' THEN cstamt 
+		ELSE 0 
+	END as other_cost,
 	j.blgqty as billing_quantity,
 	j.blgamt as billing_amount,
+	j.ovhamt as overhead_amount,
 	CASE j.status
 		WHEN 1 THEN 'Open'
 		WHEN 2 THEN 'Void'
@@ -22,3 +48,5 @@ LEFT JOIN csttyp ct on ct.recnum = j.csttyp
 LEFT JOIN source s on s.recnum = j.srcnum
 LEFT JOIN cstcde cd on cd.recnum = j.cstcde
 LEFT JOIN actpay v on v.recnum = j.vndnum
+LEFT JOIN actrec ar on ar.recnum = j.jobnum
+

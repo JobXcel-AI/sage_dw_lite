@@ -4,7 +4,7 @@ SELECT
 	p.dscrpt as purchase_order_description,
 	orddte as purchase_order_date,
 	deldte as delivery_date,
-	p.ordtyp,
+	pt.typnme as purchase_order_type,
 	CASE
 		WHEN p.status = 1 THEN 'Open'
 		WHEN p.status = 2 THEN 'Review'
@@ -33,3 +33,4 @@ FROM pchord p
 LEFT JOIN actpay a on a.recnum = p.vndnum
 LEFT JOIN vndtyp vt on vt.recnum = a.vndtyp
 LEFT JOIN eqpmnt e on e.recnum = p.eqpmnt
+LEFT JOIN pchtyp pt on pt.recnum = p.ordtyp

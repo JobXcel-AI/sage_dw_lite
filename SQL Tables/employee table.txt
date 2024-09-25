@@ -21,8 +21,9 @@ SELECT
 	phnnum as phone_number,
 	e_mail as email,
 	p.pstnme as position,
-	p.dptmnt as department,
+	d.dptnme as department,
 	dtehre as hire_date,
 	dteina as date_inactive 
 FROM employ e
 LEFT JOIN paypst p ON p.recnum = e.paypst
+LEFT JOIN dptmnt d on d.recnum = p.dptmnt
