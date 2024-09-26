@@ -585,7 +585,8 @@ CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Jobs'), '(
 	material_cost DECIMAL(14,2),
 	labor_cost DECIMAL(14,2),
 	equipment_cost DECIMAL(14,2),
-	other_cost DECIMAL(14,2)
+	other_cost DECIMAL(14,2),
+	job_cost_overhead DECIMAL(14,2)
 )')
 
 EXECUTE sp_executesql @SqlCreateTableCommand
@@ -634,7 +635,8 @@ SELECT
 	jc.material_cost,
 	jc.labor_cost,
 	jc.equipment_cost,
-	jc.other_cost
+	jc.other_cost,
+	jc.overhead_amount as job_cost_overhead
 FROM ',QUOTENAME(@Client_DB_Name),'.dbo.actrec a
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.jobtyp j on j.recnum = a.jobtyp
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.reccln r on r.recnum = a.clnnum
@@ -658,7 +660,8 @@ LEFT JOIN (
 		SUM(CASE 
 			WHEN ct.typnme = ''Other'' THEN cstamt 
 			ELSE 0 
-		END) as other_cost
+		END) as other_cost,
+		SUM(jcst.ovhamt) as overhead_amount
 	FROM ',QUOTENAME(@Client_DB_Name),'.dbo.jobcst jcst
 	INNER JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.csttyp ct on ct.recnum = jcst.csttyp
 	WHERE jcst.status = 1
