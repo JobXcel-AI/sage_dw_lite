@@ -132,7 +132,6 @@ INNER JOIN (
 	FROM ',QUOTENAME(@Client_DB_Name),'.dbo.acrinv 
 	WHERE 
 		invtyp = 1
-		AND taxdst IS NOT NULL
 		GROUP BY jobnum
 ) as i on a.recnum = i.jobnum
 ')
