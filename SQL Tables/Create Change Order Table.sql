@@ -6,7 +6,7 @@ DECLARE @Reporting_DB_Name NVARCHAR(50) = QUOTENAME(CONCAT(@Client_DB_Name, ' Re
 --Sql Create Table Command
 DECLARE @SqlCreateTableCommand NVARCHAR(MAX);
 SET @SqlCreateTableCommand = CONCAT(N'
-CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Change Orders'), '(
+CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Change_Orders'), '(
 	change_order_id BIGINT,
 	change_order_number NVARCHAR(20),
 	change_order_date DATE,
@@ -31,7 +31,7 @@ EXECUTE sp_executesql @SqlCreateTableCommand
 --SQL data insertion Query
 DECLARE @SqlInsertCommand NVARCHAR(MAX);
 SET @SqlInsertCommand = CONCAT(N'
-INSERT INTO ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Change Orders'),' 
+INSERT INTO ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Change_Orders'),' 
 
 SELECT 
 	c.recnum as change_order_id,

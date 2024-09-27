@@ -6,7 +6,7 @@ DECLARE @Reporting_DB_Name NVARCHAR(50) = QUOTENAME(CONCAT(@Client_DB_Name, ' Re
 --Sql Create Table Command
 DECLARE @SqlCreateTableCommand NVARCHAR(MAX);
 SET @SqlCreateTableCommand = CONCAT(N'
-CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('AR Invoices'), '(
+CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('AR_Invoices'), '(
 	job_number BIGINT,
 	job_name NVARCHAR(75),
 	job_phone_number NVARCHAR(14),
@@ -44,7 +44,7 @@ EXECUTE sp_executesql @SqlCreateTableCommand
 --SQL data insertion Query
 DECLARE @SqlInsertCommand NVARCHAR(MAX);
 SET @SqlInsertCommand = CONCAT(N'
-INSERT INTO ',@Reporting_DB_Name,'.dbo.',QUOTENAME('AR Invoices'),' 
+INSERT INTO ',@Reporting_DB_Name,'.dbo.',QUOTENAME('AR_Invoices'),' 
 
 SELECT 
 	a.recnum as job_number,
@@ -111,7 +111,7 @@ EXECUTE sp_executesql @SqlInsertCommand
 
 
 SET @SqlCreateTableCommand = CONCAT(N'
-CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Change Orders'), '(
+CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Change_Orders'), '(
 	change_order_id BIGINT,
 	change_order_number NVARCHAR(20),
 	change_order_date DATE,
@@ -134,7 +134,7 @@ CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Change Orders'), '(
 EXECUTE sp_executesql @SqlCreateTableCommand
 
 SET @SqlInsertCommand = CONCAT(N'
-INSERT INTO ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Change Orders'),' 
+INSERT INTO ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Change_Orders'),' 
 
 SELECT 
 	c.recnum as change_order_id,
@@ -279,7 +279,7 @@ EXECUTE sp_executesql @SqlInsertCommand
 
 
 SET @SqlCreateTableCommand = CONCAT(N'
-CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Job Cost'), '(
+CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Job_Cost'), '(
 	job_id BIGINT,
 	job_number BIGINT,
 	job_name NVARCHAR(75),
@@ -307,7 +307,7 @@ CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Job Cost'), '(
 EXECUTE sp_executesql @SqlCreateTableCommand
 
 SET @SqlInsertCommand = CONCAT(N'
-INSERT INTO ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Job Cost'),' 
+INSERT INTO ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Job_Cost'),' 
 
 SELECT 
 	j.recnum as job_id,
@@ -365,7 +365,7 @@ EXECUTE sp_executesql @SqlInsertCommand
 
 
 SET @SqlCreateTableCommand = CONCAT(N'
-CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Ledger Accounts'), '(
+CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Ledger_Accounts'), '(
 	ledger_account_id BIGINT,
 	ledger_account NVARCHAR(50),
 	subsidary_type NVARCHAR(12),
@@ -380,7 +380,7 @@ CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Ledger Accounts'), '(
 EXECUTE sp_executesql @SqlCreateTableCommand
 
 SET @SqlInsertCommand = CONCAT(N'
-INSERT INTO ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Ledger Accounts'),' 
+INSERT INTO ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Ledger_Accounts'),' 
 
 SELECT 
 	a.recnum as ledger_account_id,
@@ -427,7 +427,7 @@ EXECUTE sp_executesql @SqlInsertCommand
 
 
 SET @SqlCreateTableCommand = CONCAT(N'
-CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Purchase Orders'), '(
+CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Purchase_Orders'), '(
 	purchase_order_id BIGINT,
 	purchase_order_number NVARCHAR(20),
 	purchase_order_description NVARCHAR(50),
@@ -456,7 +456,7 @@ CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Purchase Orders'), '(
 EXECUTE sp_executesql @SqlCreateTableCommand
 
 SET @SqlInsertCommand = CONCAT(N'
-INSERT INTO ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Purchase Orders'),' 
+INSERT INTO ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Purchase_Orders'),' 
 
 SELECT
 	p.recnum as purchase_order_id,
@@ -499,7 +499,7 @@ EXECUTE sp_executesql @SqlInsertCommand
 
 
 SET @SqlCreateTableCommand = CONCAT(N'
-CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Vendor Contacts'), '(
+CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Vendor_Contacts'), '(
 	contact_name NVARCHAR(50),
 	contact_email NVARCHAR(75),
 	contact_phone NVARCHAR(14),
@@ -522,7 +522,7 @@ CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Vendor Contacts'), '(
 EXECUTE sp_executesql @SqlCreateTableCommand
 
 SET @SqlInsertCommand = CONCAT(N'
-INSERT INTO ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Vendor Contacts'),' 
+INSERT INTO ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Vendor_Contacts'),' 
 
 SELECT
 	c.cntnme as contact_name,
