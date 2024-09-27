@@ -132,6 +132,7 @@ INNER JOIN (
 	FROM ',QUOTENAME(@Client_DB_Name),'.dbo.acrinv 
 	WHERE 
 		invtyp = 1
+		AND status != 5
 		GROUP BY jobnum
 ) as i on a.recnum = i.jobnum
 ')
