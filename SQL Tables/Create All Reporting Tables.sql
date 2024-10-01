@@ -779,6 +779,8 @@ CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Jobs'), '(
 	supervisor NVARCHAR(100),
 	salesperson_id BIGINT,
 	salesperson NVARCHAR(100),
+	estimator_id BIGINT,	
+	estimator NVARCHAR(100),
 	contact NVARCHAR(50),
 	address1 NVARCHAR(50),
 	address2 NVARCHAR(50),
@@ -798,7 +800,8 @@ CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Jobs'), '(
 	labor_cost DECIMAL(14,2),
 	equipment_cost DECIMAL(14,2),
 	other_cost DECIMAL(14,2),
-	job_cost_overhead DECIMAL(14,2)
+	job_cost_overhead DECIMAL(14,2),
+	change_order_approved_amount DECIMAL(14,2)
 )')
 
 EXECUTE sp_executesql @SqlCreateTableCommand
@@ -829,6 +832,8 @@ SELECT
 	CONCAT(es.fstnme, '' '', es.lstnme) as supervisor,
 	a.slsemp as salesperson_id,
 	CONCAT(e.fstnme, '' '', e.lstnme) as salesperson,
+	a.estemp as estimator_id,
+	CONCAT(est.fstnme, '' '', est.lstnme) as estimator,
 	a.contct as contact,
 	a.addrs1 as address1,
 	a.addrs2 as address2,
@@ -848,12 +853,14 @@ SELECT
 	jc.labor_cost,
 	jc.equipment_cost,
 	jc.other_cost,
-	jc.overhead_amount as job_cost_overhead
+	jc.overhead_amount as job_cost_overhead,
+	co.appamt as change_order_approved_amount
 FROM ',QUOTENAME(@Client_DB_Name),'.dbo.actrec a
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.jobtyp j on j.recnum = a.jobtyp
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.reccln r on r.recnum = a.clnnum
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.employ es on es.recnum = a.sprvsr 
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.employ e on e.recnum = a.slsemp
+LEFT JOIN ',QUOTENAME(@Client_DB_Name),N'.dbo.employ est on est.recnum = a.estemp
 LEFT JOIN (
 	SELECT
 		jobnum,
@@ -889,8 +896,19 @@ INNER JOIN (
 	WHERE 
 		invtyp = 1
 		AND status != 5
-		GROUP BY jobnum
+	GROUP BY jobnum
 ) as i on a.recnum = i.jobnum
+LEFT JOIN 
+(
+	SELECT 
+		jobnum,
+		sum(appamt) as appamt
+	FROM
+		',QUOTENAME(@Client_DB_Name),'.dbo.prmchg
+	WHERE
+		status < 5
+	GROUP BY jobnum
+) co on co.jobnum = j.recnum
 ')
 
 EXECUTE sp_executesql @SqlInsertCommand
