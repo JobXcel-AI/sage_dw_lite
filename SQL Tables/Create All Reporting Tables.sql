@@ -33,10 +33,15 @@ CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('AR_Invoices'), '(
 	ar_invoice_total DECIMAL(12,2),
 	ar_invoice_sales_tax DECIMAL(12,2),
 	ar_invoice_amount_paid DECIMAL(12,2),
+	ar_invoice_balance DECIMAL(14,2),
+	ar_invoice_retention DECIMAL(14,2),
 	ar_invoice_type NVARCHAR(8),
 	client_name NVARCHAR(75),
 	job_supervisor NVARCHAR(50),
-	job_salesperson NVARCHAR(50)
+	job_salesperson NVARCHAR(50),
+	ar_invoice_payments_payment_amount DECIMAL(14,2),
+	ar_invoice_payments_discount_taken DECIMAL(14,2),
+	ar_invoice_payments_credit_taken DECIMAL(14,2)
 )')
 
 EXECUTE sp_executesql @SqlCreateTableCommand
@@ -95,9 +100,21 @@ SELECT
 	END as ar_invoice_type,
 	r.clnnme as client_name,
 	CONCAT(es.fstnme, '' '', es.lstnme) as job_supervisor,
-	CONCAT(e.fstnme, '' '', e.lstnme) as job_salesperson
+	CONCAT(e.fstnme, '' '', e.lstnme) as job_salesperson,
+	pmt.amount as ar_invoice_payments_payment_amount,
+	pmt.dsctkn as ar_invoice_payments_discount_taken,
+	pmt.aplcrd as ar_invoice_payments_credit_taken
 FROM ',QUOTENAME(@Client_DB_Name),'.dbo.actrec a
 INNER JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.acrinv acrinv on acrinv.jobnum = a.recnum
+LEFT JOIN (
+	SELECT
+		recnum,
+		sum(amount) as amount,
+		sum(dsctkn) as dsctkn,
+		sum(aplcrd) as aplcrd
+	FROM ',QUOTENAME(@Client_DB_Name),'.dbo.acrpmt
+	GROUP BY recnum
+) pmt on pmt.recnum = acrinv.recnum
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.taxdst tax on tax.recnum = acrinv.taxdst
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.taxdst j_t on j_t.recnum = a.slstax
 INNER JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.jobtyp jt on jt.recnum = a.jobtyp
