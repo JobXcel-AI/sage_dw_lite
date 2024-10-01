@@ -801,7 +801,9 @@ CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Jobs'), '(
 	equipment_cost DECIMAL(14,2),
 	other_cost DECIMAL(14,2),
 	job_cost_overhead DECIMAL(14,2),
-	change_order_approved_amount DECIMAL(14,2)
+	change_order_approved_amount DECIMAL(14,2),
+	retention DECIMAL(14,2),
+	invoice_balance DECIMAL(14,2)
 )')
 
 EXECUTE sp_executesql @SqlCreateTableCommand
@@ -854,7 +856,9 @@ SELECT
 	jc.equipment_cost,
 	jc.other_cost,
 	jc.overhead_amount as job_cost_overhead,
-	co.appamt as change_order_approved_amount
+	co.appamt as change_order_approved_amount,
+	i.retain as retention,
+	i.invnet as invoice_balance
 FROM ',QUOTENAME(@Client_DB_Name),'.dbo.actrec a
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.jobtyp j on j.recnum = a.jobtyp
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.reccln r on r.recnum = a.clnnum
@@ -891,7 +895,9 @@ INNER JOIN (
 		jobnum,
 		SUM(invttl) as invttl,
 		SUM(amtpad) as amtpad,
-		SUM(slstax) as slstax
+		SUM(slstax) as slstax,
+		SUM(retain) as retain,
+		SUM(invnet) as invnet
 	FROM ',QUOTENAME(@Client_DB_Name),'.dbo.acrinv 
 	WHERE 
 		invtyp = 1
