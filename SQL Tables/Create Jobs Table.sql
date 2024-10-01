@@ -30,6 +30,7 @@ CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Jobs'), '(
 	state NVARCHAR(2),
 	zip_code NVARCHAR(10),
 	phone_number NVARCHAR(14),
+	job_contact_phone_number NVARCHAR(14),
 	bid_opening_date DATE,
 	plans_received_date DATE,
 	bid_completed_date DATE,
@@ -87,6 +88,7 @@ SELECT
 	a.state_ as state,
 	a.zipcde as zip_code,
 	a.phnnum as phone_number,
+	jctct.phnnum as job_contact_phone_number,
 	a.biddte as bid_opening_date,
 	a.plnrcv as plans_received_date,
 	a.actbid as bid_completed_date,
@@ -109,6 +111,13 @@ LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.reccln r on r.recnum = a.clnnum
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.employ es on es.recnum = a.sprvsr 
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.employ e on e.recnum = a.slsemp
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),N'.dbo.employ est on est.recnum = a.estemp
+LEFT JOIN (
+	SELECT
+		recnum,
+		phnnum
+	FROM ',QUOTENAME(@Client_DB_Name),N'.dbo.jobcnt 
+	WHERE linnum = 1
+) jctct on jctct.recnum = a.recnum
 LEFT JOIN (
 	SELECT
 		jobnum,
