@@ -102,7 +102,7 @@ SELECT
 	jc.equipment_cost,
 	jc.other_cost,
 	jc.overhead_amount as job_cost_overhead,
-	co.appamt as change_order_approved_amount,
+	ISNULL(co.appamt,0) as change_order_approved_amount,
 	i.retain as retention,
 	i.invnet as invoice_balance
 FROM ',QUOTENAME(@Client_DB_Name),'.dbo.actrec a
@@ -167,7 +167,7 @@ LEFT JOIN
 	WHERE
 		status < 5
 	GROUP BY jobnum
-) co on co.jobnum = j.recnum
+) co on co.jobnum = a.recnum
 ')
 
 EXECUTE sp_executesql @SqlInsertCommand
