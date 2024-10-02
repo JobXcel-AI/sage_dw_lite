@@ -29,7 +29,8 @@ CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Purchase_Orders'), '(
 	vendor_account_number NVARCHAR(30),
 	vendor_type NVARCHAR(50),
 	vendor_email NVARCHAR(75),
-	vendor_phone_number NVARCHAR(14)
+	vendor_phone_number NVARCHAR(14),
+	delivery_via NVARCHAR(30)
 )')
 
 EXECUTE sp_executesql @SqlCreateTableCommand
@@ -69,7 +70,8 @@ SELECT
 	a.actnum as vendor_account_number,
 	vt.typnme as vendor_type,
 	a.e_mail as vendor_email,
-	a.phnnum as vendor_phone_number
+	a.phnnum as vendor_phone_number,
+	p.delvia as delivery_via
 FROM ',QUOTENAME(@Client_DB_Name),'.dbo.pchord p
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.actpay a on a.recnum = p.vndnum
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.vndtyp vt on vt.recnum = a.vndtyp
