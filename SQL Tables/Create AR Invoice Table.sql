@@ -41,7 +41,8 @@ CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('AR_Invoices'), '(
 	job_salesperson NVARCHAR(50),
 	ar_invoice_payments_payment_amount DECIMAL(14,2),
 	ar_invoice_payments_discount_taken DECIMAL(14,2),
-	ar_invoice_payments_credit_taken DECIMAL(14,2)
+	ar_invoice_payments_credit_taken DECIMAL(14,2),
+	last_payment_received_date DATE
 )')
 
 EXECUTE sp_executesql @SqlCreateTableCommand
@@ -105,7 +106,8 @@ SELECT
 	CONCAT(e.fstnme, '' '', e.lstnme) as job_salesperson,
 	pmt.amount as ar_invoice_payments_payment_amount,
 	pmt.dsctkn as ar_invoice_payments_discount_taken,
-	pmt.aplcrd as ar_invoice_payments_credit_taken
+	pmt.aplcrd as ar_invoice_payments_credit_taken,
+	pmt.chkdte as last_payment_received_date
 FROM ',QUOTENAME(@Client_DB_Name),'.dbo.actrec a
 INNER JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.acrinv acrinv on acrinv.jobnum = a.recnum
 LEFT JOIN (
@@ -113,7 +115,8 @@ LEFT JOIN (
 		recnum,
 		sum(amount) as amount,
 		sum(dsctkn) as dsctkn,
-		sum(aplcrd) as aplcrd
+		sum(aplcrd) as aplcrd,
+		max(chkdte) as chkdte
 	FROM ',QUOTENAME(@Client_DB_Name),'.dbo.acrpmt
 	GROUP BY recnum
 ) pmt on pmt.recnum = acrinv.recnum

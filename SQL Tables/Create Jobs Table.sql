@@ -46,7 +46,9 @@ CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Jobs'), '(
 	job_cost_overhead DECIMAL(14,2),
 	change_order_approved_amount DECIMAL(14,2),
 	retention DECIMAL(14,2),
-	invoice_balance DECIMAL(14,2)
+	invoice_net_due DECIMAL(14,2),
+	invoice_balance DECIMAL(14,2),
+	last_payment_received_date DATE
 )')
 
 EXECUTE sp_executesql @SqlCreateTableCommand
@@ -104,7 +106,9 @@ SELECT
 	jc.overhead_amount as job_cost_overhead,
 	ISNULL(co.appamt,0) as change_order_approved_amount,
 	i.retain as retention,
-	i.invnet as invoice_balance
+	i.invnet as invoice_net_due,
+	i.invbal as invoice_balance,
+	i.chkdte as last_payment_received_date
 FROM ',QUOTENAME(@Client_DB_Name),'.dbo.actrec a
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.jobtyp j on j.recnum = a.jobtyp
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.reccln r on r.recnum = a.clnnum
@@ -146,12 +150,21 @@ LEFT JOIN (
 INNER JOIN (
 	SELECT 
 		jobnum,
-		SUM(invttl) as invttl,
-		SUM(amtpad) as amtpad,
-		SUM(slstax) as slstax,
-		SUM(retain) as retain,
-		SUM(invnet) as invnet
-	FROM ',QUOTENAME(@Client_DB_Name),'.dbo.acrinv 
+		SUM(acrinv.invttl) as invttl,
+		SUM(acrinv.amtpad) as amtpad,
+		SUM(acrinv.slstax) as slstax,
+		SUM(acrinv.retain) as retain,
+		SUM(acrinv.invnet) as invnet,
+		SUM(acrinv.invbal) as invbal,
+		MAX(payments.chkdte) as chkdte
+	FROM ',QUOTENAME(@Client_DB_Name),'.dbo.acrinv acrinv
+	LEFT JOIN (
+		SELECT
+			recnum,
+			MAX(chkdte) as chkdte
+		FROM ',QUOTENAME(@Client_DB_Name),'.dbo.acrpmt
+		GROUP BY recnum
+	) payments on payments.recnum = acrinv.recnum
 	WHERE 
 		invtyp = 1
 		AND status != 5
