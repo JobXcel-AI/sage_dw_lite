@@ -793,10 +793,10 @@ CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Jobs'), '(
 	client_id BIGINT,
 	client_name NVARCHAR(75),
 	job_type NVARCHAR(50),
-	contract_amount DECIMAL(14,2),
-	invoice_total DECIMAL(14,2),
-	invoice_amount_paid DECIMAL(14,2),
-	invoice_sales_tax DECIMAL(14,2),
+	contract_amount DECIMAL(14,2) DEFAULT 0,
+	invoice_total DECIMAL(14,2) DEFAULT 0,
+	invoice_amount_paid DECIMAL(14,2) DEFAULT 0,
+	invoice_sales_tax DECIMAL(14,2) DEFAULT 0,
 	supervisor_id BIGINT,
 	supervisor NVARCHAR(100),
 	salesperson_id BIGINT,
@@ -819,22 +819,30 @@ CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Jobs'), '(
 	project_start_date DATE,
 	project_complete_date DATE,
 	lien_release_date DATE,
-	material_cost DECIMAL(14,2),
-	labor_cost DECIMAL(14,2),
-	equipment_cost DECIMAL(14,2),
-	other_cost DECIMAL(14,2),
-	job_cost_overhead DECIMAL(14,2),
-	change_order_approved_amount DECIMAL(14,2),
-	retention DECIMAL(14,2),
-	invoice_net_due DECIMAL(14,2),
-	invoice_balance DECIMAL(14,2),
-	last_payment_received_date DATE
+	material_cost DECIMAL(14,2) DEFAULT 0,
+	labor_cost DECIMAL(14,2) DEFAULT 0,
+	equipment_cost DECIMAL(14,2) DEFAULT 0,
+	other_cost DECIMAL(14,2) DEFAULT 0,
+	job_cost_overhead DECIMAL(14,2) DEFAULT 0,
+	change_order_approved_amount DECIMAL(14,2) DEFAULT 0,
+	retention DECIMAL(14,2) DEFAULT 0,
+	invoice_net_due DECIMAL(14,2) DEFAULT 0,
+	invoice_balance DECIMAL(14,2) DEFAULT 0,
+	last_payment_received_date DATE,
+	takeoff_ext_cost_excl_labor DECIMAL(14,2) DEFAULT 0, 
+	takeoff_sales_tax_excl_labor DECIMAL(14,2) DEFAULT 0, 
+	takeoff_overhead_amount_excl_labor DECIMAL(14,2) DEFAULT 0, 
+	takeoff_profit_amount_excl_labor DECIMAL(14,2) DEFAULT 0, 
+	takeoff_ext_price_excl_labor DECIMAL(14,2) DEFAULT 0
 )')
 
 EXECUTE sp_executesql @SqlCreateTableCommand
 
-SET @SqlInsertCommand = CONCAT(N'
-INSERT INTO ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Jobs'), ' 
+--SQL data insertion Query
+DECLARE @SqlInsertCommand1 NVARCHAR(MAX);
+DECLARE @SqlInsertCommand2 NVARCHAR(MAX);
+SET @SqlInsertCommand1 = CONCAT(N'
+INSERT INTO ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Jobs_test'), ' 
 
 SELECT
 	a.recnum as job_number,	
@@ -886,7 +894,14 @@ SELECT
 	i.retain as retention,
 	i.invnet as invoice_net_due,
 	i.invbal as invoice_balance,
-	i.chkdte as last_payment_received_date
+	i.chkdte as last_payment_received_date,
+	tkof.ext_cost as takeoff_ext_cost_excl_labor, 
+	tkof.sales_tax as takeoff_sales_tax_excl_labor, 
+	tkof.overhead_amount as takeoff_overhead_amount_excl_labor, 
+	tkof.profit_amount as takeoff_profit_amount_excl_labor, 
+	tkof.ext_price as takeoff_ext_price_excl_labor 
+')
+SET @SqlInsertCommand2 = CONCAT(N'
 FROM ',QUOTENAME(@Client_DB_Name),'.dbo.actrec a
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.jobtyp j on j.recnum = a.jobtyp
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.reccln r on r.recnum = a.clnnum
@@ -897,7 +912,7 @@ LEFT JOIN (
 	SELECT
 		recnum,
 		phnnum
-	FROM ',QUOTENAME(@Client_DB_Name),M'.dbo.jobcnt 
+	FROM ',QUOTENAME(@Client_DB_Name),N'.dbo.jobcnt 
 	WHERE linnum = 1
 ) jctct on jctct.recnum = a.recnum
 LEFT JOIN (
@@ -925,14 +940,14 @@ LEFT JOIN (
 	WHERE jcst.status = 1
 	GROUP BY jobnum
 ) jc on jc.jobnum = a.recnum
-INNER JOIN (
+LEFT JOIN (
 	SELECT 
 		jobnum,
-		SUM(invttl) as invttl,
-		SUM(amtpad) as amtpad,
-		SUM(slstax) as slstax,
-		SUM(retain) as retain,
-		SUM(invnet) as invnet,
+		SUM(acrinv.invttl) as invttl,
+		SUM(acrinv.amtpad) as amtpad,
+		SUM(acrinv.slstax) as slstax,
+		SUM(acrinv.retain) as retain,
+		SUM(acrinv.invnet) as invnet,
 		SUM(acrinv.invbal) as invbal,
 		MAX(payments.chkdte) as chkdte
 	FROM ',QUOTENAME(@Client_DB_Name),'.dbo.acrinv acrinv
@@ -948,7 +963,6 @@ INNER JOIN (
 		AND status != 5
 	GROUP BY jobnum
 ) as i on a.recnum = i.jobnum
-
 LEFT JOIN 
 (
 	SELECT 
@@ -960,10 +974,22 @@ LEFT JOIN
 		status < 5
 	GROUP BY jobnum
 ) co on co.jobnum = a.recnum
+LEFT JOIN 
+(
+	SELECT 
+		recnum,
+		SUM(extttl) as ext_cost, 
+		SUM(slstax) as sales_tax, 
+		SUM(ovhamt) as overhead_amount, 
+		SUM(pftamt) as profit_amount, 
+		SUM(bidprc) as ext_price 
+	FROM tkflin 
+	WHERE prtdsc NOT LIKE ''%labor%''
+	GROUP BY recnum
+) tkof on tkof.recnum = a.recnum
 ')
-
+SET @SqlInsertCommand = @SqlInsertCommand1 + @SqlInsertCommand2
 EXECUTE sp_executesql @SqlInsertCommand
-
 
 
 SET @SqlCreateTableCommand = CONCAT(N'
