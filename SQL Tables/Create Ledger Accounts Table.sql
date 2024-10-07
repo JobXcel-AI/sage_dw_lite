@@ -270,7 +270,7 @@ LEFT JOIN (
 				lgract, actprd,	balnce,	budget,
 				CASE WHEN postyr = DATEPART(YEAR,GETDATE()) THEN 1 ELSE 0 END as current_year
 			FROM ',QUOTENAME(@Client_DB_Name),'.dbo.lgrbal 
-			WHERE DATEPART(YEAR,DATEADD(YEAR,-1,GETDATE())) >= postyr
+			WHERE DATEPART(YEAR,DATEADD(YEAR,-1,GETDATE())) <= postyr
 		) q1
 		GROUP BY lgract, current_year, actprd
 	) q2
