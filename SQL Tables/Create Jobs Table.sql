@@ -6,7 +6,7 @@ DECLARE @Reporting_DB_Name NVARCHAR(50) = QUOTENAME(CONCAT(@Client_DB_Name, ' Re
 --Sql Create Table Command
 DECLARE @SqlCreateTableCommand NVARCHAR(MAX);
 SET @SqlCreateTableCommand = CONCAT(N'
-CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Jobs_test'), '(
+CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Jobs'), '(
 	job_number BIGINT,	
 	job_name NVARCHAR(75),
 	job_status NVARCHAR(8),
@@ -62,7 +62,7 @@ EXECUTE sp_executesql @SqlCreateTableCommand
 DECLARE @SqlInsertCommand1 NVARCHAR(MAX);
 DECLARE @SqlInsertCommand2 NVARCHAR(MAX);
 SET @SqlInsertCommand1 = CONCAT(N'
-INSERT INTO ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Jobs_test'), ' 
+INSERT INTO ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Jobs'), ' 
 
 SELECT
 	a.recnum as job_number,	

@@ -842,7 +842,7 @@ EXECUTE sp_executesql @SqlCreateTableCommand
 DECLARE @SqlInsertCommand1 NVARCHAR(MAX);
 DECLARE @SqlInsertCommand2 NVARCHAR(MAX);
 SET @SqlInsertCommand1 = CONCAT(N'
-INSERT INTO ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Jobs_test'), ' 
+INSERT INTO ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Jobs'), ' 
 
 SELECT
 	a.recnum as job_number,	
