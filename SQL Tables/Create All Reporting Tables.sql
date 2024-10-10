@@ -1245,7 +1245,7 @@ CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Payroll_Records'), '(
 	comp_code BIGINT,
 	comp_type NVARCHAR(30),
 	payroll_type NVARCHAR(13),
-	payroll_status NVARCHAR(6),
+	payroll_status NVARCHAR(8),
 	regular_pay DECIMAL(9,2),
 	overtime_pay DECIMAL(9,2),
 	premium_pay DECIMAL(9,2),
@@ -1306,7 +1306,9 @@ SELECT
 	END as payroll_type,
 	CASE p.status
 		WHEN 1 THEN ''Open''
+		WHEN 2 THEN ''Computed''
 		WHEN 3 THEN ''Posted''
+		WHEN 5 THEN ''Void''
 		ELSE ''Other''
 	END as payroll_status,
 	p.regpay as regular_pay,
