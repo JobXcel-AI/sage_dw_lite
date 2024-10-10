@@ -12,6 +12,7 @@ CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Payroll_Records'), '(
 	employee_full_name NVARCHAR(100),
 	employee_status NVARCHAR(12),
 	check_number NVARCHAR(20),
+	check_date DATE,
 	period_start DATE,
 	period_end DATE,
 	regular_hours DECIMAL(9,4),
@@ -64,6 +65,7 @@ SELECT
 		WHEN 8 THEN ''Retired''
 	END as employee_status,
 	p.chknum as check_number,
+	p.chkdte as check_date,
 	p.strprd as period_start,
 	p.payprd as period_end,
 	p.reghrs as regular_hours,
