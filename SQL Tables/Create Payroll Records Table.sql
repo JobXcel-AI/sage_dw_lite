@@ -15,32 +15,35 @@ CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Payroll_Records'), '(
 	check_date DATE,
 	period_start DATE,
 	period_end DATE,
-	regular_hours DECIMAL(9,4),
-	overtime_hours DECIMAL(9,4),
-	premium_hours DECIMAL(9,4),
-	sick_hours DECIMAL(9,4),
-	vacation_hours DECIMAL(9,4),
-	holiday_hours DECIMAL(9,4),
-	total_hours DECIMAL(9,4),
-	comp_wage DECIMAL(9,2),
-	comp_gross DECIMAL(9,2),
+	regular_hours DECIMAL(9,4) DEFAULT 0,
+	overtime_hours DECIMAL(9,4) DEFAULT 0,
+	premium_hours DECIMAL(9,4) DEFAULT 0,
+	sick_hours DECIMAL(9,4) DEFAULT 0,
+	vacation_hours DECIMAL(9,4) DEFAULT 0,
+	holiday_hours DECIMAL(9,4) DEFAULT 0,
+	total_hours DECIMAL(9,4) DEFAULT 0,
+	comp_wage DECIMAL(9,2) DEFAULT 0,
+	comp_gross DECIMAL(9,2) DEFAULT 0,
 	comp_code BIGINT,
 	comp_type NVARCHAR(30),
 	payroll_type NVARCHAR(13),
 	payroll_status NVARCHAR(8),
-	regular_pay DECIMAL(9,2),
-	overtime_pay DECIMAL(9,2),
-	premium_pay DECIMAL(9,2),
-	sick_pay DECIMAL(9,2),
-	vacation_pay DECIMAL(9,2),
-	holiday_pay DECIMAL(9,2),
-	piece_pay DECIMAL(9,2),
-	per_diem DECIMAL(9,2),
-	misc_pay DECIMAL(9,2),
-	gross_pay DECIMAL(9,2),
-	deducts DECIMAL(9,2),
-	additions DECIMAL(9,2),
-	netpay DECIMAL(9,2)
+	regular_pay DECIMAL(9,2) DEFAULT 0,
+	overtime_pay DECIMAL(9,2) DEFAULT 0,
+	premium_pay DECIMAL(9,2) DEFAULT 0,
+	sick_pay DECIMAL(9,2) DEFAULT 0,
+	vacation_pay DECIMAL(9,2) DEFAULT 0,
+	holiday_pay DECIMAL(9,2) DEFAULT 0,
+	piece_pay DECIMAL(9,2) DEFAULT 0,
+	per_diem DECIMAL(9,2) DEFAULT 0,
+	misc_pay DECIMAL(9,2) DEFAULT 0,
+	gross_pay DECIMAL(9,2) DEFAULT 0,
+	deducts DECIMAL(9,2) DEFAULT 0,
+	additions DECIMAL(9,2) DEFAULT 0,
+	netpay DECIMAL(9,2) DEFAULT 0,
+	timecard_regular_hours DECIMAL(9,2) DEFAULT 0,
+	timecard_overtime_hours DECIMAL(9,2) DEFAULT 0,
+	timecard_premium_hours DECIMAL(9,2) DEFAULT 0
 )')
 
 EXECUTE sp_executesql @SqlCreateTableCommand
@@ -107,10 +110,23 @@ SELECT
 	p.grspay as gross_pay,
 	p.dedttl as deducts,
 	p.addttl as additions,
-	p.netpay as netpay
+	p.netpay as netpay,
+	tc.regular_hours as timecard_regular_hours,
+	tc.overtime_hours as timecard_overtime_hours,
+	tc.premium_hours as timecard_premium_hours
 FROM ',QUOTENAME(@Client_DB_Name),'.dbo.payrec p
 INNER JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.employ e on e.recnum = p.empnum
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.wkrcmp w on w.recnum = e.wrkcmp
+LEFT JOIN (
+	SELECT
+		recnum,
+		SUM(CASE WHEN paytyp = 1 THEN hrswrk ELSE 0 END) as regular_hours,
+		SUM(CASE WHEN paytyp = 2 THEN hrswrk ELSE 0 END) as overtime_hours,
+		SUM(CASE WHEN paytyp = 3 THEN hrswrk ELSE 0 END) as premium_hours
+	FROM tmcdln 
+	WHERE jobnum IS NOT NULL
+	GROUP BY recnum
+) tc on tc.recnum = p.recnum
 ')
 
 EXECUTE sp_executesql @SqlInsertCommand
