@@ -2,71 +2,22 @@
 DECLARE @Client_DB_Name NVARCHAR(50) = 'Nvision';  
 --Specify Reporting DB Name
 DECLARE @Reporting_DB_Name NVARCHAR(50) = QUOTENAME(CONCAT(@Client_DB_Name, ' Reporting'));
+--Initial variable declaration
+DECLARE @SqlInsertQuery NVARCHAR(MAX);
+DECLARE @SqlInsertQuery1 NVARCHAR(MAX);
+DECLARE @SqlInsertQuery2 NVARCHAR(MAX);
 
---Sql Create Table Command
-DECLARE @SqlCreateTableCommand NVARCHAR(MAX);
-SET @SqlCreateTableCommand = CONCAT(N'
-CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Jobs'), '(
-	job_number BIGINT,	
-	job_name NVARCHAR(75),
-	job_status NVARCHAR(8),
-	client_id BIGINT,
-	client_name NVARCHAR(75),
-	job_type NVARCHAR(50),
-	contract_amount DECIMAL(14,2) DEFAULT 0,
-	invoice_total DECIMAL(14,2) DEFAULT 0,
-	invoice_amount_paid DECIMAL(14,2) DEFAULT 0,
-	invoice_sales_tax DECIMAL(14,2) DEFAULT 0,
-	supervisor_id BIGINT,
-	supervisor NVARCHAR(100),
-	salesperson_id BIGINT,
-	salesperson NVARCHAR(100),
-	estimator_id BIGINT,	
-	estimator NVARCHAR(100),
-	contact NVARCHAR(50),
-	address1 NVARCHAR(50),
-	address2 NVARCHAR(50),
-	city NVARCHAR(50),
-	state NVARCHAR(2),
-	zip_code NVARCHAR(10),
-	phone_number NVARCHAR(14),
-	job_contact_phone_number NVARCHAR(14),
-	bid_opening_date DATE,
-	plans_received_date DATE,
-	bid_completed_date DATE,
-	contract_signed_date DATE,
-	pre_lien_filed_date DATE,
-	project_start_date DATE,
-	project_complete_date DATE,
-	lien_release_date DATE,
-	material_cost DECIMAL(14,2) DEFAULT 0,
-	labor_cost DECIMAL(14,2) DEFAULT 0,
-	equipment_cost DECIMAL(14,2) DEFAULT 0,
-	other_cost DECIMAL(14,2) DEFAULT 0,
-	job_cost_overhead DECIMAL(14,2) DEFAULT 0,
-	change_order_approved_amount DECIMAL(14,2) DEFAULT 0,
-	retention DECIMAL(14,2) DEFAULT 0,
-	invoice_net_due DECIMAL(14,2) DEFAULT 0,
-	invoice_balance DECIMAL(14,2) DEFAULT 0,
-	last_payment_received_date DATE,
-	takeoff_ext_cost_excl_labor DECIMAL(14,2) DEFAULT 0, 
-	takeoff_sales_tax_excl_labor DECIMAL(14,2) DEFAULT 0, 
-	takeoff_overhead_amount_excl_labor DECIMAL(14,2) DEFAULT 0, 
-	takeoff_profit_amount_excl_labor DECIMAL(14,2) DEFAULT 0, 
-	takeoff_ext_price_excl_labor DECIMAL(14,2) DEFAULT 0,
-	created_date DATE,
-	is_deleted BIT DEFAULT 0,
-	deleted_date DATE
-)')
-
-EXECUTE sp_executesql @SqlCreateTableCommand
-
---SQL data insertion Query
-DECLARE @SqlInsertCommand1 NVARCHAR(MAX);
-DECLARE @SqlInsertCommand2 NVARCHAR(MAX);
-SET @SqlInsertCommand1 = CONCAT(N'
-INSERT INTO ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Jobs'), ' 
-
+--Update Jobs Table
+SET @SqlInsertQuery1 = CONCAT(
+--Step 1. Temp table containing reporting table
+N'SELECT * INTO #TempTbl FROM ',@Reporting_DB_Name,N'.dbo.Jobs;
+SELECT * INTO #DeletedRecords FROM #TempTbl WHERE is_deleted = 1;
+DELETE FROM #TempTbl WHERE is_deleted = 1;
+ALTER TABLE #TempTbl
+DROP COLUMN IF EXISTS is_deleted, deleted_date;',
+--Step 2. delete existing reporting table data and replace with updated values
+'DELETE FROM ',@Reporting_DB_Name,N'.dbo.Jobs;
+INSERT INTO ',@Reporting_DB_Name,N'.dbo.Jobs
 SELECT
 	a.recnum as job_number,	
 	a.jobnme as job_name,
@@ -127,7 +78,7 @@ SELECT
 	0 as is_deleted,
 	null as deleted_date 
 ')
-SET @SqlInsertCommand2 = CONCAT(N'
+SET @SqlInsertQuery2 = CONCAT(N'
 FROM ',QUOTENAME(@Client_DB_Name),'.dbo.actrec a
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.jobtyp j on j.recnum = a.jobtyp
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.reccln r on r.recnum = a.clnnum
@@ -212,8 +163,16 @@ LEFT JOIN
 	FROM ',QUOTENAME(@Client_DB_Name),'.dbo.tkflin 
 	WHERE prtdsc NOT LIKE ''%labor%''
 	GROUP BY recnum
-) tkof on tkof.recnum = a.recnum
+) tkof on tkof.recnum = a.recnum;',
+--Step 3. Find any values in Temp Table not in Reporting Table, insert them as records flagged as deleted
+'INSERT INTO ',@Reporting_DB_Name,N'.dbo.Jobs
+SELECT *, 
+	1 as is_deleted,
+	GETDATE() as deleted_date
+FROM #TempTbl t 
+WHERE t.job_number NOT IN (SELECT job_number FROM ',@Reporting_DB_Name,N'.dbo.Jobs)
+UNION ALL 
+SELECT * FROM #DeletedRecords
 ')
-DECLARE @SqlInsertCommand NVARCHAR(MAX);
-SET @SqlInsertCommand = @SqlInsertCommand1 + @SqlInsertCommand2
-EXECUTE sp_executesql @SqlInsertCommand
+SET @SqlInsertQuery = @SqlInsertQuery1 + @SqlInsertQuery2
+EXECUTE sp_executesql @SqlInsertQuery
