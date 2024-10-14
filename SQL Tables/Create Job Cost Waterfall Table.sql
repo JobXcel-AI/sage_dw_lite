@@ -28,16 +28,16 @@ DECLARE @wf_table TABLE (
 INSERT INTO @wf_table 
 SELECT
 	a.recnum as job_number,	
-	a.cntrct as contract_amount,
-	i.invttl as invoice_total,
-	i.amtpad as invoice_amount_paid,
-	i.slstax * -1 as invoice_sales_tax,
-	jc.material_cost * -1 as material_cost,
-	jc.labor_cost * -1 as labor_cost,
-	jc.equipment_cost * -1 as equipment_cost,
-	jc.other_cost * -1 as other_cost,
-	jc.overhead_amount * -1 as overhead_cost,
-	c.appamt as approved_amount
+	ISNULL(a.cntrct,0) as contract_amount,
+	ISNULL(i.invttl,0) as invoice_total,
+	ISNULL(i.amtpad,0) as invoice_amount_paid,
+	ISNULL(i.slstax,0) * -1 as invoice_sales_tax,
+	ISNULL(jc.material_cost,0) * -1 as material_cost,
+	ISNULL(jc.labor_cost,0) * -1 as labor_cost,
+	ISNULL(jc.equipment_cost,0) * -1 as equipment_cost,
+	ISNULL(jc.other_cost,0) * -1 as other_cost,
+	ISNULL(jc.overhead_amount,0) * -1 as overhead_cost,
+	ISNULL(c.appamt,0) as approved_amount
 FROM ',QUOTENAME(@Client_DB_Name),'.dbo.actrec a
 LEFT JOIN (
 	SELECT

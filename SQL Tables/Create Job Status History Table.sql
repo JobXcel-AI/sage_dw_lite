@@ -102,9 +102,7 @@ SELECT
 	END as can_be_removed
 FROM @JobHistory 
 
-
 INSERT INTO ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Job_Status_History'), ' 
-
 SELECT DISTINCT
 	job_number,
 	job_status_number,

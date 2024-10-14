@@ -55,9 +55,9 @@ SELECT
 	aprdte as approved_date,
 	invdte as invoice_date,
 	c.pchord as purchase_order_number,
-	reqamt as requested_amount,
-	appamt as approved_amount,
-	ovhamt as overhead_amount
+	ISNULL(reqamt,0) as requested_amount,
+	ISNULL(appamt,0) as approved_amount,
+	ISNULL(ovhamt,0) as overhead_amount
 FROM ',QUOTENAME(@Client_DB_Name),'.dbo.prmchg c
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.actrec a on a.recnum = c.jobnum
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.chgtyp ct on ct.recnum = c.chgtyp')

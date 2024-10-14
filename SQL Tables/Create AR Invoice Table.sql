@@ -91,11 +91,11 @@ SELECT
 	te2.entnme as tax_entity2,
 	te2.taxrt1 as tax_entity2_rate,
 	acrinv.duedte as ar_invoice_due_date,
-	acrinv.invttl as ar_invoice_total,
-	acrinv.slstax as ar_invoice_sales_tax,
-	acrinv.amtpad as ar_invoice_amount_paid,
-	acrinv.invbal as ar_invoice_balance,
-	acrinv.retain as ar_invoice_retention,
+	ISNULL(acrinv.invttl,0) as ar_invoice_total,
+	ISNULL(acrinv.slstax,0) as ar_invoice_sales_tax,
+	ISNULL(acrinv.amtpad,0) as ar_invoice_amount_paid,
+	ISNULL(acrinv.invbal,0) as ar_invoice_balance,
+	ISNULL(acrinv.retain,0) as ar_invoice_retention,
 	CASE acrinv.invtyp 
 		WHEN 1 THEN ''Contract''
 		WHEN 2 THEN ''Memo''
@@ -104,9 +104,9 @@ SELECT
 	r.clnnme as client_name,
 	CONCAT(es.fstnme, '' '', es.lstnme) as job_supervisor,
 	CONCAT(e.fstnme, '' '', e.lstnme) as job_salesperson,
-	pmt.amount as ar_invoice_payments_payment_amount,
-	pmt.dsctkn as ar_invoice_payments_discount_taken,
-	pmt.aplcrd as ar_invoice_payments_credit_taken,
+	ISNULL(pmt.amount,0) as ar_invoice_payments_payment_amount,
+	ISNULL(pmt.dsctkn,0) as ar_invoice_payments_discount_taken,
+	ISNULL(pmt.aplcrd,0) as ar_invoice_payments_credit_taken,
 	pmt.chkdte as last_payment_received_date
 FROM ',QUOTENAME(@Client_DB_Name),'.dbo.actrec a
 INNER JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.acrinv acrinv on acrinv.jobnum = a.recnum

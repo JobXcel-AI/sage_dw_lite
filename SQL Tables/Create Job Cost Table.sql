@@ -58,27 +58,27 @@ SELECT
 	v.recnum as vendor_id,
 	v.vndnme as vendor,
 	ct.typnme as cost_type,
-	csthrs as cost_in_hours,
-	cstamt as cost_amount,
+	ISNULL(csthrs,0) as cost_in_hours,
+	ISNULL(cstamt,0) as cost_amount,
 	CASE 
-		WHEN ct.typnme = ''Material'' THEN cstamt 
+		WHEN ct.typnme = ''Material'' THEN ISNULL(cstamt,0)
 		ELSE 0 
 	END as material_cost,
 	CASE 
-		WHEN ct.typnme = ''Labor'' THEN cstamt 
+		WHEN ct.typnme = ''Labor'' THEN ISNULL(cstamt,0)
 		ELSE 0 
 	END as labor_cost,
 	CASE 
-		WHEN ct.typnme = ''Equipment'' THEN cstamt 
+		WHEN ct.typnme = ''Equipment'' THEN ISNULL(cstamt,0)
 		ELSE 0 
 	END as equipment_cost,
 	CASE 
-		WHEN ct.typnme = ''Other'' THEN cstamt 
+		WHEN ct.typnme = ''Other'' THEN ISNULL(cstamt,0)
 		ELSE 0 
 	END as other_cost,
-	j.blgqty as billing_quantity,
-	j.blgamt as billing_amount,
-	j.ovhamt as overhead_amount,
+	ISNULL(j.blgqty,0) as billing_quantity,
+	ISNULL(j.blgamt,0) as billing_amount,
+	ISNULL(j.ovhamt,0) as overhead_amount,
 	CASE j.status
 		WHEN 1 THEN ''Open''
 		WHEN 2 THEN ''Void''

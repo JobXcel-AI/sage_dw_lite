@@ -91,9 +91,11 @@ SELECT
 	te2.entnme as tax_entity2,
 	te2.taxrt1 as tax_entity2_rate,
 	acrinv.duedte as ar_invoice_due_date,
-	acrinv.invttl as ar_invoice_total,
-	acrinv.slstax as ar_invoice_sales_tax,
-	acrinv.amtpad as ar_invoice_amount_paid,
+	ISNULL(acrinv.invttl,0) as ar_invoice_total,
+	ISNULL(acrinv.slstax,0) as ar_invoice_sales_tax,
+	ISNULL(acrinv.amtpad,0) as ar_invoice_amount_paid,
+	ISNULL(acrinv.invbal,0) as ar_invoice_balance,
+	ISNULL(acrinv.retain,0) as ar_invoice_retention,
 	CASE acrinv.invtyp 
 		WHEN 1 THEN ''Contract''
 		WHEN 2 THEN ''Memo''
@@ -102,9 +104,9 @@ SELECT
 	r.clnnme as client_name,
 	CONCAT(es.fstnme, '' '', es.lstnme) as job_supervisor,
 	CONCAT(e.fstnme, '' '', e.lstnme) as job_salesperson,
-	pmt.amount as ar_invoice_payments_payment_amount,
-	pmt.dsctkn as ar_invoice_payments_discount_taken,
-	pmt.aplcrd as ar_invoice_payments_credit_taken,
+	ISNULL(pmt.amount,0) as ar_invoice_payments_payment_amount,
+	ISNULL(pmt.dsctkn,0) as ar_invoice_payments_discount_taken,
+	ISNULL(pmt.aplcrd,0) as ar_invoice_payments_credit_taken,
 	pmt.chkdte as last_payment_received_date
 FROM ',QUOTENAME(@Client_DB_Name),'.dbo.actrec a
 INNER JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.acrinv acrinv on acrinv.jobnum = a.recnum
@@ -128,6 +130,7 @@ LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.employ es on es.recnum = a.sprvsr
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.employ e on e.recnum = a.slsemp')
 
 EXECUTE sp_executesql @SqlInsertCommand
+
 
 
 SET @SqlCreateTableCommand = CONCAT(N'
@@ -178,14 +181,17 @@ SELECT
 	aprdte as approved_date,
 	invdte as invoice_date,
 	c.pchord as purchase_order_number,
-	reqamt as requested_amount,
-	appamt as approved_amount,
-	ovhamt as overhead_amount
+	ISNULL(reqamt,0) as requested_amount,
+	ISNULL(appamt,0) as approved_amount,
+	ISNULL(ovhamt,0) as overhead_amount
 FROM ',QUOTENAME(@Client_DB_Name),'.dbo.prmchg c
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.actrec a on a.recnum = c.jobnum
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.chgtyp ct on ct.recnum = c.chgtyp')
 
 EXECUTE sp_executesql @SqlInsertCommand
+
+
+
 
 SET @SqlCreateTableCommand = CONCAT(N'
 CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Employees'), '(
@@ -245,6 +251,7 @@ LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.dptmnt d ON d.recnum = p.dptmnt')
 EXECUTE sp_executesql @SqlInsertCommand
 
 
+
 SET @SqlCreateTableCommand = CONCAT(N'
 CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Inventory'), '(
 	part_number BIGINT,
@@ -274,8 +281,8 @@ SELECT
 	q.prtnum as part_number,
 	l.locnme as location,
 	dl.locnme as default_location,
-	q.qtyohn as quantity_on_hand,
-	q.qtyavl as quantity_available,
+	ISNULL(q.qtyohn,0) as quantity_on_hand,
+	ISNULL(q.qtyavl,0) as quantity_available,
 	p.prtnme as description,
 	p.prtunt as unit,
 	p.binnum as bin_number,
@@ -296,6 +303,7 @@ LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.csttyp ct on ct.recnum = p.csttyp
 ')
 
 EXECUTE sp_executesql @SqlInsertCommand
+
 
 
 SET @SqlCreateTableCommand = CONCAT(N'
@@ -349,27 +357,27 @@ SELECT
 	v.recnum as vendor_id,
 	v.vndnme as vendor,
 	ct.typnme as cost_type,
-	csthrs as cost_in_hours,
-	cstamt as cost_amount,
+	ISNULL(csthrs,0) as cost_in_hours,
+	ISNULL(cstamt,0) as cost_amount,
 	CASE 
-		WHEN ct.typnme = ''Material'' THEN cstamt 
+		WHEN ct.typnme = ''Material'' THEN ISNULL(cstamt,0)
 		ELSE 0 
 	END as material_cost,
 	CASE 
-		WHEN ct.typnme = ''Labor'' THEN cstamt 
+		WHEN ct.typnme = ''Labor'' THEN ISNULL(cstamt,0)
 		ELSE 0 
 	END as labor_cost,
 	CASE 
-		WHEN ct.typnme = ''Equipment'' THEN cstamt 
+		WHEN ct.typnme = ''Equipment'' THEN ISNULL(cstamt,0)
 		ELSE 0 
 	END as equipment_cost,
 	CASE 
-		WHEN ct.typnme = ''Other'' THEN cstamt 
+		WHEN ct.typnme = ''Other'' THEN ISNULL(cstamt,0)
 		ELSE 0 
 	END as other_cost,
-	j.blgqty as billing_quantity,
-	j.blgamt as billing_amount,
-	j.ovhamt as overhead_amount,
+	ISNULL(j.blgqty,0) as billing_quantity,
+	ISNULL(j.blgamt,0) as billing_amount,
+	ISNULL(j.ovhamt,0) as overhead_amount,
 	CASE j.status
 		WHEN 1 THEN ''Open''
 		WHEN 2 THEN ''Void''
@@ -382,6 +390,7 @@ LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.actpay v on v.recnum = j.vndnum
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.actrec ar on ar.recnum = j.jobnum')
 
 EXECUTE sp_executesql @SqlInsertCommand
+
 
 
 SET @SqlCreateTableCommand = CONCAT(N'
@@ -448,7 +457,9 @@ CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Ledger_Accounts'), '(
 
 EXECUTE sp_executesql @SqlCreateTableCommand
 
-SET @SqlInsertCommand = CONCAT(N'
+DECLARE @SqlInsertCommand1 NVARCHAR(MAX)
+DECLARE @SqlInsertCommand2 NVARCHAR(MAX)
+SET @SqlInsertCommand1 = CONCAT(N'
 INSERT INTO ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Ledger_Accounts'),' 
 
 SELECT 
@@ -542,54 +553,56 @@ LEFT JOIN ',QUOTENAME(@Client_DB_Name),N'.dbo.csttyp ct on ct.recnum = a.csttyp
 LEFT JOIN (
 	SELECT 
 		lgract,
-		SUM(CY_PD1_Balance) as CY_PD1_Balance,
-		SUM(CY_PD2_Balance) as CY_PD2_Balance,
-		SUM(CY_PD3_Balance) as CY_PD3_Balance,
-		SUM(CY_PD4_Balance) as CY_PD4_Balance,
-		SUM(CY_PD5_Balance) as CY_PD5_Balance,
-		SUM(CY_PD6_Balance) as CY_PD6_Balance,
-		SUM(CY_PD7_Balance) as CY_PD7_Balance,
-		SUM(CY_PD8_Balance) as CY_PD8_Balance,
-		SUM(CY_PD9_Balance) as CY_PD9_Balance,
-		SUM(CY_PD10_Balance) as CY_PD10_Balance,
-		SUM(CY_PD11_Balance) as CY_PD11_Balance,
-		SUM(CY_PD12_Balance) as CY_PD12_Balance,
-		SUM(PY_PD1_Balance) as PY_PD1_Balance,
-		SUM(PY_PD2_Balance) as PY_PD2_Balance,
-		SUM(PY_PD3_Balance) as PY_PD3_Balance,
-		SUM(PY_PD4_Balance) as PY_PD4_Balance,
-		SUM(PY_PD5_Balance) as PY_PD5_Balance,
-		SUM(PY_PD6_Balance) as PY_PD6_Balance,
-		SUM(PY_PD7_Balance) as PY_PD7_Balance,
-		SUM(PY_PD8_Balance) as PY_PD8_Balance,
-		SUM(PY_PD9_Balance) as PY_PD9_Balance,
-		SUM(PY_PD10_Balance) as PY_PD10_Balance,
-		SUM(PY_PD11_Balance) as PY_PD11_Balance,
-		SUM(PY_PD12_Balance) as PY_PD12_Balance,
-		SUM(CY_PD1_Budget) as CY_PD1_Budget,
-		SUM(CY_PD2_Budget) as CY_PD2_Budget,
-		SUM(CY_PD3_Budget) as CY_PD3_Budget,
-		SUM(CY_PD4_Budget) as CY_PD4_Budget,
-		SUM(CY_PD5_Budget) as CY_PD5_Budget,
-		SUM(CY_PD6_Budget) as CY_PD6_Budget,
-		SUM(CY_PD7_Budget) as CY_PD7_Budget,
-		SUM(CY_PD8_Budget) as CY_PD8_Budget,
-		SUM(CY_PD9_Budget) as CY_PD9_Budget,
-		SUM(CY_PD10_Budget) as CY_PD10_Budget,
-		SUM(CY_PD11_Budget) as CY_PD11_Budget,
-		SUM(CY_PD12_Budget) as CY_PD12_Budget,
-		SUM(PY_PD1_Budget) as PY_PD1_Budget,
-		SUM(PY_PD2_Budget) as PY_PD2_Budget,
-		SUM(PY_PD3_Budget) as PY_PD3_Budget,
-		SUM(PY_PD4_Budget) as PY_PD4_Budget,
-		SUM(PY_PD5_Budget) as PY_PD5_Budget,
-		SUM(PY_PD6_Budget) as PY_PD6_Budget,
-		SUM(PY_PD7_Budget) as PY_PD7_Budget,
-		SUM(PY_PD8_Budget) as PY_PD8_Budget,
-		SUM(PY_PD9_Budget) as PY_PD9_Budget,
-		SUM(PY_PD10_Budget) as PY_PD10_Budget,
-		SUM(PY_PD11_Budget) as PY_PD11_Budget,
-		SUM(PY_PD12_Budget) as PY_PD12_Budget
+		SUM(ISNULL(CY_PD1_Balance,0)) as CY_PD1_Balance,
+		SUM(ISNULL(CY_PD2_Balance,0)) as CY_PD2_Balance,
+		SUM(ISNULL(CY_PD3_Balance,0)) as CY_PD3_Balance,
+		SUM(ISNULL(CY_PD4_Balance,0)) as CY_PD4_Balance,
+		SUM(ISNULL(CY_PD5_Balance,0)) as CY_PD5_Balance,
+		SUM(ISNULL(CY_PD6_Balance,0)) as CY_PD6_Balance,
+		SUM(ISNULL(CY_PD7_Balance,0)) as CY_PD7_Balance,
+		SUM(ISNULL(CY_PD8_Balance,0)) as CY_PD8_Balance,
+		SUM(ISNULL(CY_PD9_Balance,0)) as CY_PD9_Balance,
+		SUM(ISNULL(CY_PD10_Balance,0)) as CY_PD10_Balance,
+		SUM(ISNULL(CY_PD11_Balance,0)) as CY_PD11_Balance,
+		SUM(ISNULL(CY_PD12_Balance,0)) as CY_PD12_Balance,
+		SUM(ISNULL(PY_PD1_Balance,0)) as PY_PD1_Balance,
+		SUM(ISNULL(PY_PD2_Balance,0)) as PY_PD2_Balance,
+		SUM(ISNULL(PY_PD3_Balance,0)) as PY_PD3_Balance,
+		SUM(ISNULL(PY_PD4_Balance,0)) as PY_PD4_Balance,
+		SUM(ISNULL(PY_PD5_Balance,0)) as PY_PD5_Balance,
+		SUM(ISNULL(PY_PD6_Balance,0)) as PY_PD6_Balance,
+		SUM(ISNULL(PY_PD7_Balance,0)) as PY_PD7_Balance,
+		SUM(ISNULL(PY_PD8_Balance,0)) as PY_PD8_Balance,
+		SUM(ISNULL(PY_PD9_Balance,0)) as PY_PD9_Balance,
+		SUM(ISNULL(PY_PD10_Balance,0)) as PY_PD10_Balance,
+		SUM(ISNULL(PY_PD11_Balance,0)) as PY_PD11_Balance,
+		SUM(ISNULL(PY_PD12_Balance,0)) as PY_PD12_Balance,
+		SUM(ISNULL(CY_PD1_Budget,0)) as CY_PD1_Budget,
+		SUM(ISNULL(CY_PD2_Budget,0)) as CY_PD2_Budget,
+		SUM(ISNULL(CY_PD3_Budget,0)) as CY_PD3_Budget,
+		SUM(ISNULL(CY_PD4_Budget,0)) as CY_PD4_Budget,
+		SUM(ISNULL(CY_PD5_Budget,0)) as CY_PD5_Budget,
+		SUM(ISNULL(CY_PD6_Budget,0)) as CY_PD6_Budget,
+		SUM(ISNULL(CY_PD7_Budget,0)) as CY_PD7_Budget,
+		SUM(ISNULL(CY_PD8_Budget,0)) as CY_PD8_Budget,
+		SUM(ISNULL(CY_PD9_Budget,0)) as CY_PD9_Budget,
+		SUM(ISNULL(CY_PD10_Budget,0)) as CY_PD10_Budget,
+		SUM(ISNULL(CY_PD11_Budget,0)) as CY_PD11_Budget,
+		SUM(ISNULL(CY_PD12_Budget,0)) as CY_PD12_Budget,
+		SUM(ISNULL(PY_PD1_Budget,0)) as PY_PD1_Budget,
+		SUM(ISNULL(PY_PD2_Budget,0)) as PY_PD2_Budget,
+		SUM(ISNULL(PY_PD3_Budget,0)) as PY_PD3_Budget,
+		SUM(ISNULL(PY_PD4_Budget,0)) as PY_PD4_Budget,
+		SUM(ISNULL(PY_PD5_Budget,0)) as PY_PD5_Budget,
+		SUM(ISNULL(PY_PD6_Budget,0)) as PY_PD6_Budget,
+		SUM(ISNULL(PY_PD7_Budget,0)) as PY_PD7_Budget,
+		SUM(ISNULL(PY_PD8_Budget,0)) as PY_PD8_Budget,
+		SUM(ISNULL(PY_PD9_Budget,0)) as PY_PD9_Budget,
+		SUM(ISNULL(PY_PD10_Budget,0)) as PY_PD10_Budget,
+		SUM(ISNULL(PY_PD11_Budget,0)) as PY_PD11_Budget,
+		SUM(ISNULL(PY_PD12_Budget,0)) as PY_PD12_Budget
+')
+SET @SqlInsertCommand2 = CONCAT(N'
 	FROM 
 	(
 		SELECT 
@@ -655,7 +668,9 @@ LEFT JOIN (
 	GROUP BY lgract
 ) ab on ab.lgract = a.recnum ')
 
+SET @SqlInsertCommand = @SqlInsertCommand1 + @SqlInsertCommand2
 EXECUTE sp_executesql @SqlInsertCommand
+
 
 
 SET @SqlCreateTableCommand = CONCAT(N'
@@ -707,13 +722,13 @@ SELECT
 		WHEN p.status = 6 THEN ''Master''
 	END as purchase_order_status,
 	e.eqpnme as equipment,
-	p.rcvdte as received,
-	p.currnt as current_value,
-	p.cancel as canceled,
-	p.subttl as subtotal,
-	p.slstax as sales_tax,
-	p.pchttl as total,
-	p.pchbal as balance,
+	ISNULL(p.rcvdte,0) as received,
+	ISNULL(p.currnt,0) as current_value,
+	ISNULL(p.cancel,0) as canceled,
+	ISNULL(p.subttl,0) as subtotal,
+	ISNULL(p.slstax,0) as sales_tax,
+	ISNULL(p.pchttl,0) as total,
+	ISNULL(p.pchbal,0) as balance,
 	p.jobnum as job_number,
 	p.hotlst as hot_list,
 	a.recnum as vendor_id,
@@ -730,6 +745,7 @@ LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.eqpmnt e on e.recnum = p.eqpmnt
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.pchtyp pt on pt.recnum = p.ordtyp')
 
 EXECUTE sp_executesql @SqlInsertCommand
+
 
 
 SET @SqlCreateTableCommand = CONCAT(N'
@@ -783,6 +799,7 @@ LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.csttyp ct on ct.recnum = act.typdft
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.vndtyp vt on vt.recnum = act.vndtyp')
 
 EXECUTE sp_executesql @SqlInsertCommand
+
 
 
 SET @SqlCreateTableCommand = CONCAT(N'
@@ -839,8 +856,6 @@ CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Jobs'), '(
 EXECUTE sp_executesql @SqlCreateTableCommand
 
 --SQL data insertion Query
-DECLARE @SqlInsertCommand1 NVARCHAR(MAX);
-DECLARE @SqlInsertCommand2 NVARCHAR(MAX);
 SET @SqlInsertCommand1 = CONCAT(N'
 INSERT INTO ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Jobs'), ' 
 
@@ -885,21 +900,21 @@ SELECT
 	a.sttdte as project_start_date,
 	a.cmpdte as project_complete_date,
 	a.lenrls as lien_release_date,
-	jc.material_cost,
-	jc.labor_cost,
-	jc.equipment_cost,
-	jc.other_cost,
-	jc.overhead_amount as job_cost_overhead,
+	ISNULL(jc.material_cost,0) as material_cost,
+	ISNULL(jc.labor_cost,0) as labor_cost,
+	ISNULL(jc.equipment_cost,0) as equipment_cost,
+	ISNULL(jc.other_cost,0) as other_cost,
+	ISNULL(jc.overhead_amount,0) as job_cost_overhead,
 	ISNULL(co.appamt,0) as change_order_approved_amount,
-	i.retain as retention,
-	i.invnet as invoice_net_due,
-	i.invbal as invoice_balance,
+	ISNULL(i.retain,0) as retention,
+	ISNULL(i.invnet,0) as invoice_net_due,
+	ISNULL(i.invbal,0) as invoice_balance,
 	i.chkdte as last_payment_received_date,
-	tkof.ext_cost as takeoff_ext_cost_excl_labor, 
-	tkof.sales_tax as takeoff_sales_tax_excl_labor, 
-	tkof.overhead_amount as takeoff_overhead_amount_excl_labor, 
-	tkof.profit_amount as takeoff_profit_amount_excl_labor, 
-	tkof.ext_price as takeoff_ext_price_excl_labor 
+	ISNULL(tkof.ext_cost,0) as takeoff_ext_cost_excl_labor, 
+	ISNULL(tkof.sales_tax,0) as takeoff_sales_tax_excl_labor, 
+	ISNULL(tkof.overhead_amount,0) as takeoff_overhead_amount_excl_labor, 
+	ISNULL(tkof.profit_amount,0) as takeoff_profit_amount_excl_labor, 
+	ISNULL(tkof.ext_price,0) as takeoff_ext_price_excl_labor 
 ')
 SET @SqlInsertCommand2 = CONCAT(N'
 FROM ',QUOTENAME(@Client_DB_Name),'.dbo.actrec a
@@ -992,6 +1007,7 @@ SET @SqlInsertCommand = @SqlInsertCommand1 + @SqlInsertCommand2
 EXECUTE sp_executesql @SqlInsertCommand
 
 
+
 SET @SqlCreateTableCommand = CONCAT(N'
 CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Job_Cost_Waterfall'), '(
 	job_number BIGINT,	
@@ -1015,16 +1031,16 @@ DECLARE @wf_table TABLE (
 INSERT INTO @wf_table 
 SELECT
 	a.recnum as job_number,	
-	a.cntrct as contract_amount,
-	i.invttl as invoice_total,
-	i.amtpad as invoice_amount_paid,
-	i.slstax * -1 as invoice_sales_tax,
-	jc.material_cost * -1 as material_cost,
-	jc.labor_cost * -1 as labor_cost,
-	jc.equipment_cost * -1 as equipment_cost,
-	jc.other_cost * -1 as other_cost,
-	jc.overhead_amount * -1 as overhead_cost,
-	c.appamt as approved_amount
+	ISNULL(a.cntrct,0) as contract_amount,
+	ISNULL(i.invttl,0) as invoice_total,
+	ISNULL(i.amtpad,0) as invoice_amount_paid,
+	ISNULL(i.slstax,0) * -1 as invoice_sales_tax,
+	ISNULL(jc.material_cost,0) * -1 as material_cost,
+	ISNULL(jc.labor_cost,0) * -1 as labor_cost,
+	ISNULL(jc.equipment_cost,0) * -1 as equipment_cost,
+	ISNULL(jc.other_cost,0) * -1 as other_cost,
+	ISNULL(jc.overhead_amount,0) * -1 as overhead_cost,
+	ISNULL(c.appamt,0) as approved_amount
 FROM ',QUOTENAME(@Client_DB_Name),'.dbo.actrec a
 LEFT JOIN (
 	SELECT
@@ -1182,15 +1198,15 @@ SELECT
 	lt.trnnum transaction_number,
 	lt.recnum ledger_transaction_id,
 	v.vndnme as vendor_name,
-	jobvar as job_variance,
-	eqpvar as equipment_variance,
-	wipvar as work_in_progress_variance,
-	dbtamt as debit_amount,
-	crdamt as credit_amount,
-	lt.chkamt as check_amount,
+	ISNULL(jobvar,0) as job_variance,
+	ISNULL(eqpvar,0) as equipment_variance,
+	ISNULL(wipvar,0) as work_in_progress_variance,
+	ISNULL(dbtamt,0) as debit_amount,
+	ISNULL(crdamt,0) as credit_amount,
+	ISNULL(lt.chkamt,0) as check_amount,
 	s.srcnme as source_name,
-	jc.cstamt as job_cost,
-	ec.cstamt as equip_cost,
+	ISNULL(jc.cstamt,0) as job_cost,
+	ISNULL(ec.cstamt,0) as equip_cost,
 	lt.trndte as transaction_date,
 	lt.pchord as purchase_order_number,
 	lt.entdte as entered_date,
@@ -1287,15 +1303,15 @@ SELECT
 	p.chkdte as check_date,
 	p.strprd as period_start,
 	p.payprd as period_end,
-	p.reghrs as regular_hours,
-	p.ovthrs as overtime_hours,
-	p.prmhrs as premium_hours,
-	p.sckhrs as sick_hours,
-	p.vachrs as vacation_hours,
-	p.holhrs as holiday_hours,
-	p.ttlhrs as total_hours,
-	p.cmpwge as comp_wage,
-	p.cmpgrs as comp_gross,
+	ISNULL(p.reghrs,0) as regular_hours,
+	ISNULL(p.ovthrs,0) as overtime_hours,
+	ISNULL(p.prmhrs,0) as premium_hours,
+	ISNULL(p.sckhrs,0) as sick_hours,
+	ISNULL(p.vachrs,0) as vacation_hours,
+	ISNULL(p.holhrs,0) as holiday_hours,
+	ISNULL(p.ttlhrs,0) as total_hours,
+	ISNULL(p.cmpwge,0) as comp_wage,
+	ISNULL(p.cmpgrs,0) as comp_gross,
 	e.wrkcmp as comp_code,
 	w.cdenme as comp_type,
 	CASE p.paytyp
@@ -1314,22 +1330,22 @@ SELECT
 		WHEN 5 THEN ''Void''
 		ELSE ''Other''
 	END as payroll_status,
-	p.regpay as regular_pay,
-	p.ovtpay as overtime_pay,
-	p.prmpay as premium_pay,
-	p.sckpay as sick_pay,
-	p.vacpay as vacation_pay,
-	p.holpay as holiday_pay,
-	p.pcerte as piece_pay,
-	p.perdim as per_diem,
-	p.mscpay as misc_pay,
-	p.grspay as gross_pay,
-	p.dedttl as deducts,
-	p.addttl as additions,
-	p.netpay as netpay,
-	tc.regular_hours as timecard_regular_hours,
-	tc.overtime_hours as timecard_overtime_hours,
-	tc.premium_hours as timecard_premium_hours
+	ISNULL(p.regpay,0) as regular_pay,
+	ISNULL(p.ovtpay,0) as overtime_pay,
+	ISNULL(p.prmpay,0) as premium_pay,
+	ISNULL(p.sckpay,0) as sick_pay,
+	ISNULL(p.vacpay,0) as vacation_pay,
+	ISNULL(p.holpay,0) as holiday_pay,
+	ISNULL(p.pcerte,0) as piece_pay,
+	ISNULL(p.perdim,0) as per_diem,
+	ISNULL(p.mscpay,0) as misc_pay,
+	ISNULL(p.grspay,0) as gross_pay,
+	ISNULL(p.dedttl,0) as deducts,
+	ISNULL(p.addttl,0) as additions,
+	ISNULL(p.netpay,0) as netpay,
+	ISNULL(tc.regular_hours,0) as timecard_regular_hours,
+	ISNULL(tc.overtime_hours,0) as timecard_overtime_hours,
+	ISNULL(tc.premium_hours,0) as timecard_premium_hours
 FROM ',QUOTENAME(@Client_DB_Name),'.dbo.payrec p
 INNER JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.employ e on e.recnum = p.empnum
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.wkrcmp w on w.recnum = e.wrkcmp
@@ -1446,9 +1462,7 @@ SELECT
 	END as can_be_removed
 FROM @JobHistory 
 
-
 INSERT INTO ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Job_Status_History'), ' 
-
 SELECT DISTINCT
 	job_number,
 	job_status_number,

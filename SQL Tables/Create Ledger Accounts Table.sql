@@ -70,7 +70,9 @@ EXECUTE sp_executesql @SqlCreateTableCommand
 
 --SQL data insertion Query
 DECLARE @SqlInsertCommand NVARCHAR(MAX);
-SET @SqlInsertCommand = CONCAT(N'
+DECLARE @SqlInsertCommand1 NVARCHAR(MAX)
+DECLARE @SqlInsertCommand2 NVARCHAR(MAX)
+SET @SqlInsertCommand1 = CONCAT(N'
 INSERT INTO ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Ledger_Accounts'),' 
 
 SELECT 
@@ -164,54 +166,56 @@ LEFT JOIN ',QUOTENAME(@Client_DB_Name),N'.dbo.csttyp ct on ct.recnum = a.csttyp
 LEFT JOIN (
 	SELECT 
 		lgract,
-		SUM(CY_PD1_Balance) as CY_PD1_Balance,
-		SUM(CY_PD2_Balance) as CY_PD2_Balance,
-		SUM(CY_PD3_Balance) as CY_PD3_Balance,
-		SUM(CY_PD4_Balance) as CY_PD4_Balance,
-		SUM(CY_PD5_Balance) as CY_PD5_Balance,
-		SUM(CY_PD6_Balance) as CY_PD6_Balance,
-		SUM(CY_PD7_Balance) as CY_PD7_Balance,
-		SUM(CY_PD8_Balance) as CY_PD8_Balance,
-		SUM(CY_PD9_Balance) as CY_PD9_Balance,
-		SUM(CY_PD10_Balance) as CY_PD10_Balance,
-		SUM(CY_PD11_Balance) as CY_PD11_Balance,
-		SUM(CY_PD12_Balance) as CY_PD12_Balance,
-		SUM(PY_PD1_Balance) as PY_PD1_Balance,
-		SUM(PY_PD2_Balance) as PY_PD2_Balance,
-		SUM(PY_PD3_Balance) as PY_PD3_Balance,
-		SUM(PY_PD4_Balance) as PY_PD4_Balance,
-		SUM(PY_PD5_Balance) as PY_PD5_Balance,
-		SUM(PY_PD6_Balance) as PY_PD6_Balance,
-		SUM(PY_PD7_Balance) as PY_PD7_Balance,
-		SUM(PY_PD8_Balance) as PY_PD8_Balance,
-		SUM(PY_PD9_Balance) as PY_PD9_Balance,
-		SUM(PY_PD10_Balance) as PY_PD10_Balance,
-		SUM(PY_PD11_Balance) as PY_PD11_Balance,
-		SUM(PY_PD12_Balance) as PY_PD12_Balance,
-		SUM(CY_PD1_Budget) as CY_PD1_Budget,
-		SUM(CY_PD2_Budget) as CY_PD2_Budget,
-		SUM(CY_PD3_Budget) as CY_PD3_Budget,
-		SUM(CY_PD4_Budget) as CY_PD4_Budget,
-		SUM(CY_PD5_Budget) as CY_PD5_Budget,
-		SUM(CY_PD6_Budget) as CY_PD6_Budget,
-		SUM(CY_PD7_Budget) as CY_PD7_Budget,
-		SUM(CY_PD8_Budget) as CY_PD8_Budget,
-		SUM(CY_PD9_Budget) as CY_PD9_Budget,
-		SUM(CY_PD10_Budget) as CY_PD10_Budget,
-		SUM(CY_PD11_Budget) as CY_PD11_Budget,
-		SUM(CY_PD12_Budget) as CY_PD12_Budget,
-		SUM(PY_PD1_Budget) as PY_PD1_Budget,
-		SUM(PY_PD2_Budget) as PY_PD2_Budget,
-		SUM(PY_PD3_Budget) as PY_PD3_Budget,
-		SUM(PY_PD4_Budget) as PY_PD4_Budget,
-		SUM(PY_PD5_Budget) as PY_PD5_Budget,
-		SUM(PY_PD6_Budget) as PY_PD6_Budget,
-		SUM(PY_PD7_Budget) as PY_PD7_Budget,
-		SUM(PY_PD8_Budget) as PY_PD8_Budget,
-		SUM(PY_PD9_Budget) as PY_PD9_Budget,
-		SUM(PY_PD10_Budget) as PY_PD10_Budget,
-		SUM(PY_PD11_Budget) as PY_PD11_Budget,
-		SUM(PY_PD12_Budget) as PY_PD12_Budget
+		SUM(ISNULL(CY_PD1_Balance,0)) as CY_PD1_Balance,
+		SUM(ISNULL(CY_PD2_Balance,0)) as CY_PD2_Balance,
+		SUM(ISNULL(CY_PD3_Balance,0)) as CY_PD3_Balance,
+		SUM(ISNULL(CY_PD4_Balance,0)) as CY_PD4_Balance,
+		SUM(ISNULL(CY_PD5_Balance,0)) as CY_PD5_Balance,
+		SUM(ISNULL(CY_PD6_Balance,0)) as CY_PD6_Balance,
+		SUM(ISNULL(CY_PD7_Balance,0)) as CY_PD7_Balance,
+		SUM(ISNULL(CY_PD8_Balance,0)) as CY_PD8_Balance,
+		SUM(ISNULL(CY_PD9_Balance,0)) as CY_PD9_Balance,
+		SUM(ISNULL(CY_PD10_Balance,0)) as CY_PD10_Balance,
+		SUM(ISNULL(CY_PD11_Balance,0)) as CY_PD11_Balance,
+		SUM(ISNULL(CY_PD12_Balance,0)) as CY_PD12_Balance,
+		SUM(ISNULL(PY_PD1_Balance,0)) as PY_PD1_Balance,
+		SUM(ISNULL(PY_PD2_Balance,0)) as PY_PD2_Balance,
+		SUM(ISNULL(PY_PD3_Balance,0)) as PY_PD3_Balance,
+		SUM(ISNULL(PY_PD4_Balance,0)) as PY_PD4_Balance,
+		SUM(ISNULL(PY_PD5_Balance,0)) as PY_PD5_Balance,
+		SUM(ISNULL(PY_PD6_Balance,0)) as PY_PD6_Balance,
+		SUM(ISNULL(PY_PD7_Balance,0)) as PY_PD7_Balance,
+		SUM(ISNULL(PY_PD8_Balance,0)) as PY_PD8_Balance,
+		SUM(ISNULL(PY_PD9_Balance,0)) as PY_PD9_Balance,
+		SUM(ISNULL(PY_PD10_Balance,0)) as PY_PD10_Balance,
+		SUM(ISNULL(PY_PD11_Balance,0)) as PY_PD11_Balance,
+		SUM(ISNULL(PY_PD12_Balance,0)) as PY_PD12_Balance,
+		SUM(ISNULL(CY_PD1_Budget,0)) as CY_PD1_Budget,
+		SUM(ISNULL(CY_PD2_Budget,0)) as CY_PD2_Budget,
+		SUM(ISNULL(CY_PD3_Budget,0)) as CY_PD3_Budget,
+		SUM(ISNULL(CY_PD4_Budget,0)) as CY_PD4_Budget,
+		SUM(ISNULL(CY_PD5_Budget,0)) as CY_PD5_Budget,
+		SUM(ISNULL(CY_PD6_Budget,0)) as CY_PD6_Budget,
+		SUM(ISNULL(CY_PD7_Budget,0)) as CY_PD7_Budget,
+		SUM(ISNULL(CY_PD8_Budget,0)) as CY_PD8_Budget,
+		SUM(ISNULL(CY_PD9_Budget,0)) as CY_PD9_Budget,
+		SUM(ISNULL(CY_PD10_Budget,0)) as CY_PD10_Budget,
+		SUM(ISNULL(CY_PD11_Budget,0)) as CY_PD11_Budget,
+		SUM(ISNULL(CY_PD12_Budget,0)) as CY_PD12_Budget,
+		SUM(ISNULL(PY_PD1_Budget,0)) as PY_PD1_Budget,
+		SUM(ISNULL(PY_PD2_Budget,0)) as PY_PD2_Budget,
+		SUM(ISNULL(PY_PD3_Budget,0)) as PY_PD3_Budget,
+		SUM(ISNULL(PY_PD4_Budget,0)) as PY_PD4_Budget,
+		SUM(ISNULL(PY_PD5_Budget,0)) as PY_PD5_Budget,
+		SUM(ISNULL(PY_PD6_Budget,0)) as PY_PD6_Budget,
+		SUM(ISNULL(PY_PD7_Budget,0)) as PY_PD7_Budget,
+		SUM(ISNULL(PY_PD8_Budget,0)) as PY_PD8_Budget,
+		SUM(ISNULL(PY_PD9_Budget,0)) as PY_PD9_Budget,
+		SUM(ISNULL(PY_PD10_Budget,0)) as PY_PD10_Budget,
+		SUM(ISNULL(PY_PD11_Budget,0)) as PY_PD11_Budget,
+		SUM(ISNULL(PY_PD12_Budget,0)) as PY_PD12_Budget
+')
+SET @SqlInsertCommand2 = CONCAT(N'
 	FROM 
 	(
 		SELECT 
@@ -277,4 +281,5 @@ LEFT JOIN (
 	GROUP BY lgract
 ) ab on ab.lgract = a.recnum ')
 
+SET @SqlInsertCommand = @SqlInsertCommand1 + @SqlInsertCommand2
 EXECUTE sp_executesql @SqlInsertCommand
