@@ -9,6 +9,8 @@ DECLARE @SqlInsertQuery NVARCHAR(MAX);
 SET @SqlInsertQuery = CONCAT(
 --Step 1. Temp table containing reporting table
 N'SELECT * INTO #TempTbl FROM ',@Reporting_DB_Name,N'.dbo.AR_Invoices;
+SELECT * INTO #DeletedRecords FROM #TempTbl WHERE is_deleted = 1;
+DELETE FROM #TempTbl WHERE is_deleted = 1;
 ALTER TABLE #TempTbl
 DROP COLUMN IF EXISTS is_deleted, deleted_date;',
 --Step 2. delete existing reporting table data and replace with updated values
@@ -100,5 +102,7 @@ SELECT *,
 	GETDATE() as deleted_date
 FROM #TempTbl t 
 WHERE t.job_number NOT IN (SELECT job_number FROM ',@Reporting_DB_Name,N'.dbo.AR_Invoices)
+UNION ALL 
+SELECT * FROM #DeletedRecords
 ')
 EXECUTE sp_executesql @SqlInsertQuery

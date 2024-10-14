@@ -22,6 +22,7 @@ CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Employees'), '(
 	position NVARCHAR(50),
 	department NVARCHAR(50),
 	hire_date DATE,
+	date_inactive DATE,
 	created_date DATE,
 	is_deleted BIT DEFAULT 0,
 	deleted_date DATE
