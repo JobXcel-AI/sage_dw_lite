@@ -28,7 +28,10 @@ CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Job_Cost'), '(
 	billing_quantity DECIMAL(7,2),
 	billing_amount DECIMAL(12,2),
 	overhead_amount DECIMAL(12,2),
-	job_cost_status NVARCHAR(4)
+	job_cost_status NVARCHAR(4),
+	created_date DATE,
+	is_deleted BIT DEFAULT 0,
+	deleted_date DATE
 )')
 
 EXECUTE sp_executesql @SqlCreateTableCommand
@@ -82,7 +85,10 @@ SELECT
 	CASE j.status
 		WHEN 1 THEN ''Open''
 		WHEN 2 THEN ''Void''
-	END as job_cost_status
+	END as job_cost_status,
+	j.insdte as created_date,
+	0 as is_deleted,
+	null as deleted_date
 FROM ',QUOTENAME(@Client_DB_Name),'.dbo.jobcst j
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.csttyp ct on ct.recnum = j.csttyp
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.source s on s.recnum = j.srcnum

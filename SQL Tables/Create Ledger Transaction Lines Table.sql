@@ -26,7 +26,10 @@ CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Ledger_Transaction_Lines'),
 	purchase_order_number NVARCHAR(20),
 	entered_date DATE,
 	month_id INT,
-	posting_year INT
+	posting_year INT,
+	created_date DATE,
+	is_deleted BIT DEFAULT 0,
+	deleted_date DATE
 )')
 
 EXECUTE sp_executesql @SqlCreateTableCommand
@@ -56,7 +59,10 @@ SELECT
 	lt.pchord as purchase_order_number,
 	lt.entdte as entered_date,
 	lt.actprd as month_id,
-	lt.postyr as posting_year
+	lt.postyr as posting_year,
+	lt.insdte as created_date,
+	0 as is_deleted,
+	null as deleted_date
 FROM ',QUOTENAME(@Client_DB_Name),'.dbo.lgrtrn lt
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.lgtnln ltl on lt.recnum = ltl.recnum
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.lgract la on la.recnum = ltl.lgract

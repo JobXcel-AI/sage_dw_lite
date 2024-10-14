@@ -22,7 +22,10 @@ CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Inventory'), '(
 	cost_code NVARCHAR(50),
 	cost_type NVARCHAR(30),
 	last_updated DATE,
-	part_notes NVARCHAR(MAX)
+	part_notes NVARCHAR(MAX),
+	created_date DATE,
+	is_deleted BIT DEFAULT 0,
+	deleted_date DATE
 )')
 
 EXECUTE sp_executesql @SqlCreateTableCommand
@@ -48,7 +51,10 @@ SELECT
 	cd.cdenme as cost_code,
 	ct.typnme as cost_type,
 	p.lstupd as last_updated,
-	p.ntetxt as part_notes
+	p.ntetxt as part_notes,
+	q.insdte as created_date,
+	0 as is_deleted,
+	null as deleted_date
 FROM ',QUOTENAME(@Client_DB_Name),'.dbo.invqty q
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.invloc l on l.recnum = q.locnum 
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.tkfprt p on p.recnum = q.prtnum

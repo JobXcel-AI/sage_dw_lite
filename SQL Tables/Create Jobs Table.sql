@@ -53,7 +53,10 @@ CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Jobs'), '(
 	takeoff_sales_tax_excl_labor DECIMAL(14,2) DEFAULT 0, 
 	takeoff_overhead_amount_excl_labor DECIMAL(14,2) DEFAULT 0, 
 	takeoff_profit_amount_excl_labor DECIMAL(14,2) DEFAULT 0, 
-	takeoff_ext_price_excl_labor DECIMAL(14,2) DEFAULT 0
+	takeoff_ext_price_excl_labor DECIMAL(14,2) DEFAULT 0,
+	created_date DATE,
+	is_deleted BIT DEFAULT 0,
+	deleted_date DATE
 )')
 
 EXECUTE sp_executesql @SqlCreateTableCommand
@@ -119,7 +122,10 @@ SELECT
 	ISNULL(tkof.sales_tax,0) as takeoff_sales_tax_excl_labor, 
 	ISNULL(tkof.overhead_amount,0) as takeoff_overhead_amount_excl_labor, 
 	ISNULL(tkof.profit_amount,0) as takeoff_profit_amount_excl_labor, 
-	ISNULL(tkof.ext_price,0) as takeoff_ext_price_excl_labor 
+	ISNULL(tkof.ext_price,0) as takeoff_ext_price_excl_labor,
+	a.insdte as created_date,
+	0 as is_deleted,
+	null as deleted_date 
 ')
 SET @SqlInsertCommand2 = CONCAT(N'
 FROM ',QUOTENAME(@Client_DB_Name),'.dbo.actrec a

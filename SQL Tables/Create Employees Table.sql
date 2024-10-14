@@ -22,7 +22,9 @@ CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Employees'), '(
 	position NVARCHAR(50),
 	department NVARCHAR(50),
 	hire_date DATE,
-	date_inactive DATE
+	created_date DATE,
+	is_deleted BIT DEFAULT 0,
+	deleted_date DATE
 )')
 
 EXECUTE sp_executesql @SqlCreateTableCommand
@@ -57,7 +59,10 @@ SELECT
 	p.pstnme as position,
 	d.dptnme as department,
 	dtehre as hire_date,
-	dteina as date_inactive 
+	dteina as date_inactive,
+	e.insdte as created_date,
+	0 as is_deleted,
+	null as deleted_date 
 FROM ',QUOTENAME(@Client_DB_Name),'.dbo.employ e
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.paypst p ON p.recnum = e.paypst
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.dptmnt d ON d.recnum = p.dptmnt')

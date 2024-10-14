@@ -43,7 +43,10 @@ CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Payroll_Records'), '(
 	netpay DECIMAL(9,2) DEFAULT 0,
 	timecard_regular_hours DECIMAL(9,2) DEFAULT 0,
 	timecard_overtime_hours DECIMAL(9,2) DEFAULT 0,
-	timecard_premium_hours DECIMAL(9,2) DEFAULT 0
+	timecard_premium_hours DECIMAL(9,2) DEFAULT 0,
+	created_date DATE,
+	is_deleted BIT DEFAULT 0,
+	deleted_date DATE
 )')
 
 EXECUTE sp_executesql @SqlCreateTableCommand
@@ -113,8 +116,10 @@ SELECT
 	ISNULL(p.netpay,0) as netpay,
 	ISNULL(tc.regular_hours,0) as timecard_regular_hours,
 	ISNULL(tc.overtime_hours,0) as timecard_overtime_hours,
-	ISNULL(tc.premium_hours,0) as timecard_premium_hours
-
+	ISNULL(tc.premium_hours,0) as timecard_premium_hours,
+	p.insdte as created_date,
+	0 as is_deleted,
+	null as deleted_date
 FROM ',QUOTENAME(@Client_DB_Name),'.dbo.payrec p
 INNER JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.employ e on e.recnum = p.empnum
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.wkrcmp w on w.recnum = e.wrkcmp

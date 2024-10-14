@@ -30,7 +30,10 @@ CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Purchase_Orders'), '(
 	vendor_type NVARCHAR(50),
 	vendor_email NVARCHAR(75),
 	vendor_phone_number NVARCHAR(14),
-	delivery_via NVARCHAR(30)
+	delivery_via NVARCHAR(30),
+	created_date DATE,
+	is_deleted BIT DEFAULT 0,
+	deleted_date DATE
 )')
 
 EXECUTE sp_executesql @SqlCreateTableCommand
@@ -71,7 +74,10 @@ SELECT
 	vt.typnme as vendor_type,
 	a.e_mail as vendor_email,
 	a.phnnum as vendor_phone_number,
-	p.delvia as delivery_via
+	p.delvia as delivery_via,
+	p.insdte as created_date,
+	0 as is_deleted,
+	null as deleted_date
 FROM ',QUOTENAME(@Client_DB_Name),'.dbo.pchord p
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.actpay a on a.recnum = p.vndnum
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.vndtyp vt on vt.recnum = a.vndtyp

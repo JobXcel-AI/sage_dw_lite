@@ -42,7 +42,10 @@ CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('AR_Invoices'), '(
 	ar_invoice_payments_payment_amount DECIMAL(14,2),
 	ar_invoice_payments_discount_taken DECIMAL(14,2),
 	ar_invoice_payments_credit_taken DECIMAL(14,2),
-	last_payment_received_date DATE
+	last_payment_received_date DATE,
+	created_date DATE,
+	is_deleted BIT DEFAULT 0,
+	deleted_date DATE
 )')
 
 EXECUTE sp_executesql @SqlCreateTableCommand
@@ -107,7 +110,10 @@ SELECT
 	ISNULL(pmt.amount,0) as ar_invoice_payments_payment_amount,
 	ISNULL(pmt.dsctkn,0) as ar_invoice_payments_discount_taken,
 	ISNULL(pmt.aplcrd,0) as ar_invoice_payments_credit_taken,
-	pmt.chkdte as last_payment_received_date
+	pmt.chkdte as last_payment_received_date,
+	a.insdte as created_date,
+	0 as is_deleted,
+	null as deleted_date
 FROM ',QUOTENAME(@Client_DB_Name),'.dbo.actrec a
 INNER JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.acrinv acrinv on acrinv.jobnum = a.recnum
 LEFT JOIN (
@@ -151,7 +157,10 @@ CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Change_Orders'), '(
 	purchase_order_number NVARCHAR(30),
 	requested_amount DECIMAL(12,2),
 	approved_amount DECIMAL(12,2),
-	overhead_amount DECIMAL(12,2)
+	overhead_amount DECIMAL(12,2),
+	created_date DATE,
+	is_deleted BIT DEFAULT 0,
+	deleted_date DATE
 )')
 
 EXECUTE sp_executesql @SqlCreateTableCommand
@@ -183,7 +192,10 @@ SELECT
 	c.pchord as purchase_order_number,
 	ISNULL(reqamt,0) as requested_amount,
 	ISNULL(appamt,0) as approved_amount,
-	ISNULL(ovhamt,0) as overhead_amount
+	ISNULL(ovhamt,0) as overhead_amount,
+	c.insdte as created_date,
+	0 as is_deleted,
+	null as deleted_date
 FROM ',QUOTENAME(@Client_DB_Name),'.dbo.prmchg c
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.actrec a on a.recnum = c.jobnum
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.chgtyp ct on ct.recnum = c.chgtyp')
@@ -210,7 +222,10 @@ CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Employees'), '(
 	position NVARCHAR(50),
 	department NVARCHAR(50),
 	hire_date DATE,
-	date_inactive DATE
+	date_inactive DATE,
+	created_date DATE,
+	is_deleted BIT DEFAULT 0,
+	deleted_date DATE
 )')
 
 EXECUTE sp_executesql @SqlCreateTableCommand
@@ -243,7 +258,10 @@ SELECT
 	p.pstnme as position,
 	d.dptnme as department,
 	dtehre as hire_date,
-	dteina as date_inactive 
+	dteina as date_inactive,
+	e.insdte as created_date,
+	0 as is_deleted,
+	null as deleted_date 
 FROM ',QUOTENAME(@Client_DB_Name),'.dbo.employ e
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.paypst p ON p.recnum = e.paypst
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.dptmnt d ON d.recnum = p.dptmnt')
@@ -269,7 +287,10 @@ CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Inventory'), '(
 	cost_code NVARCHAR(50),
 	cost_type NVARCHAR(30),
 	last_updated DATE,
-	part_notes NVARCHAR(MAX)
+	part_notes NVARCHAR(MAX),
+	created_date DATE,
+	is_deleted BIT DEFAULT 0,
+	deleted_date DATE
 )')
 
 EXECUTE sp_executesql @SqlCreateTableCommand
@@ -293,7 +314,10 @@ SELECT
 	cd.cdenme as cost_code,
 	ct.typnme as cost_type,
 	p.lstupd as last_updated,
-	p.ntetxt as part_notes
+	p.ntetxt as part_notes,
+	q.insdte as created_date,
+	0 as is_deleted,
+	null as deleted_date
 FROM ',QUOTENAME(@Client_DB_Name),'.dbo.invqty q
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.invloc l on l.recnum = q.locnum 
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.tkfprt p on p.recnum = q.prtnum
@@ -308,7 +332,7 @@ EXECUTE sp_executesql @SqlInsertCommand
 
 SET @SqlCreateTableCommand = CONCAT(N'
 CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Job_Cost'), '(
-	job_id BIGINT,
+	job_cost_id BIGINT,
 	job_number BIGINT,
 	job_name NVARCHAR(75),
 	job_status NVARCHAR(8),
@@ -329,7 +353,10 @@ CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Job_Cost'), '(
 	billing_quantity DECIMAL(7,2),
 	billing_amount DECIMAL(12,2),
 	overhead_amount DECIMAL(12,2),
-	job_cost_status NVARCHAR(4)
+	job_cost_status NVARCHAR(4),
+	created_date DATE,
+	is_deleted BIT DEFAULT 0,
+	deleted_date DATE
 )')
 
 EXECUTE sp_executesql @SqlCreateTableCommand
@@ -338,7 +365,7 @@ SET @SqlInsertCommand = CONCAT(N'
 INSERT INTO ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Job_Cost'),' 
 
 SELECT 
-	j.recnum as job_id,
+	j.recnum as job_cost_id,
 	j.jobnum as job_number,
 	ar.jobnme as job_name,
 	CASE ar.status 
@@ -381,7 +408,10 @@ SELECT
 	CASE j.status
 		WHEN 1 THEN ''Open''
 		WHEN 2 THEN ''Void''
-	END as job_cost_status
+	END as job_cost_status,
+	j.insdte as created_date,
+	0 as is_deleted,
+	null as deleted_date
 FROM ',QUOTENAME(@Client_DB_Name),'.dbo.jobcst j
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.csttyp ct on ct.recnum = j.csttyp
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.source s on s.recnum = j.srcnum
@@ -451,8 +481,10 @@ CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Ledger_Accounts'), '(
 	PY_PD9_Budget DECIMAL(14,2),
 	PY_PD10_Budget DECIMAL(14,2),
 	PY_PD11_Budget DECIMAL(14,2),
-	PY_PD12_Budget DECIMAL(14,2)
-
+	PY_PD12_Budget DECIMAL(14,2),
+	created_date DATE,
+	is_deleted BIT DEFAULT 0,
+	deleted_date DATE
 )')
 
 EXECUTE sp_executesql @SqlCreateTableCommand
@@ -546,7 +578,10 @@ SELECT
 	ab.PY_PD9_Budget,
 	ab.PY_PD10_Budget,
 	ab.PY_PD11_Budget,
-	ab.PY_PD12_Budget
+	ab.PY_PD12_Budget,
+	a.insdte as created_date,
+	0 as is_deleted,
+	null as deleted_date	
 FROM ',QUOTENAME(@Client_DB_Name),'.dbo.lgract a 
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.lgract pa on pa.recnum = a.sumact
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),N'.dbo.csttyp ct on ct.recnum = a.csttyp
@@ -698,7 +733,10 @@ CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Purchase_Orders'), '(
 	vendor_type NVARCHAR(50),
 	vendor_email NVARCHAR(75),
 	vendor_phone_number NVARCHAR(14),
-	delivery_via NVARCHAR(30)
+	delivery_via NVARCHAR(30),
+	created_date DATE,
+	is_deleted BIT DEFAULT 0,
+	deleted_date DATE
 )')
 
 EXECUTE sp_executesql @SqlCreateTableCommand
@@ -737,7 +775,10 @@ SELECT
 	vt.typnme as vendor_type,
 	a.e_mail as vendor_email,
 	a.phnnum as vendor_phone_number,
-	p.delvia as delivery_via
+	p.delvia as delivery_via,
+	p.insdte as created_date,
+	0 as is_deleted,
+	null as deleted_date
 FROM ',QUOTENAME(@Client_DB_Name),'.dbo.pchord p
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.actpay a on a.recnum = p.vndnum
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.vndtyp vt on vt.recnum = a.vndtyp
@@ -766,7 +807,10 @@ CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Vendor_Contacts'), '(
 	vendor_resale_number NVARCHAR(30),
 	vendor_license_number NVARCHAR(30),
 	cost_code NVARCHAR(50),
-	cost_type NVARCHAR(30)
+	cost_type NVARCHAR(30),
+	created_date DATE,
+	is_deleted BIT DEFAULT 0,
+	deleted_date DATE
 )')
 
 EXECUTE sp_executesql @SqlCreateTableCommand
@@ -791,7 +835,10 @@ SELECT
 	act.resnum as vendor_resale_number,
 	act.licnum as vendor_license_number,
 	cst.cdenme as cost_code,
-	ct.typnme as cost_type
+	ct.typnme as cost_type,
+	c.insdte as created_date,
+	0 as is_deleted,
+	null as deleted_date
 FROM ',QUOTENAME(@Client_DB_Name),'.dbo.actpay AS act 
 INNER JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.vndcnt AS c ON act.recnum = c.recnum
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.cstcde cst on cst.recnum = act.cdedft
@@ -850,7 +897,10 @@ CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Jobs'), '(
 	takeoff_sales_tax_excl_labor DECIMAL(14,2) DEFAULT 0, 
 	takeoff_overhead_amount_excl_labor DECIMAL(14,2) DEFAULT 0, 
 	takeoff_profit_amount_excl_labor DECIMAL(14,2) DEFAULT 0, 
-	takeoff_ext_price_excl_labor DECIMAL(14,2) DEFAULT 0
+	takeoff_ext_price_excl_labor DECIMAL(14,2) DEFAULT 0,
+	created_date DATE,
+	is_deleted BIT DEFAULT 0,
+	deleted_date DATE
 )')
 
 EXECUTE sp_executesql @SqlCreateTableCommand
@@ -914,7 +964,10 @@ SELECT
 	ISNULL(tkof.sales_tax,0) as takeoff_sales_tax_excl_labor, 
 	ISNULL(tkof.overhead_amount,0) as takeoff_overhead_amount_excl_labor, 
 	ISNULL(tkof.profit_amount,0) as takeoff_profit_amount_excl_labor, 
-	ISNULL(tkof.ext_price,0) as takeoff_ext_price_excl_labor 
+	ISNULL(tkof.ext_price,0) as takeoff_ext_price_excl_labor,
+	a.insdte as created_date,
+	0 as is_deleted,
+	null as deleted_date 
 ')
 SET @SqlInsertCommand2 = CONCAT(N'
 FROM ',QUOTENAME(@Client_DB_Name),'.dbo.actrec a
@@ -1183,7 +1236,10 @@ CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Ledger_Transaction_Lines'),
 	purchase_order_number NVARCHAR(20),
 	entered_date DATE,
 	month_id INT,
-	posting_year INT
+	posting_year INT,
+	created_date DATE,
+	is_deleted BIT DEFAULT 0,
+	deleted_date DATE
 )')
 
 EXECUTE sp_executesql @SqlCreateTableCommand
@@ -1211,7 +1267,10 @@ SELECT
 	lt.pchord as purchase_order_number,
 	lt.entdte as entered_date,
 	lt.actprd as month_id,
-	lt.postyr as posting_year
+	lt.postyr as posting_year,
+	lt.insdte as created_date,
+	0 as is_deleted,
+	null as deleted_date
 FROM ',QUOTENAME(@Client_DB_Name),'.dbo.lgrtrn lt
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.lgtnln ltl on lt.recnum = ltl.recnum
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.lgract la on la.recnum = ltl.lgract
@@ -1277,7 +1336,10 @@ CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Payroll_Records'), '(
 	netpay DECIMAL(9,2) DEFAULT 0,
 	timecard_regular_hours DECIMAL(9,2) DEFAULT 0,
 	timecard_overtime_hours DECIMAL(9,2) DEFAULT 0,
-	timecard_premium_hours DECIMAL(9,2) DEFAULT 0
+	timecard_premium_hours DECIMAL(9,2) DEFAULT 0,
+	created_date DATE,
+	is_deleted BIT DEFAULT 0,
+	deleted_date DATE
 )')
 
 EXECUTE sp_executesql @SqlCreateTableCommand
@@ -1345,7 +1407,10 @@ SELECT
 	ISNULL(p.netpay,0) as netpay,
 	ISNULL(tc.regular_hours,0) as timecard_regular_hours,
 	ISNULL(tc.overtime_hours,0) as timecard_overtime_hours,
-	ISNULL(tc.premium_hours,0) as timecard_premium_hours
+	ISNULL(tc.premium_hours,0) as timecard_premium_hours,
+	p.insdte as created_date,
+	0 as is_deleted,
+	null as deleted_date
 FROM ',QUOTENAME(@Client_DB_Name),'.dbo.payrec p
 INNER JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.employ e on e.recnum = p.empnum
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.wkrcmp w on w.recnum = e.wrkcmp

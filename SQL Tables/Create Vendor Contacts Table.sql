@@ -23,7 +23,10 @@ CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Vendor_Contacts'), '(
 	vendor_resale_number NVARCHAR(30),
 	vendor_license_number NVARCHAR(30),
 	cost_code NVARCHAR(50),
-	cost_type NVARCHAR(30)
+	cost_type NVARCHAR(30),
+	created_date DATE,
+	is_deleted BIT DEFAULT 0,
+	deleted_date DATE
 )')
 
 EXECUTE sp_executesql @SqlCreateTableCommand
@@ -50,7 +53,10 @@ SELECT
 	act.resnum as vendor_resale_number,
 	act.licnum as vendor_license_number,
 	cst.cdenme as cost_code,
-	ct.typnme as cost_type
+	ct.typnme as cost_type,
+	c.insdte as created_date,
+	0 as is_deleted,
+	null as deleted_date
 FROM ',QUOTENAME(@Client_DB_Name),'.dbo.actpay AS act 
 INNER JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.vndcnt AS c ON act.recnum = c.recnum
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.cstcde cst on cst.recnum = act.cdedft

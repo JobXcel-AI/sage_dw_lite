@@ -63,7 +63,10 @@ CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Ledger_Accounts'), '(
 	PY_PD9_Budget DECIMAL(14,2),
 	PY_PD10_Budget DECIMAL(14,2),
 	PY_PD11_Budget DECIMAL(14,2),
-	PY_PD12_Budget DECIMAL(14,2)
+	PY_PD12_Budget DECIMAL(14,2),
+	created_date DATE,
+	is_deleted BIT DEFAULT 0,
+	deleted_date DATE
 )')
 
 EXECUTE sp_executesql @SqlCreateTableCommand
@@ -159,7 +162,10 @@ SELECT
 	ab.PY_PD9_Budget,
 	ab.PY_PD10_Budget,
 	ab.PY_PD11_Budget,
-	ab.PY_PD12_Budget
+	ab.PY_PD12_Budget,
+	a.insdte as created_date,
+	0 as is_deleted,
+	null as deleted_date
 FROM ',QUOTENAME(@Client_DB_Name),'.dbo.lgract a 
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.lgract pa on pa.recnum = a.sumact
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),N'.dbo.csttyp ct on ct.recnum = a.csttyp
