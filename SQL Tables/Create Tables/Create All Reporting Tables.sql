@@ -585,6 +585,8 @@ SELECT
 FROM ',QUOTENAME(@Client_DB_Name),'.dbo.lgract a 
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.lgract pa on pa.recnum = a.sumact
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),N'.dbo.csttyp ct on ct.recnum = a.csttyp
+')
+SET @SqlInsertCommand2 = CONCAT(N'
 LEFT JOIN (
 	SELECT 
 		lgract,
@@ -636,8 +638,6 @@ LEFT JOIN (
 		SUM(ISNULL(PY_PD10_Budget,0)) as PY_PD10_Budget,
 		SUM(ISNULL(PY_PD11_Budget,0)) as PY_PD11_Budget,
 		SUM(ISNULL(PY_PD12_Budget,0)) as PY_PD12_Budget
-')
-SET @SqlInsertCommand2 = CONCAT(N'
 	FROM 
 	(
 		SELECT 

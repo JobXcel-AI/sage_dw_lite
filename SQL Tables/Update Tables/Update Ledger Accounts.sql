@@ -2,82 +2,22 @@
 DECLARE @Client_DB_Name NVARCHAR(50) = 'Nvision';  
 --Specify Reporting DB Name
 DECLARE @Reporting_DB_Name NVARCHAR(50) = QUOTENAME(CONCAT(@Client_DB_Name, ' Reporting'));
+--Initial variable declaration
+DECLARE @SqlInsertQuery NVARCHAR(MAX);
+DECLARE @SqlInsertQuery1 NVARCHAR(MAX);
+DECLARE @SqlInsertQuery2 NVARCHAR(MAX);
 
---Sql Create Table Command
-DECLARE @SqlCreateTableCommand NVARCHAR(MAX);
-SET @SqlCreateTableCommand = CONCAT(N'
-CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Ledger_Accounts'), '(
-	ledger_account_id BIGINT,
-	ledger_account NVARCHAR(50),
-	subsidary_type NVARCHAR(12),
-	summary_account NVARCHAR(50),
-	cost_type NVARCHAR(30),
-	ending_balance DECIMAL(14,2),
-	account_type NVARCHAR(22),
-	debit_or_credit NVARCHAR(6),
-	notes NVARCHAR(MAX),
-	CY_PD1_Balance DECIMAL(14,2),
-	CY_PD2_Balance DECIMAL(14,2),
-	CY_PD3_Balance DECIMAL(14,2),
-	CY_PD4_Balance DECIMAL(14,2),
-	CY_PD5_Balance DECIMAL(14,2),
-	CY_PD6_Balance DECIMAL(14,2),
-	CY_PD7_Balance DECIMAL(14,2),
-	CY_PD8_Balance DECIMAL(14,2),
-	CY_PD9_Balance DECIMAL(14,2),
-	CY_PD10_Balance DECIMAL(14,2),
-	CY_PD11_Balance DECIMAL(14,2),
-	CY_PD12_Balance DECIMAL(14,2),
-	PY_PD1_Balance DECIMAL(14,2),
-	PY_PD2_Balance DECIMAL(14,2),
-	PY_PD3_Balance DECIMAL(14,2),
-	PY_PD4_Balance DECIMAL(14,2),
-	PY_PD5_Balance DECIMAL(14,2),
-	PY_PD6_Balance DECIMAL(14,2),
-	PY_PD7_Balance DECIMAL(14,2),
-	PY_PD8_Balance DECIMAL(14,2),
-	PY_PD9_Balance DECIMAL(14,2),
-	PY_PD10_Balance DECIMAL(14,2),
-	PY_PD11_Balance DECIMAL(14,2),
-	PY_PD12_Balance DECIMAL(14,2),
-	CY_PD1_Budget DECIMAL(14,2),
-	CY_PD2_Budget DECIMAL(14,2),
-	CY_PD3_Budget DECIMAL(14,2),
-	CY_PD4_Budget DECIMAL(14,2),
-	CY_PD5_Budget DECIMAL(14,2),
-	CY_PD6_Budget DECIMAL(14,2),
-	CY_PD7_Budget DECIMAL(14,2),
-	CY_PD8_Budget DECIMAL(14,2),
-	CY_PD9_Budget DECIMAL(14,2),
-	CY_PD10_Budget DECIMAL(14,2),
-	CY_PD11_Budget DECIMAL(14,2),
-	CY_PD12_Budget DECIMAL(14,2),
-	PY_PD1_Budget DECIMAL(14,2),
-	PY_PD2_Budget DECIMAL(14,2),
-	PY_PD3_Budget DECIMAL(14,2),
-	PY_PD4_Budget DECIMAL(14,2),
-	PY_PD5_Budget DECIMAL(14,2),
-	PY_PD6_Budget DECIMAL(14,2),
-	PY_PD7_Budget DECIMAL(14,2),
-	PY_PD8_Budget DECIMAL(14,2),
-	PY_PD9_Budget DECIMAL(14,2),
-	PY_PD10_Budget DECIMAL(14,2),
-	PY_PD11_Budget DECIMAL(14,2),
-	PY_PD12_Budget DECIMAL(14,2),
-	created_date DATE,
-	is_deleted BIT DEFAULT 0,
-	deleted_date DATE
-)')
-
-EXECUTE sp_executesql @SqlCreateTableCommand
-
---SQL data insertion Query
-DECLARE @SqlInsertCommand NVARCHAR(MAX);
-DECLARE @SqlInsertCommand1 NVARCHAR(MAX)
-DECLARE @SqlInsertCommand2 NVARCHAR(MAX)
-SET @SqlInsertCommand1 = CONCAT(N'
-INSERT INTO ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Ledger_Accounts'),' 
-
+--Update Ledger_Accounts Table
+SET @SqlInsertQuery1 = CONCAT(
+--Step 1. Temp table containing reporting table
+N'SELECT * INTO #TempTbl FROM ',@Reporting_DB_Name,N'.dbo.Ledger_Accounts;
+SELECT * INTO #DeletedRecords FROM #TempTbl WHERE is_deleted = 1;
+DELETE FROM #TempTbl WHERE is_deleted = 1;
+ALTER TABLE #TempTbl
+DROP COLUMN IF EXISTS is_deleted, deleted_date;',
+--Step 2. delete existing reporting table data and replace with updated values
+'DELETE FROM ',@Reporting_DB_Name,N'.dbo.Ledger_Accounts;
+INSERT INTO ',@Reporting_DB_Name,N'.dbo.Ledger_Accounts
 SELECT 
 	a.recnum as ledger_account_id,
 	a.lngnme as ledger_account,
@@ -170,7 +110,7 @@ FROM ',QUOTENAME(@Client_DB_Name),'.dbo.lgract a
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.lgract pa on pa.recnum = a.sumact
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),N'.dbo.csttyp ct on ct.recnum = a.csttyp
 ')
-SET @SqlInsertCommand2 = CONCAT(N'
+SET @SqlInsertQuery2 = CONCAT(N'
 LEFT JOIN (
 	SELECT 
 		lgract,
@@ -285,7 +225,16 @@ LEFT JOIN (
 		GROUP BY lgract, current_year, actprd
 	) q2
 	GROUP BY lgract
-) ab on ab.lgract = a.recnum ')
-
-SET @SqlInsertCommand = @SqlInsertCommand1 + @SqlInsertCommand2
-EXECUTE sp_executesql @SqlInsertCommand
+) ab on ab.lgract = a.recnum;',
+--Step 3. Find any values in Temp Table not in Reporting Table, insert them as records flagged as deleted
+'INSERT INTO ',@Reporting_DB_Name,N'.dbo.Ledger_Accounts
+SELECT *, 
+	1 as is_deleted,
+	GETDATE() as deleted_date
+FROM #TempTbl t 
+WHERE t.ledger_account_id NOT IN (SELECT ledger_account_id FROM ',@Reporting_DB_Name,N'.dbo.Ledger_Accounts)
+UNION ALL 
+SELECT * FROM #DeletedRecords
+')
+SET @SqlInsertQuery = @SqlInsertQuery1 + @SqlInsertQuery2
+EXECUTE sp_executesql @SqlInsertQuery
