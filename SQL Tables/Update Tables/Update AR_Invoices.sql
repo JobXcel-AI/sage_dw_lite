@@ -2,25 +2,17 @@
 DECLARE @Client_DB_Name NVARCHAR(50) = 'Nvision';  
 --Specify Reporting DB Name
 DECLARE @Reporting_DB_Name NVARCHAR(50) = QUOTENAME(CONCAT(@Client_DB_Name, ' Reporting'));
-SET @Client_DB_Name = QUOTENAME(@Client_DB_Name);
 --Initial variable declaration
-DECLARE @SqlTempTbl NVARCHAR(MAX);
 DECLARE @SqlInsertQuery NVARCHAR(MAX);
-DROP TABLE IF EXISTS #TempTbl
 
 --Update AR_Invoices Table
+SET @SqlInsertQuery = CONCAT(
 --Step 1. Temp table containing reporting table
-SET @SqlTempTbl = CONCAT(N'
-SELECT * INTO #TempTbl FROM ',@Reporting_DB_Name,N'.dbo.AR_Invoices;
+N'SELECT * INTO #TempTbl FROM ',@Reporting_DB_Name,N'.dbo.AR_Invoices;
 ALTER TABLE #TempTbl
-DROP COLUMN is_deleted,
-DROP COLUMN deleted_date;
-')
-EXECUTE sp_executesql @SqlTempTbl
-
+DROP COLUMN IF EXISTS is_deleted, deleted_date;',
 --Step 2. delete existing reporting table data and replace with updated values
-SET @SqlInsertQuery = CONCAT(N'
-DELETE FROM ',@Reporting_DB_Name,N'.dbo.AR_Invoices;
+'DELETE FROM ',@Reporting_DB_Name,N'.dbo.AR_Invoices;
 INSERT INTO ',@Reporting_DB_Name,N'.dbo.AR_Invoices
 SELECT 
 	a.recnum as job_number,
@@ -100,17 +92,13 @@ LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.reccln r on r.recnum = a.clnnum
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.taxent te on te.recnum = tax.entty1
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.taxent te2 on te2.recnum = tax.entty2
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.employ es on es.recnum = a.sprvsr 
-LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.employ e on e.recnum = a.slsemp
-')
-EXECUTE sp_executesql @SqlInsertQuery
-
+LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.employ e on e.recnum = a.slsemp;',
 --Step 3. Find any values in Temp Table not in Reporting Table, insert them as records flagged as deleted
-SET @SqlInsertQuery = CONCAT(N'
-INSERT INTO ',@Reporting_DB_Name,N'.dbo.AR_Invoices
+'INSERT INTO ',@Reporting_DB_Name,N'.dbo.AR_Invoices
 SELECT *, 
 	1 as is_deleted,
 	GETDATE() as deleted_date
 FROM #TempTbl t 
-WHERE t.job_number NOT IN (SELECT job_number FROM ',@Reporting_DB_Name,N'.dbo.AR_Invoice)
+WHERE t.job_number NOT IN (SELECT job_number FROM ',@Reporting_DB_Name,N'.dbo.AR_Invoices)
 ')
 EXECUTE sp_executesql @SqlInsertQuery
