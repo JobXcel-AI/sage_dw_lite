@@ -2,43 +2,20 @@
 DECLARE @Client_DB_Name NVARCHAR(50) = 'Nvision';  
 --Specify Reporting DB Name
 DECLARE @Reporting_DB_Name NVARCHAR(50) = QUOTENAME(CONCAT(@Client_DB_Name, ' Reporting'));
+--Initial variable declaration
+DECLARE @SqlInsertQuery NVARCHAR(MAX);
 
---Sql Create Table Command
-DECLARE @SqlCreateTableCommand NVARCHAR(MAX);
-SET @SqlCreateTableCommand = CONCAT(N'
-CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Ledger_Transaction_Lines'), '(
-	ledger_transaction_description NVARCHAR(50),
-	ledger_account_id BIGINT,
-	ledger_account_name NVARCHAR(50),
-	transaction_number NVARCHAR(20),
-	ledger_transaction_id BIGINT,
-	vendor_name NVARCHAR(100),
-	job_variance DECIMAL(14,2),
-	equipment_variance DECIMAL(14,2),
-	work_in_progress_variance DECIMAL(14,2),
-	debit_amount DECIMAL(14,2),
-	credit_amount DECIMAL(14,2),
-	check_amount DECIMAL(14,2),
-	source_name NVARCHAR(20),
-	job_cost DECIMAL(14,2),
-	equip_cost DECIMAL(14,2),
-	transaction_date DATE,
-	purchase_order_number NVARCHAR(20),
-	entered_date DATE,
-	month_id INT,
-	posting_year INT,
-	created_date DATE,
-	is_deleted BIT DEFAULT 0,
-	deleted_date DATE
-)')
-
-EXECUTE sp_executesql @SqlCreateTableCommand
-
---SQL data insertion Query
-DECLARE @SqlInsertCommand NVARCHAR(MAX);
-SET @SqlInsertCommand = CONCAT(N'
-INSERT INTO ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Ledger_Transaction_Lines'),' 
-
+--Update Ledger_Transaction_Lines Table
+SET @SqlInsertQuery = CONCAT(
+--Step 1. Temp table containing reporting table
+N'SELECT * INTO #TempTbl FROM ',@Reporting_DB_Name,N'.dbo.Ledger_Transaction_Lines;
+SELECT * INTO #DeletedRecords FROM #TempTbl WHERE is_deleted = 1;
+DELETE FROM #TempTbl WHERE is_deleted = 1;
+ALTER TABLE #TempTbl
+DROP COLUMN IF EXISTS is_deleted, deleted_date;',
+--Step 2. delete existing reporting table data and replace with updated values
+'DELETE FROM ',@Reporting_DB_Name,N'.dbo.Ledger_Transaction_Lines;
+INSERT INTO ',@Reporting_DB_Name,N'.dbo.Ledger_Transaction_Lines
 SELECT 
 	ltl.dscrpt ledger_transaction_description,
 	ltl.lgract ledger_account_id,
@@ -83,7 +60,16 @@ LEFT JOIN
 	FROM ',QUOTENAME(@Client_DB_Name),'.dbo.eqpcst 
 	GROUP BY vndnum
 ) ec on ec.vndnum = v.recnum
-LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.source s on s.recnum = lt.srcnum
+LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.source s on s.recnum = lt.srcnum;',
+--Step 3. Find any values in Temp Table not in Reporting Table, insert them as records flagged as deleted
+'INSERT INTO ',@Reporting_DB_Name,N'.dbo.Ledger_Transaction_Lines
+SELECT *, 
+	1 as is_deleted,
+	GETDATE() as deleted_date
+FROM #TempTbl t 
+WHERE t.ledger_transaction_id NOT IN (SELECT ledger_transaction_id FROM ',@Reporting_DB_Name,N'.dbo.Ledger_Transaction_Lines)
+UNION ALL 
+SELECT * FROM #DeletedRecords
 ')
 
-EXECUTE sp_executesql @SqlInsertCommand
+EXECUTE sp_executesql @SqlInsertQuery
