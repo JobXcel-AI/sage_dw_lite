@@ -2,45 +2,20 @@
 DECLARE @Client_DB_Name NVARCHAR(50) = 'Nvision';  
 --Specify Reporting DB Name
 DECLARE @Reporting_DB_Name NVARCHAR(50) = QUOTENAME(CONCAT(@Client_DB_Name, ' Reporting'));
+--Initial variable declaration
+DECLARE @SqlInsertQuery NVARCHAR(MAX);
 
---Sql Create Table Command
-DECLARE @SqlCreateTableCommand NVARCHAR(MAX);
-SET @SqlCreateTableCommand = CONCAT(N'
-CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Job_Cost'), '(
-	job_cost_id BIGINT,
-	job_number BIGINT,
-	job_name NVARCHAR(75),
-	job_status NVARCHAR(8),
-	job_cost_code NVARCHAR(50),
-	work_order_number NVARCHAR(20),
-	transaction_number NVARCHAR(20),
-	job_cost_description NVARCHAR(50),
-	job_cost_source NVARCHAR(20),
-	vendor_id BIGINT,
-	vendor NVARCHAR(75),
-	cost_type NVARCHAR(30),
-	cost_in_hours DECIMAL(7,2),
-	cost_amount DECIMAL(12,2),
-	material_cost DECIMAL(12,2),
-	labor_cost DECIMAL(12,2),
-	equipment_cost DECIMAL(12,2),
-	other_cost DECIMAL(12,2),
-	billing_quantity DECIMAL(7,2),
-	billing_amount DECIMAL(12,2),
-	overhead_amount DECIMAL(12,2),
-	job_cost_status NVARCHAR(4),
-	created_date DATE,
-	is_deleted BIT DEFAULT 0,
-	deleted_date DATE
-)')
-
-EXECUTE sp_executesql @SqlCreateTableCommand
-
---SQL data insertion Query
-DECLARE @SqlInsertCommand NVARCHAR(MAX);
-SET @SqlInsertCommand = CONCAT(N'
-INSERT INTO ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Job_Cost'),' 
-
+--Update Job_Cost Table
+SET @SqlInsertQuery = CONCAT(
+--Step 1. Temp table containing reporting table
+N'SELECT * INTO #TempTbl FROM ',@Reporting_DB_Name,N'.dbo.Job_Cost;
+SELECT * INTO #DeletedRecords FROM #TempTbl WHERE is_deleted = 1;
+DELETE FROM #TempTbl WHERE is_deleted = 1;
+ALTER TABLE #TempTbl
+DROP COLUMN IF EXISTS is_deleted, deleted_date;',
+--Step 2. delete existing reporting table data and replace with updated values
+'DELETE FROM ',@Reporting_DB_Name,N'.dbo.Job_Cost;
+INSERT INTO ',@Reporting_DB_Name,N'.dbo.Job_Cost
 SELECT 
 	j.recnum as job_cost_id,
 	j.jobnum as job_number,
@@ -94,6 +69,16 @@ LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.csttyp ct on ct.recnum = j.csttyp
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.source s on s.recnum = j.srcnum
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.cstcde cd on cd.recnum = j.cstcde
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.actpay v on v.recnum = j.vndnum
-LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.actrec ar on ar.recnum = j.jobnum')
+LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.actrec ar on ar.recnum = j.jobnum;',
+--Step 3. Find any values in Temp Table not in Reporting Table, insert them as records flagged as deleted
+'INSERT INTO ',@Reporting_DB_Name,N'.dbo.Job_Cost
+SELECT *, 
+	1 as is_deleted,
+	GETDATE() as deleted_date
+FROM #TempTbl t 
+WHERE t.job_cost_id NOT IN (SELECT job_cost_id FROM ',@Reporting_DB_Name,N'.dbo.Job_Cost)
+UNION ALL 
+SELECT * FROM #DeletedRecords
+')
 
-EXECUTE sp_executesql @SqlInsertCommand
+EXECUTE sp_executesql @SqlInsertQuery

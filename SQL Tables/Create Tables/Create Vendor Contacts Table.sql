@@ -7,6 +7,7 @@ DECLARE @Reporting_DB_Name NVARCHAR(50) = QUOTENAME(CONCAT(@Client_DB_Name, ' Re
 DECLARE @SqlCreateTableCommand NVARCHAR(MAX);
 SET @SqlCreateTableCommand = CONCAT(N'
 CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Vendor_Contacts'), '(
+	vendor_contact_id NVARCHAR(20),
 	contact_name NVARCHAR(50),
 	contact_email NVARCHAR(75),
 	contact_phone NVARCHAR(14),
@@ -37,6 +38,7 @@ SET @SqlInsertCommand = CONCAT(N'
 INSERT INTO ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Vendor_Contacts'),' 
 
 SELECT
+	CONCAT(act.recnum,''-'',c.linnum) as vendor_contact_id,
 	c.cntnme as contact_name,
 	c.e_mail as contact_email,
 	c.phnnum as contact_phone,
