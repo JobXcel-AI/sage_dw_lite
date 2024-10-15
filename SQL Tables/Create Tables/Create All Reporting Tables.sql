@@ -148,6 +148,7 @@ CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Change_Orders'), '(
 	job_name NVARCHAR(75),
 	job_phase_number BIGINT,
 	status NVARCHAR(8),
+	status_number INT,
 	change_order_description NVARCHAR(50),
 	change_type NVARCHAR(50),
 	reason NVARCHAR(50),
@@ -158,9 +159,10 @@ CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Change_Orders'), '(
 	requested_amount DECIMAL(12,2),
 	approved_amount DECIMAL(12,2),
 	overhead_amount DECIMAL(12,2),
-	created_date DATE,
+	created_date DATETIME,
 	is_deleted BIT DEFAULT 0,
-	deleted_date DATE
+	deleted_date DATE,
+	last_updated_date DATETIME
 )')
 
 EXECUTE sp_executesql @SqlCreateTableCommand
@@ -183,6 +185,7 @@ SELECT
 		WHEN 5 THEN ''Void''
 		WHen 6 THEN ''Rejected''
 	END as status,
+	c.status as status_number,
 	dscrpt as change_order_description,
 	ct.typnme as change_type,
 	reason,
@@ -1608,11 +1611,11 @@ DECLARE @ChangeOrderHistory TABLE (record_number BIGINT, job_number BIGINT, vers
 INSERT INTO @ChangeOrderHistory 
 
 SELECT DISTINCT
-	coalesce(a.recnum,b.recnum) as record_number,
-	coalesce(a.jobnum,b.jobnum) as job_number,
-	coalesce(a._Date, b.upddte) as version_date,
-	coalesce(a.status, b.status) as change_order_status_number,
-	CASE coalesce(a.status, b.status)
+	coalesce(a.recnum,b.change_order_id) as record_number,
+	coalesce(a.jobnum,b.job_number) as job_number,
+	coalesce(a._Date, b.last_updated_date) as version_date,
+	coalesce(a.status, b.status_number) as change_order_status_number,
+	CASE coalesce(a.status, b.status_number)
 		WHEN 1 THEN ''Approved''
 		WHEN 2 THEN ''Open''
 		WHEN 3 THEN ''Review''
@@ -1629,16 +1632,16 @@ FROM (
 		jobnum
 	FROM ',QUOTENAME(@Client_DB_Name),N'.[dbo_Audit].[prmchg]
 ) a
-RIGHT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.prmchg b on a.recnum = b.recnum
+RIGHT JOIN ',@Reporting_DB_Name,'.dbo.Change_Orders b on a.recnum = b.change_order_id
 UNION ALL 
 SELECT record_number, job_number, version_date, change_order_status_number, change_order_status 
 FROM (
 	SELECT 
-		coalesce(a.recnum,b.recnum) as record_number,
-		coalesce(a.jobnum,b.jobnum) as job_number,
-		b.insdte as version_date,
-		coalesce(a.status, b.status) as change_order_status_number,
-		CASE coalesce(a.status, b.status)
+		coalesce(a.recnum,b.change_order_id) as record_number,
+		coalesce(a.jobnum,b.job_number) as job_number,
+		b.created_date as version_date,
+		coalesce(a.status, b.status_number) as change_order_status_number,
+		CASE coalesce(a.status, b.status_number)
 			WHEN 1 THEN ''Approved''
 			WHEN 2 THEN ''Open''
 			WHEN 3 THEN ''Review''
@@ -1647,7 +1650,7 @@ FROM (
 			WHEN 6 THEN ''Rejected''
 			ELSE ''Other''
 		END as change_order_status,
-		ROW_NUMBER() OVER (PARTITION BY coalesce(a.recnum,b.recnum) ORDER BY coalesce(a.recnum,b.recnum), b.insdte, a.status) as row_num
+		ROW_NUMBER() OVER (PARTITION BY coalesce(a.recnum,b.change_order_id) ORDER BY coalesce(a.recnum,b.change_order_id), b.created_date, coalesce(a.status, b.status_number)) as row_num
 	FROM (
 		SELECT 
 			recnum,
@@ -1656,26 +1659,18 @@ FROM (
 			jobnum
 		FROM ',QUOTENAME(@Client_DB_Name),'.[dbo_Audit].[prmchg]
 	) a
-	RIGHT JOIN ',QUOTENAME(@Client_DB_Name),N'.dbo.prmchg b on a.recnum = b.recnum
+	RIGHT JOIN ',@Reporting_DB_Name,'.dbo.Change_Orders b on a.recnum = b.change_order_id
 ) q2 
 WHERE row_num = 1
 UNION ALL 
 SELECT
-	recnum as record_number,
-	jobnum as job_number,
-	DATEADD(SECOND,1,upddte) as version_date,
-	status as change_order_status_number, 
-	CASE status
-		WHEN 1 THEN ''Approved''
-		WHEN 2 THEN ''Open''
-		WHEN 3 THEN ''Review''
-		WHEN 4 THEN ''Disputed''
-		WHEN 5 THEN ''Void''
-		WHen 6 THEN ''Rejected''
-		ELSE ''Other''
-	END as change_order_status
-FROM ',QUOTENAME(@Client_DB_Name),N'.dbo.prmchg
-WHERE upddte IS NOT NULL
+	change_order_id as record_number,
+	job_number,
+	DATEADD(SECOND,1,last_updated_date) as version_date,
+	status_number as change_order_status_number, 
+	status as change_order_status
+FROM ',@Reporting_DB_Name,'.dbo.Change_Orders
+WHERE last_updated_date IS NOT NULL
 
 DECLARE @ChangeOrderHistory2 TABLE (id BIGINT, record_number BIGINT, job_number BIGINT, version_date DATETIME, change_order_status_number INT, change_order_status NVARCHAR(8), can_be_removed BIT)
 INSERT INTO @ChangeOrderHistory2 
@@ -1690,6 +1685,7 @@ SELECT
 	ELSE 0
 	END as can_be_removed
 FROM @ChangeOrderHistory 
+
 ')
 SET @SQLinsertChangeOrderHistory2 = CONCAT(N'
 INSERT INTO ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Change_Order_History'), ' 

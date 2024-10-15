@@ -31,6 +31,7 @@ SELECT
 		WHEN 5 THEN ''Void''
 		WHen 6 THEN ''Rejected''
 	END as status,
+	c.status as status_number,
 	dscrpt as change_order_description,
 	ct.typnme as change_type,
 	reason,

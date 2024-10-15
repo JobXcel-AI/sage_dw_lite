@@ -14,6 +14,7 @@ CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Change_Orders'), '(
 	job_name NVARCHAR(75),
 	job_phase_number BIGINT,
 	status NVARCHAR(8),
+	status_number INT,
 	change_order_description NVARCHAR(50),
 	change_type NVARCHAR(50),
 	reason NVARCHAR(50),
@@ -24,9 +25,10 @@ CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Change_Orders'), '(
 	requested_amount DECIMAL(12,2),
 	approved_amount DECIMAL(12,2),
 	overhead_amount DECIMAL(12,2),
-	created_date DATE,
+	created_date DATETIME,
 	is_deleted BIT DEFAULT 0,
-	deleted_date DATE
+	deleted_date DATE,
+	last_updated_date DATETIME
 )')
 
 EXECUTE sp_executesql @SqlCreateTableCommand
@@ -51,6 +53,7 @@ SELECT
 		WHEN 5 THEN ''Void''
 		WHen 6 THEN ''Rejected''
 	END as status,
+	c.status as status_number,
 	dscrpt as change_order_description,
 	ct.typnme as change_type,
 	reason,
@@ -63,7 +66,8 @@ SELECT
 	ISNULL(ovhamt,0) as overhead_amount,
 	c.insdte as created_date,
 	0 as is_deleted,
-	null as deleted_date
+	null as deleted_date,
+	c.upddte as last_updated_date
 FROM ',QUOTENAME(@Client_DB_Name),'.dbo.prmchg c
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.actrec a on a.recnum = c.jobnum
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.chgtyp ct on ct.recnum = c.chgtyp')
