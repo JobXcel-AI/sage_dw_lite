@@ -3,10 +3,11 @@
 DECLARE @Reporting_DB_Name NVARCHAR(50) = QUOTENAME('Vertex Coatings Reporting');
 --Initial variable declaration
 DECLARE @SqlInsertCommand NVARCHAR(MAX);
-
+DECLARE @SQLdeleteCommand NVARCHAR(100);
 
 --Clear existing History Table
-DELETE FROM ',@Reporting_DB_Name,N'.dbo.Change_Order_Open_History;
+SET @SQLdeleteCommand = CONCAT('DELETE FROM ',@Reporting_DB_Name,'.dbo.Change_Order_Open_History;')
+EXECUTE sp_executesql @SQLdeleteCommand;
 
 --Recreate History Table
 
