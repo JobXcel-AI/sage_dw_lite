@@ -2,60 +2,20 @@
 DECLARE @Client_DB_Name NVARCHAR(50) = 'Nvision';  
 --Specify Reporting DB Name
 DECLARE @Reporting_DB_Name NVARCHAR(50) = QUOTENAME(CONCAT(@Client_DB_Name, ' Reporting'));
+--Initial variable declaration
+DECLARE @SqlInsertQuery NVARCHAR(MAX);
 
---Sql Create Table Command
-DECLARE @SqlCreateTableCommand NVARCHAR(MAX);
-SET @SqlCreateTableCommand = CONCAT(N'
-CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Payroll_Records'), '(
-	payroll_record_id BIGINT,
-	employee_id BIGINT,
-	employee_full_name NVARCHAR(100),
-	employee_status NVARCHAR(12),
-	check_number NVARCHAR(20),
-	check_date DATE,
-	period_start DATE,
-	period_end DATE,
-	regular_hours DECIMAL(9,4) DEFAULT 0,
-	overtime_hours DECIMAL(9,4) DEFAULT 0,
-	premium_hours DECIMAL(9,4) DEFAULT 0,
-	sick_hours DECIMAL(9,4) DEFAULT 0,
-	vacation_hours DECIMAL(9,4) DEFAULT 0,
-	holiday_hours DECIMAL(9,4) DEFAULT 0,
-	total_hours DECIMAL(9,4) DEFAULT 0,
-	comp_wage DECIMAL(9,2) DEFAULT 0,
-	comp_gross DECIMAL(9,2) DEFAULT 0,
-	comp_code BIGINT,
-	comp_type NVARCHAR(30),
-	payroll_type NVARCHAR(13),
-	payroll_status NVARCHAR(8),
-	regular_pay DECIMAL(9,2) DEFAULT 0,
-	overtime_pay DECIMAL(9,2) DEFAULT 0,
-	premium_pay DECIMAL(9,2) DEFAULT 0,
-	sick_pay DECIMAL(9,2) DEFAULT 0,
-	vacation_pay DECIMAL(9,2) DEFAULT 0,
-	holiday_pay DECIMAL(9,2) DEFAULT 0,
-	piece_pay DECIMAL(9,2) DEFAULT 0,
-	per_diem DECIMAL(9,2) DEFAULT 0,
-	misc_pay DECIMAL(9,2) DEFAULT 0,
-	gross_pay DECIMAL(9,2) DEFAULT 0,
-	deducts DECIMAL(9,2) DEFAULT 0,
-	additions DECIMAL(9,2) DEFAULT 0,
-	netpay DECIMAL(9,2) DEFAULT 0,
-	timecard_regular_hours DECIMAL(9,2) DEFAULT 0,
-	timecard_overtime_hours DECIMAL(9,2) DEFAULT 0,
-	timecard_premium_hours DECIMAL(9,2) DEFAULT 0,
-	created_date DATE,
-	is_deleted BIT DEFAULT 0,
-	deleted_date DATE
-)')
-
-EXECUTE sp_executesql @SqlCreateTableCommand
-
---SQL data insertion Query
-DECLARE @SqlInsertCommand NVARCHAR(MAX);
-SET @SqlInsertCommand = CONCAT(N'
-INSERT INTO ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Payroll_Records'),' 
-
+--Update Payroll_Records Table
+SET @SqlInsertQuery = CONCAT(
+--Step 1. Temp table containing reporting table
+N'SELECT * INTO #TempTbl FROM ',@Reporting_DB_Name,N'.dbo.Payroll_Records;
+SELECT * INTO #DeletedRecords FROM #TempTbl WHERE is_deleted = 1;
+DELETE FROM #TempTbl WHERE is_deleted = 1;
+ALTER TABLE #TempTbl
+DROP COLUMN IF EXISTS is_deleted, deleted_date;',
+--Step 2. delete existing reporting table data and replace with updated values
+'DELETE FROM ',@Reporting_DB_Name,N'.dbo.Payroll_Records;
+INSERT INTO ',@Reporting_DB_Name,N'.dbo.Payroll_Records
 SELECT
 	p.recnum as payroll_record_id,
 	p.empnum as employee_id,
@@ -133,6 +93,16 @@ LEFT JOIN (
 	WHERE jobnum IS NOT NULL
 	GROUP BY recnum
 ) tc on tc.recnum = p.recnum
+;',
+--Step 3. Find any values in Temp Table not in Reporting Table, insert them as records flagged as deleted
+'INSERT INTO ',@Reporting_DB_Name,N'.dbo.Payroll_Records
+SELECT *, 
+	1 as is_deleted,
+	GETDATE() as deleted_date
+FROM #TempTbl t 
+WHERE t.payroll_record_id NOT IN (SELECT payroll_record_id FROM ',@Reporting_DB_Name,N'.dbo.Payroll_Records)
+UNION ALL 
+SELECT * FROM #DeletedRecords
 ')
 
-EXECUTE sp_executesql @SqlInsertCommand
+EXECUTE sp_executesql @SqlInsertQuery

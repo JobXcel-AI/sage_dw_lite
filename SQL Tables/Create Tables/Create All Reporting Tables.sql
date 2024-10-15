@@ -1420,7 +1420,7 @@ LEFT JOIN (
 		SUM(CASE WHEN paytyp = 1 THEN hrswrk ELSE 0 END) as regular_hours,
 		SUM(CASE WHEN paytyp = 2 THEN hrswrk ELSE 0 END) as overtime_hours,
 		SUM(CASE WHEN paytyp = 3 THEN hrswrk ELSE 0 END) as premium_hours
-	FROM tmcdln 
+	FROM ',QUOTENAME(@Client_DB_Name),'.dbo.tmcdln 
 	WHERE jobnum IS NOT NULL
 	GROUP BY recnum
 ) tc on tc.recnum = p.recnum
