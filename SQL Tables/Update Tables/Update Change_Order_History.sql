@@ -6,14 +6,16 @@ DECLARE @Reporting_DB_Name NVARCHAR(50) = QUOTENAME(CONCAT(@Client_DB_Name, ' Re
 DECLARE @SQLinsertChangeOrderHistory1 NVARCHAR(MAX);
 DECLARE @SQLinsertChangeOrderHistory2 NVARCHAR(MAX);
 DECLARE @SQLinsertChangeOrderHistory NVARCHAR(MAX);
+DECLARE @SQLdeleteCommand NVARCHAR(100);
 
 --Clear existing History Table
-DELETE FROM ',@Reporting_DB_Name,N'.dbo.Change_Order_History;
+SET @SQLdeleteCommand = CONCAT('DELETE FROM ',@Reporting_DB_Name,'.dbo.Change_Order_History;')
+EXECUTE sp_executesql @SQLdeleteCommand;
 
 --Recreate History Table
 
 SET @SQLinsertChangeOrderHistory1 = CONCAT(N'
-DECLARE @ChangeOrderHistory TABLE (record_number BIGINT, job_number BIGINT, version_date DATETIME, change_order_status_number INT, change_order_status NVARCHAR(8))
+DECLARE @ChangeOrderHistory TABLE (record_number BIGINT, job_number BIGINT, version_date DATETIME, change_order_status_number INT, change_order_status NVARCHAR(8), deleted_date DATETIME)
 INSERT INTO @ChangeOrderHistory 
 
 SELECT DISTINCT
@@ -29,7 +31,8 @@ SELECT DISTINCT
 		WHEN 5 THEN ''Void''
 		WHEN 6 THEN ''Rejected''
 		ELSE ''Other''
-	END as change_order_status
+	END as change_order_status,
+	b.deleted_date
 FROM (
 	SELECT 
 		recnum,
@@ -40,7 +43,7 @@ FROM (
 ) a
 RIGHT JOIN ',@Reporting_DB_Name,'.dbo.Change_Orders b on a.recnum = b.change_order_id
 UNION ALL 
-SELECT record_number, job_number, version_date, change_order_status_number, change_order_status 
+SELECT record_number, job_number, version_date, change_order_status_number, change_order_status, deleted_date 
 FROM (
 	SELECT 
 		coalesce(a.recnum,b.change_order_id) as record_number,
@@ -56,6 +59,7 @@ FROM (
 			WHEN 6 THEN ''Rejected''
 			ELSE ''Other''
 		END as change_order_status,
+		b.deleted_date,
 		ROW_NUMBER() OVER (PARTITION BY coalesce(a.recnum,b.change_order_id) ORDER BY coalesce(a.recnum,b.change_order_id), b.created_date, coalesce(a.status, b.status_number)) as row_num
 	FROM (
 		SELECT 
@@ -74,11 +78,12 @@ SELECT
 	job_number,
 	DATEADD(SECOND,1,last_updated_date) as version_date,
 	status_number as change_order_status_number, 
-	status as change_order_status
+	status as change_order_status,
+	deleted_date
 FROM ',@Reporting_DB_Name,'.dbo.Change_Orders
 WHERE last_updated_date IS NOT NULL
 
-DECLARE @ChangeOrderHistory2 TABLE (id BIGINT, record_number BIGINT, job_number BIGINT, version_date DATETIME, change_order_status_number INT, change_order_status NVARCHAR(8), can_be_removed BIT)
+DECLARE @ChangeOrderHistory2 TABLE (id BIGINT, record_number BIGINT, job_number BIGINT, version_date DATETIME, change_order_status_number INT, change_order_status NVARCHAR(8), can_be_removed BIT, deleted_date DATETIME)
 INSERT INTO @ChangeOrderHistory2 
 	
 SELECT 
@@ -89,7 +94,8 @@ SELECT
 		LEAD(change_order_status) OVER(PARTITION BY record_number ORDER BY record_number, version_date) = change_order_status
 	THEN 1
 	ELSE 0
-	END as can_be_removed
+	END as can_be_removed,
+	deleted_date
 FROM @ChangeOrderHistory 
 ')
 SET @SQLinsertChangeOrderHistory2 = CONCAT(N'
@@ -101,7 +107,7 @@ SELECT DISTINCT
 	change_order_status_number,
 	change_order_status,
 	CASE WHEN prior_version_date IS NULL THEN first_version_date ELSE version_date END as valid_from_date,
-	CASE WHEN next_version_date IS NULL THEN DATEADD(YEAR,100,version_date) ELSE next_version_date END as valid_to_date
+	CASE WHEN next_version_date IS NULL THEN CASE WHEN deleted_date IS NOT NULL THEN deleted_date ELSE DATEADD(YEAR,100,version_date) END ELSE next_version_date END as valid_to_date
 FROM
 (
 	SELECT
@@ -110,6 +116,7 @@ FROM
 		version_date,
 		change_order_status_number,
 		change_order_status,
+		deleted_date,
 		FIRST_VALUE(version_date) OVER(PARTITION BY record_number, change_order_status ORDER BY record_number, version_date) as first_version_date,
 		LAG(version_date) OVER(PARTITION BY record_number ORDER BY record_number, version_date) as prior_version_date,
 		LEAD(version_date) OVER(PARTITION BY record_number ORDER BY record_number, version_date) as next_version_date,
