@@ -75,6 +75,7 @@ SELECT
 	ISNULL(tkof.profit_amount,0) as takeoff_profit_amount_excl_labor, 
 	ISNULL(tkof.ext_price,0) as takeoff_ext_price_excl_labor,
 	a.insdte as created_date,
+	a.upddte as last_updated_date,
 	0 as is_deleted,
 	null as deleted_date 
 ')

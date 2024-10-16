@@ -78,6 +78,7 @@ SELECT
 	ISNULL(tc.overtime_hours,0) as timecard_overtime_hours,
 	ISNULL(tc.premium_hours,0) as timecard_premium_hours,
 	p.insdte as created_date,
+	p.upddte as last_updated_date,
 	0 as is_deleted,
 	null as deleted_date
 FROM ',QUOTENAME(@Client_DB_Name),'.dbo.payrec p

@@ -49,6 +49,7 @@ SELECT
 	a.phnnum as vendor_phone_number,
 	p.delvia as delivery_via,
 	p.insdte as created_date,
+	p.upddte as last_updated_date,
 	0 as is_deleted,
 	null as deleted_date
 FROM ',QUOTENAME(@Client_DB_Name),'.dbo.pchord p

@@ -36,6 +36,7 @@ SELECT
 	cst.cdenme as cost_code,
 	ct.typnme as cost_type,
 	c.insdte as created_date,
+	c.upddte as last_updated_date,
 	0 as is_deleted,
 	null as deleted_date
 FROM ',QUOTENAME(@Client_DB_Name),'.dbo.actpay AS act 

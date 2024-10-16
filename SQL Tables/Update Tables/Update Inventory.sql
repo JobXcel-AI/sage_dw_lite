@@ -34,6 +34,7 @@ SELECT
 	p.lstupd as last_updated,
 	p.ntetxt as part_notes,
 	q.insdte as created_date,
+	q.upddte as last_updated_date,
 	0 as is_deleted,
 	null as deleted_date
 FROM ',QUOTENAME(@Client_DB_Name),'.dbo.invqty q

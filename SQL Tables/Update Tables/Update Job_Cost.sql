@@ -62,6 +62,7 @@ SELECT
 		WHEN 2 THEN ''Void''
 	END as job_cost_status,
 	j.insdte as created_date,
+	j.upddte as last_updated_date,
 	0 as is_deleted,
 	null as deleted_date
 FROM ',QUOTENAME(@Client_DB_Name),'.dbo.jobcst j
