@@ -12,9 +12,6 @@ DECLARE @TranName VARCHAR(20);
 
 
 --Update AR_Invoices Table
-SELECT @TranName = 'AR_Invoices';
-BEGIN TRY
-BEGIN TRANSACTION @TranName;
 SET @SqlInsertQuery = CONCAT(
 --Step 1. Temp table containing reporting table
 N'SELECT * INTO #TempTbl FROM ',@Reporting_DB_Name,N'.dbo.AR_Invoices;
@@ -115,21 +112,29 @@ WHERE t.job_number NOT IN (SELECT job_number FROM ',@Reporting_DB_Name,N'.dbo.AR
 UNION ALL 
 SELECT * FROM #DeletedRecords
 ')
-EXECUTE sp_executesql @SqlInsertQuery
-COMMIT TRANSACTION @TranName
+
+SELECT @TranName = 'AR_Invoices';
+BEGIN TRY
+	BEGIN TRANSACTION @TranName;
+
+	EXECUTE sp_executesql @SqlInsertQuery
+
+	COMMIT TRANSACTION @TranName
 END TRY
 BEGIN CATCH
-	IF @@TRANCOUNT > 1
+	IF @@TRANCOUNT > 0
 		ROLLBACK TRANSACTION @TranName
 	DECLARE @ErrorMessage NVARCHAR(4000);  
 	DECLARE @ErrorSeverity INT;  
 	DECLARE @ErrorState INT;  
 	SELECT   
+	@TranName as Transaction_Name,
 	@ErrorMessage = ERROR_MESSAGE(),  
 	@ErrorSeverity = ERROR_SEVERITY(),  
 	@ErrorState = ERROR_STATE();  
 	RAISERROR (@ErrorMessage, @ErrorSeverity, @ErrorState); 
 END CATCH
+
 
 
 --Update Change Orders
@@ -186,11 +191,34 @@ WHERE t.change_order_id NOT IN (SELECT change_order_id FROM ',@Reporting_DB_Name
 UNION ALL 
 SELECT * FROM #DeletedRecords
 ')
-EXECUTE sp_executesql @SqlInsertQuery
+SELECT @TranName = 'Change_Orders';
+BEGIN TRY
+	BEGIN TRANSACTION @TranName;
+
+	EXECUTE sp_executesql @SqlInsertQuery
+
+	COMMIT TRANSACTION @TranName
+END TRY
+BEGIN CATCH
+	IF @@TRANCOUNT > 0
+		ROLLBACK TRANSACTION @TranName
+	DECLARE @ErrorMessage NVARCHAR(4000);  
+	DECLARE @ErrorSeverity INT;  
+	DECLARE @ErrorState INT;  
+	SELECT   
+	@TranName as Transaction_Name,
+	@ErrorMessage = ERROR_MESSAGE(),  
+	@ErrorSeverity = ERROR_SEVERITY(),  
+	@ErrorState = ERROR_STATE();  
+	RAISERROR (@ErrorMessage, @ErrorSeverity, @ErrorState); 
+END CATCH
 
 
 
 --Update Change Order History
+SELECT @TranName = 'Change_Order_History';
+BEGIN TRY
+	BEGIN TRANSACTION @TranName;
 --Clear existing History Table
 SET @SqlDeleteCommand = CONCAT('DELETE FROM ',@Reporting_DB_Name,'.dbo.Change_Order_History;')
 EXECUTE sp_executesql @SqlDeleteCommand;
@@ -315,6 +343,22 @@ FROM
 SET @SqlInsertQuery = @SqlInsertQuery1 + @SqlInsertQuery2
 EXECUTE sp_executesql @SqlInsertQuery
 
+COMMIT TRANSACTION @TranName
+END TRY
+BEGIN CATCH
+	IF @@TRANCOUNT > 0
+		ROLLBACK TRANSACTION @TranName
+	DECLARE @ErrorMessage NVARCHAR(4000);  
+	DECLARE @ErrorSeverity INT;  
+	DECLARE @ErrorState INT;  
+	SELECT   
+	@TranName as Transaction_Name,
+	@ErrorMessage = ERROR_MESSAGE(),  
+	@ErrorSeverity = ERROR_SEVERITY(),  
+	@ErrorState = ERROR_STATE();  
+	RAISERROR (@ErrorMessage, @ErrorSeverity, @ErrorState); 
+END CATCH
+
 
 
 --Update Change Order Open History
@@ -339,8 +383,27 @@ BEGIN
 	SET @DateVal = DATEADD(MONTH,1,@DateVal)
 END
 ')
+SELECT @TranName = 'Change_Order_Open_History';
+BEGIN TRY
+	BEGIN TRANSACTION @TranName;
 
-EXECUTE sp_executesql @SqlInsertQuery
+	EXECUTE sp_executesql @SqlInsertQuery
+
+	COMMIT TRANSACTION @TranName
+END TRY
+BEGIN CATCH
+	IF @@TRANCOUNT > 0
+		ROLLBACK TRANSACTION @TranName
+	DECLARE @ErrorMessage NVARCHAR(4000);  
+	DECLARE @ErrorSeverity INT;  
+	DECLARE @ErrorState INT;  
+	SELECT   
+	@TranName as Transaction_Name,
+	@ErrorMessage = ERROR_MESSAGE(),  
+	@ErrorSeverity = ERROR_SEVERITY(),  
+	@ErrorState = ERROR_STATE();  
+	RAISERROR (@ErrorMessage, @ErrorSeverity, @ErrorState); 
+END CATCH
 
 
 
@@ -398,7 +461,27 @@ WHERE t.employee_id NOT IN (SELECT employee_id FROM ',@Reporting_DB_Name,N'.dbo.
 UNION ALL 
 SELECT * FROM #DeletedRecords
 ')
-EXECUTE sp_executesql @SqlInsertQuery
+SELECT @TranName = 'Employee';
+BEGIN TRY
+	BEGIN TRANSACTION @TranName;
+
+	EXECUTE sp_executesql @SqlInsertQuery
+
+	COMMIT TRANSACTION @TranName
+END TRY
+BEGIN CATCH
+	IF @@TRANCOUNT > 0
+		ROLLBACK TRANSACTION @TranName
+	DECLARE @ErrorMessage NVARCHAR(4000);  
+	DECLARE @ErrorSeverity INT;  
+	DECLARE @ErrorState INT;  
+	SELECT   
+	@TranName as Transaction_Name,
+	@ErrorMessage = ERROR_MESSAGE(),  
+	@ErrorSeverity = ERROR_SEVERITY(),  
+	@ErrorState = ERROR_STATE();  
+	RAISERROR (@ErrorMessage, @ErrorSeverity, @ErrorState); 
+END CATCH
 
 
 
@@ -451,7 +534,27 @@ WHERE t.part_number NOT IN (SELECT part_number FROM ',@Reporting_DB_Name,N'.dbo.
 UNION ALL 
 SELECT * FROM #DeletedRecords
 ')
-EXECUTE sp_executesql @SqlInsertQuery
+SELECT @TranName = 'Inventory';
+BEGIN TRY
+	BEGIN TRANSACTION @TranName;
+
+	EXECUTE sp_executesql @SqlInsertQuery
+
+	COMMIT TRANSACTION @TranName
+END TRY
+BEGIN CATCH
+	IF @@TRANCOUNT > 0
+		ROLLBACK TRANSACTION @TranName
+	DECLARE @ErrorMessage NVARCHAR(4000);  
+	DECLARE @ErrorSeverity INT;  
+	DECLARE @ErrorState INT;  
+	SELECT   
+	@TranName as Transaction_Name,
+	@ErrorMessage = ERROR_MESSAGE(),  
+	@ErrorSeverity = ERROR_SEVERITY(),  
+	@ErrorState = ERROR_STATE();  
+	RAISERROR (@ErrorMessage, @ErrorSeverity, @ErrorState); 
+END CATCH
 
 
 
@@ -624,7 +727,27 @@ UNION ALL
 SELECT * FROM #DeletedRecords
 ')
 SET @SqlInsertQuery = @SqlInsertQuery1 + @SqlInsertQuery2
-EXECUTE sp_executesql @SqlInsertQuery
+SELECT @TranName = 'Jobs';
+BEGIN TRY
+	BEGIN TRANSACTION @TranName;
+
+	EXECUTE sp_executesql @SqlInsertQuery
+
+	COMMIT TRANSACTION @TranName
+END TRY
+BEGIN CATCH
+	IF @@TRANCOUNT > 0
+		ROLLBACK TRANSACTION @TranName
+	DECLARE @ErrorMessage NVARCHAR(4000);  
+	DECLARE @ErrorSeverity INT;  
+	DECLARE @ErrorState INT;  
+	SELECT   
+	@TranName as Transaction_Name,
+	@ErrorMessage = ERROR_MESSAGE(),  
+	@ErrorSeverity = ERROR_SEVERITY(),  
+	@ErrorState = ERROR_STATE();  
+	RAISERROR (@ErrorMessage, @ErrorSeverity, @ErrorState); 
+END CATCH
 
 
 
@@ -705,11 +828,34 @@ UNION ALL
 SELECT * FROM #DeletedRecords
 ')
 
-EXECUTE sp_executesql @SqlInsertQuery
+SELECT @TranName = 'Job_Cost';
+BEGIN TRY
+	BEGIN TRANSACTION @TranName;
+
+	EXECUTE sp_executesql @SqlInsertQuery
+
+	COMMIT TRANSACTION @TranName
+END TRY
+BEGIN CATCH
+	IF @@TRANCOUNT > 0
+		ROLLBACK TRANSACTION @TranName
+	DECLARE @ErrorMessage NVARCHAR(4000);  
+	DECLARE @ErrorSeverity INT;  
+	DECLARE @ErrorState INT;  
+	SELECT   
+	@TranName as Transaction_Name,
+	@ErrorMessage = ERROR_MESSAGE(),  
+	@ErrorSeverity = ERROR_SEVERITY(),  
+	@ErrorState = ERROR_STATE();  
+	RAISERROR (@ErrorMessage, @ErrorSeverity, @ErrorState); 
+END CATCH
 
 
 
 --Update Job Status History
+SELECT @TranName = 'Job_Status_History';
+BEGIN TRY
+	BEGIN TRANSACTION @TranName;
 --Clear existing History Table
 SET @SqlDeleteCommand = CONCAT('DELETE FROM ',@Reporting_DB_Name,'.dbo.Job_Status_History;')
 EXECUTE sp_executesql @SqlDeleteCommand;
@@ -824,9 +970,28 @@ FROM
 
 EXECUTE sp_executesql @SqlInsertQuery
 
+	COMMIT TRANSACTION @TranName
+END TRY
+BEGIN CATCH
+	IF @@TRANCOUNT > 0
+		ROLLBACK TRANSACTION @TranName
+	DECLARE @ErrorMessage NVARCHAR(4000);  
+	DECLARE @ErrorSeverity INT;  
+	DECLARE @ErrorState INT;  
+	SELECT   
+	@TranName as Transaction_Name,
+	@ErrorMessage = ERROR_MESSAGE(),  
+	@ErrorSeverity = ERROR_SEVERITY(),  
+	@ErrorState = ERROR_STATE();  
+	RAISERROR (@ErrorMessage, @ErrorSeverity, @ErrorState); 
+END CATCH
+
 
 
 --Update Jobs Active History
+SELECT @TranName = 'Jobs_Active';
+BEGIN TRY
+	BEGIN TRANSACTION @TranName;
 --Clear existing History Table
 SET @SqlDeleteCommand = CONCAT('DELETE FROM ',@Reporting_DB_Name,'.dbo.Jobs_Active_History;')
 EXECUTE sp_executesql @SqlDeleteCommand;
@@ -850,9 +1015,28 @@ END
 
 EXECUTE sp_executesql @SqlInsertQuery
 
+	COMMIT TRANSACTION @TranName
+END TRY
+BEGIN CATCH
+	IF @@TRANCOUNT > 0
+		ROLLBACK TRANSACTION @TranName
+	DECLARE @ErrorMessage NVARCHAR(4000);  
+	DECLARE @ErrorSeverity INT;  
+	DECLARE @ErrorState INT;  
+	SELECT   
+	@TranName as Transaction_Name,
+	@ErrorMessage = ERROR_MESSAGE(),  
+	@ErrorSeverity = ERROR_SEVERITY(),  
+	@ErrorState = ERROR_STATE();  
+	RAISERROR (@ErrorMessage, @ErrorSeverity, @ErrorState); 
+END CATCH
+
 
 
 --Update Job Cost Waterfall
+SELECT @TranName = 'Job_Cost_Waterfall';
+BEGIN TRY
+	BEGIN TRANSACTION @TranName;
 --Clear existing waterfall Table
 SET @SqlDeleteCommand = CONCAT('DELETE FROM ',@Reporting_DB_Name,'.dbo.Job_Cost_Waterfall;')
 EXECUTE sp_executesql @SqlDeleteCommand;
@@ -1001,6 +1185,22 @@ WHERE waterfall_value < 0 OR waterfall_value > 0
 ')
 
 EXECUTE sp_executesql @SqlInsertQuery
+
+	COMMIT TRANSACTION @TranName
+END TRY
+BEGIN CATCH
+	IF @@TRANCOUNT > 0
+		ROLLBACK TRANSACTION @TranName
+	DECLARE @ErrorMessage NVARCHAR(4000);  
+	DECLARE @ErrorSeverity INT;  
+	DECLARE @ErrorState INT;  
+	SELECT   
+	@TranName as Transaction_Name,
+	@ErrorMessage = ERROR_MESSAGE(),  
+	@ErrorSeverity = ERROR_SEVERITY(),  
+	@ErrorState = ERROR_STATE();  
+	RAISERROR (@ErrorMessage, @ErrorSeverity, @ErrorState); 
+END CATCH
 
 
 
@@ -1235,7 +1435,27 @@ UNION ALL
 SELECT * FROM #DeletedRecords
 ')
 SET @SqlInsertQuery = @SqlInsertQuery1 + @SqlInsertQuery2
-EXECUTE sp_executesql @SqlInsertQuery
+SELECT @TranName = 'Ledger_Accounts';
+BEGIN TRY
+	BEGIN TRANSACTION @TranName;
+
+	EXECUTE sp_executesql @SqlInsertQuery
+
+	COMMIT TRANSACTION @TranName
+END TRY
+BEGIN CATCH
+	IF @@TRANCOUNT > 0
+		ROLLBACK TRANSACTION @TranName
+	DECLARE @ErrorMessage NVARCHAR(4000);  
+	DECLARE @ErrorSeverity INT;  
+	DECLARE @ErrorState INT;  
+	SELECT   
+	@TranName as Transaction_Name,
+	@ErrorMessage = ERROR_MESSAGE(),  
+	@ErrorSeverity = ERROR_SEVERITY(),  
+	@ErrorState = ERROR_STATE();  
+	RAISERROR (@ErrorMessage, @ErrorSeverity, @ErrorState); 
+END CATCH
 
 
 
@@ -1307,7 +1527,27 @@ UNION ALL
 SELECT * FROM #DeletedRecords
 ')
 
-EXECUTE sp_executesql @SqlInsertQuery
+SELECT @TranName = 'Ledger_Transaction_Lines';
+BEGIN TRY
+	BEGIN TRANSACTION @TranName;
+
+	EXECUTE sp_executesql @SqlInsertQuery
+
+	COMMIT TRANSACTION @TranName
+END TRY
+BEGIN CATCH
+	IF @@TRANCOUNT > 0
+		ROLLBACK TRANSACTION @TranName
+	DECLARE @ErrorMessage NVARCHAR(4000);  
+	DECLARE @ErrorSeverity INT;  
+	DECLARE @ErrorState INT;  
+	SELECT   
+	@TranName as Transaction_Name,
+	@ErrorMessage = ERROR_MESSAGE(),  
+	@ErrorSeverity = ERROR_SEVERITY(),  
+	@ErrorState = ERROR_STATE();  
+	RAISERROR (@ErrorMessage, @ErrorSeverity, @ErrorState); 
+END CATCH
 
 
 
@@ -1412,7 +1652,27 @@ UNION ALL
 SELECT * FROM #DeletedRecords
 ')
 
-EXECUTE sp_executesql @SqlInsertQuery
+SELECT @TranName = 'Payroll_Records';
+BEGIN TRY
+	BEGIN TRANSACTION @TranName;
+
+	EXECUTE sp_executesql @SqlInsertQuery
+
+	COMMIT TRANSACTION @TranName
+END TRY
+BEGIN CATCH
+	IF @@TRANCOUNT > 0
+		ROLLBACK TRANSACTION @TranName
+	DECLARE @ErrorMessage NVARCHAR(4000);  
+	DECLARE @ErrorSeverity INT;  
+	DECLARE @ErrorState INT;  
+	SELECT   
+	@TranName as Transaction_Name,
+	@ErrorMessage = ERROR_MESSAGE(),  
+	@ErrorSeverity = ERROR_SEVERITY(),  
+	@ErrorState = ERROR_STATE();  
+	RAISERROR (@ErrorMessage, @ErrorSeverity, @ErrorState); 
+END CATCH
 
 
 
@@ -1479,7 +1739,27 @@ UNION ALL
 SELECT * FROM #DeletedRecords
 ')
 
-EXECUTE sp_executesql @SqlInsertQuery
+SELECT @TranName = 'Purchase_Orders';
+BEGIN TRY
+	BEGIN TRANSACTION @TranName;
+
+	EXECUTE sp_executesql @SqlInsertQuery
+
+	COMMIT TRANSACTION @TranName
+END TRY
+BEGIN CATCH
+	IF @@TRANCOUNT > 0
+		ROLLBACK TRANSACTION @TranName
+	DECLARE @ErrorMessage NVARCHAR(4000);  
+	DECLARE @ErrorSeverity INT;  
+	DECLARE @ErrorState INT;  
+	SELECT   
+	@TranName as Transaction_Name,
+	@ErrorMessage = ERROR_MESSAGE(),  
+	@ErrorSeverity = ERROR_SEVERITY(),  
+	@ErrorState = ERROR_STATE();  
+	RAISERROR (@ErrorMessage, @ErrorSeverity, @ErrorState); 
+END CATCH
 
 
 
@@ -1533,4 +1813,24 @@ UNION ALL
 SELECT * FROM #DeletedRecords
 ')
 
-EXECUTE sp_executesql @SqlInsertQuery
+SELECT @TranName = 'Vendor_Contacts';
+BEGIN TRY
+	BEGIN TRANSACTION @TranName;
+
+	EXECUTE sp_executesql @SqlInsertQuery
+
+	COMMIT TRANSACTION @TranName
+END TRY
+BEGIN CATCH
+	IF @@TRANCOUNT > 0
+		ROLLBACK TRANSACTION @TranName
+	DECLARE @ErrorMessage NVARCHAR(4000);  
+	DECLARE @ErrorSeverity INT;  
+	DECLARE @ErrorState INT;  
+	SELECT   
+	@TranName as Transaction_Name,
+	@ErrorMessage = ERROR_MESSAGE(),  
+	@ErrorSeverity = ERROR_SEVERITY(),  
+	@ErrorState = ERROR_STATE();  
+	RAISERROR (@ErrorMessage, @ErrorSeverity, @ErrorState); 
+END CATCH
