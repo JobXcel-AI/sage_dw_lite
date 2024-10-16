@@ -874,6 +874,7 @@ CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Jobs'), '(
 	job_number BIGINT,	
 	job_name NVARCHAR(75),
 	job_status NVARCHAR(8),
+	job_status_number INT,
 	client_id BIGINT,
 	client_name NVARCHAR(75),
 	job_type NVARCHAR(50),
@@ -942,6 +943,7 @@ SELECT
 		WHEN 6 THEN ''Closed''
 		ELSE ''Other''
 	END as job_status,
+	a.status as job_status_number,
 	r.recnum as client_id,
 	r.clnnme as client_name,
 	j.typnme as job_type,
