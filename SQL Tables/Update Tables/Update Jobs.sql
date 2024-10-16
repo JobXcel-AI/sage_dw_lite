@@ -30,6 +30,7 @@ SELECT
 		WHEN 6 THEN ''Closed''
 		ELSE ''Other''
 	END as job_status,
+	a.status as job_status_number,
 	r.recnum as client_id,
 	r.clnnme as client_name,
 	j.typnme as job_type,

@@ -8,7 +8,9 @@ DECLARE @SqlInsertQuery2 NVARCHAR(MAX);
 DECLARE @SqlInsertQuery NVARCHAR(MAX);
 DECLARE @SqlDeleteCommand NVARCHAR(100);
 DECLARE @TranName VARCHAR(20);
-
+DECLARE @ErrorMessage NVARCHAR(4000);  
+DECLARE @ErrorSeverity INT;  
+DECLARE @ErrorState INT;  
 
 
 --Update AR_Invoices Table
@@ -124,11 +126,7 @@ END TRY
 BEGIN CATCH
 	IF @@TRANCOUNT > 0
 		ROLLBACK TRANSACTION @TranName
-	DECLARE @ErrorMessage NVARCHAR(4000);  
-	DECLARE @ErrorSeverity INT;  
-	DECLARE @ErrorState INT;  
 	SELECT   
-	@TranName as Transaction_Name,
 	@ErrorMessage = ERROR_MESSAGE(),  
 	@ErrorSeverity = ERROR_SEVERITY(),  
 	@ErrorState = ERROR_STATE();  
@@ -202,11 +200,7 @@ END TRY
 BEGIN CATCH
 	IF @@TRANCOUNT > 0
 		ROLLBACK TRANSACTION @TranName
-	DECLARE @ErrorMessage NVARCHAR(4000);  
-	DECLARE @ErrorSeverity INT;  
-	DECLARE @ErrorState INT;  
 	SELECT   
-	@TranName as Transaction_Name,
 	@ErrorMessage = ERROR_MESSAGE(),  
 	@ErrorSeverity = ERROR_SEVERITY(),  
 	@ErrorState = ERROR_STATE();  
@@ -348,11 +342,7 @@ END TRY
 BEGIN CATCH
 	IF @@TRANCOUNT > 0
 		ROLLBACK TRANSACTION @TranName
-	DECLARE @ErrorMessage NVARCHAR(4000);  
-	DECLARE @ErrorSeverity INT;  
-	DECLARE @ErrorState INT;  
 	SELECT   
-	@TranName as Transaction_Name,
 	@ErrorMessage = ERROR_MESSAGE(),  
 	@ErrorSeverity = ERROR_SEVERITY(),  
 	@ErrorState = ERROR_STATE();  
@@ -394,11 +384,7 @@ END TRY
 BEGIN CATCH
 	IF @@TRANCOUNT > 0
 		ROLLBACK TRANSACTION @TranName
-	DECLARE @ErrorMessage NVARCHAR(4000);  
-	DECLARE @ErrorSeverity INT;  
-	DECLARE @ErrorState INT;  
 	SELECT   
-	@TranName as Transaction_Name,
 	@ErrorMessage = ERROR_MESSAGE(),  
 	@ErrorSeverity = ERROR_SEVERITY(),  
 	@ErrorState = ERROR_STATE();  
@@ -472,11 +458,7 @@ END TRY
 BEGIN CATCH
 	IF @@TRANCOUNT > 0
 		ROLLBACK TRANSACTION @TranName
-	DECLARE @ErrorMessage NVARCHAR(4000);  
-	DECLARE @ErrorSeverity INT;  
-	DECLARE @ErrorState INT;  
 	SELECT   
-	@TranName as Transaction_Name,
 	@ErrorMessage = ERROR_MESSAGE(),  
 	@ErrorSeverity = ERROR_SEVERITY(),  
 	@ErrorState = ERROR_STATE();  
@@ -545,11 +527,7 @@ END TRY
 BEGIN CATCH
 	IF @@TRANCOUNT > 0
 		ROLLBACK TRANSACTION @TranName
-	DECLARE @ErrorMessage NVARCHAR(4000);  
-	DECLARE @ErrorSeverity INT;  
-	DECLARE @ErrorState INT;  
 	SELECT   
-	@TranName as Transaction_Name,
 	@ErrorMessage = ERROR_MESSAGE(),  
 	@ErrorSeverity = ERROR_SEVERITY(),  
 	@ErrorState = ERROR_STATE();  
@@ -581,6 +559,7 @@ SELECT
 		WHEN 6 THEN ''Closed''
 		ELSE ''Other''
 	END as job_status,
+	a.status as job_status_number,
 	r.recnum as client_id,
 	r.clnnme as client_name,
 	j.typnme as job_type,
@@ -738,11 +717,7 @@ END TRY
 BEGIN CATCH
 	IF @@TRANCOUNT > 0
 		ROLLBACK TRANSACTION @TranName
-	DECLARE @ErrorMessage NVARCHAR(4000);  
-	DECLARE @ErrorSeverity INT;  
-	DECLARE @ErrorState INT;  
 	SELECT   
-	@TranName as Transaction_Name,
 	@ErrorMessage = ERROR_MESSAGE(),  
 	@ErrorSeverity = ERROR_SEVERITY(),  
 	@ErrorState = ERROR_STATE();  
@@ -839,11 +814,7 @@ END TRY
 BEGIN CATCH
 	IF @@TRANCOUNT > 0
 		ROLLBACK TRANSACTION @TranName
-	DECLARE @ErrorMessage NVARCHAR(4000);  
-	DECLARE @ErrorSeverity INT;  
-	DECLARE @ErrorState INT;  
 	SELECT   
-	@TranName as Transaction_Name,
 	@ErrorMessage = ERROR_MESSAGE(),  
 	@ErrorSeverity = ERROR_SEVERITY(),  
 	@ErrorState = ERROR_STATE();  
@@ -975,11 +946,7 @@ END TRY
 BEGIN CATCH
 	IF @@TRANCOUNT > 0
 		ROLLBACK TRANSACTION @TranName
-	DECLARE @ErrorMessage NVARCHAR(4000);  
-	DECLARE @ErrorSeverity INT;  
-	DECLARE @ErrorState INT;  
 	SELECT   
-	@TranName as Transaction_Name,
 	@ErrorMessage = ERROR_MESSAGE(),  
 	@ErrorSeverity = ERROR_SEVERITY(),  
 	@ErrorState = ERROR_STATE();  
@@ -1020,11 +987,7 @@ END TRY
 BEGIN CATCH
 	IF @@TRANCOUNT > 0
 		ROLLBACK TRANSACTION @TranName
-	DECLARE @ErrorMessage NVARCHAR(4000);  
-	DECLARE @ErrorSeverity INT;  
-	DECLARE @ErrorState INT;  
 	SELECT   
-	@TranName as Transaction_Name,
 	@ErrorMessage = ERROR_MESSAGE(),  
 	@ErrorSeverity = ERROR_SEVERITY(),  
 	@ErrorState = ERROR_STATE();  
@@ -1191,11 +1154,7 @@ END TRY
 BEGIN CATCH
 	IF @@TRANCOUNT > 0
 		ROLLBACK TRANSACTION @TranName
-	DECLARE @ErrorMessage NVARCHAR(4000);  
-	DECLARE @ErrorSeverity INT;  
-	DECLARE @ErrorState INT;  
 	SELECT   
-	@TranName as Transaction_Name,
 	@ErrorMessage = ERROR_MESSAGE(),  
 	@ErrorSeverity = ERROR_SEVERITY(),  
 	@ErrorState = ERROR_STATE();  
@@ -1446,11 +1405,7 @@ END TRY
 BEGIN CATCH
 	IF @@TRANCOUNT > 0
 		ROLLBACK TRANSACTION @TranName
-	DECLARE @ErrorMessage NVARCHAR(4000);  
-	DECLARE @ErrorSeverity INT;  
-	DECLARE @ErrorState INT;  
 	SELECT   
-	@TranName as Transaction_Name,
 	@ErrorMessage = ERROR_MESSAGE(),  
 	@ErrorSeverity = ERROR_SEVERITY(),  
 	@ErrorState = ERROR_STATE();  
@@ -1538,11 +1493,7 @@ END TRY
 BEGIN CATCH
 	IF @@TRANCOUNT > 0
 		ROLLBACK TRANSACTION @TranName
-	DECLARE @ErrorMessage NVARCHAR(4000);  
-	DECLARE @ErrorSeverity INT;  
-	DECLARE @ErrorState INT;  
 	SELECT   
-	@TranName as Transaction_Name,
 	@ErrorMessage = ERROR_MESSAGE(),  
 	@ErrorSeverity = ERROR_SEVERITY(),  
 	@ErrorState = ERROR_STATE();  
@@ -1663,11 +1614,7 @@ END TRY
 BEGIN CATCH
 	IF @@TRANCOUNT > 0
 		ROLLBACK TRANSACTION @TranName
-	DECLARE @ErrorMessage NVARCHAR(4000);  
-	DECLARE @ErrorSeverity INT;  
-	DECLARE @ErrorState INT;  
 	SELECT   
-	@TranName as Transaction_Name,
 	@ErrorMessage = ERROR_MESSAGE(),  
 	@ErrorSeverity = ERROR_SEVERITY(),  
 	@ErrorState = ERROR_STATE();  
@@ -1750,11 +1697,7 @@ END TRY
 BEGIN CATCH
 	IF @@TRANCOUNT > 0
 		ROLLBACK TRANSACTION @TranName
-	DECLARE @ErrorMessage NVARCHAR(4000);  
-	DECLARE @ErrorSeverity INT;  
-	DECLARE @ErrorState INT;  
 	SELECT   
-	@TranName as Transaction_Name,
 	@ErrorMessage = ERROR_MESSAGE(),  
 	@ErrorSeverity = ERROR_SEVERITY(),  
 	@ErrorState = ERROR_STATE();  
@@ -1824,11 +1767,7 @@ END TRY
 BEGIN CATCH
 	IF @@TRANCOUNT > 0
 		ROLLBACK TRANSACTION @TranName
-	DECLARE @ErrorMessage NVARCHAR(4000);  
-	DECLARE @ErrorSeverity INT;  
-	DECLARE @ErrorState INT;  
 	SELECT   
-	@TranName as Transaction_Name,
 	@ErrorMessage = ERROR_MESSAGE(),  
 	@ErrorSeverity = ERROR_SEVERITY(),  
 	@ErrorState = ERROR_STATE();  
