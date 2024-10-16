@@ -43,9 +43,10 @@ CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('AR_Invoices'), '(
 	ar_invoice_payments_discount_taken DECIMAL(14,2),
 	ar_invoice_payments_credit_taken DECIMAL(14,2),
 	last_payment_received_date DATE,
-	created_date DATE,
+	created_date DATETIME,
+	last_updated_date DATETIME,
 	is_deleted BIT DEFAULT 0,
-	deleted_date DATE
+	deleted_date DATETIME
 )')
 
 EXECUTE sp_executesql @SqlCreateTableCommand
@@ -112,6 +113,7 @@ SELECT
 	ISNULL(pmt.aplcrd,0) as ar_invoice_payments_credit_taken,
 	pmt.chkdte as last_payment_received_date,
 	a.insdte as created_date,
+	a.upddte as last_updated_date,
 	0 as is_deleted,
 	null as deleted_date
 FROM ',QUOTENAME(@Client_DB_Name),'.dbo.actrec a

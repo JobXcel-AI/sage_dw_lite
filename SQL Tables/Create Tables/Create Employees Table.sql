@@ -23,9 +23,10 @@ CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Employees'), '(
 	department NVARCHAR(50),
 	hire_date DATE,
 	date_inactive DATE,
-	created_date DATE,
+	created_date DATETIME,
+	last_updated_date DATETIME,
 	is_deleted BIT DEFAULT 0,
-	deleted_date DATE
+	deleted_date DATETIME
 )')
 
 EXECUTE sp_executesql @SqlCreateTableCommand
@@ -62,6 +63,7 @@ SELECT
 	dtehre as hire_date,
 	dteina as date_inactive,
 	e.insdte as created_date,
+	e.upddte as last_updated_date,
 	0 as is_deleted,
 	null as deleted_date 
 FROM ',QUOTENAME(@Client_DB_Name),'.dbo.employ e

@@ -54,9 +54,10 @@ CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Jobs'), '(
 	takeoff_overhead_amount_excl_labor DECIMAL(14,2) DEFAULT 0, 
 	takeoff_profit_amount_excl_labor DECIMAL(14,2) DEFAULT 0, 
 	takeoff_ext_price_excl_labor DECIMAL(14,2) DEFAULT 0,
-	created_date DATE,
+	created_date DATETIME,
+	last_updated_date DATETIME,
 	is_deleted BIT DEFAULT 0,
-	deleted_date DATE
+	deleted_date DATETIME
 )')
 
 EXECUTE sp_executesql @SqlCreateTableCommand
@@ -124,6 +125,7 @@ SELECT
 	ISNULL(tkof.profit_amount,0) as takeoff_profit_amount_excl_labor, 
 	ISNULL(tkof.ext_price,0) as takeoff_ext_price_excl_labor,
 	a.insdte as created_date,
+	a.upddte as last_updated_date,
 	0 as is_deleted,
 	null as deleted_date 
 ')

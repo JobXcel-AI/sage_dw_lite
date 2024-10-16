@@ -44,9 +44,10 @@ CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Payroll_Records'), '(
 	timecard_regular_hours DECIMAL(9,2) DEFAULT 0,
 	timecard_overtime_hours DECIMAL(9,2) DEFAULT 0,
 	timecard_premium_hours DECIMAL(9,2) DEFAULT 0,
-	created_date DATE,
+	created_date DATETIME,
+	last_updated_date DATETIME,
 	is_deleted BIT DEFAULT 0,
-	deleted_date DATE
+	deleted_date DATETIME
 )')
 
 EXECUTE sp_executesql @SqlCreateTableCommand
@@ -118,6 +119,7 @@ SELECT
 	ISNULL(tc.overtime_hours,0) as timecard_overtime_hours,
 	ISNULL(tc.premium_hours,0) as timecard_premium_hours,
 	p.insdte as created_date,
+	p.upddte as last_updated_date,
 	0 as is_deleted,
 	null as deleted_date
 FROM ',QUOTENAME(@Client_DB_Name),'.dbo.payrec p

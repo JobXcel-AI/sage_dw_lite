@@ -23,9 +23,10 @@ CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Inventory'), '(
 	cost_type NVARCHAR(30),
 	last_updated DATE,
 	part_notes NVARCHAR(MAX),
-	created_date DATE,
+	created_date DATETIME,
+	last_updated_date DATETIME,
 	is_deleted BIT DEFAULT 0,
-	deleted_date DATE
+	deleted_date DATETIME
 )')
 
 EXECUTE sp_executesql @SqlCreateTableCommand
@@ -53,6 +54,7 @@ SELECT
 	p.lstupd as last_updated,
 	p.ntetxt as part_notes,
 	q.insdte as created_date,
+	q.upddte as last_updated_date,
 	0 as is_deleted,
 	null as deleted_date
 FROM ',QUOTENAME(@Client_DB_Name),'.dbo.invqty q

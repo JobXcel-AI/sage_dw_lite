@@ -43,6 +43,7 @@ SELECT
 	ISNULL(appamt,0) as approved_amount,
 	ISNULL(ovhamt,0) as overhead_amount,
 	c.insdte as created_date,
+	c.upddte as last_updated_date,
 	0 as is_deleted,
 	null as deleted_date
 FROM ',QUOTENAME(@Client_DB_Name),'.dbo.prmchg c

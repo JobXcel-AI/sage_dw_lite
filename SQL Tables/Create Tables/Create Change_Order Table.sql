@@ -26,9 +26,9 @@ CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Change_Orders'), '(
 	approved_amount DECIMAL(12,2),
 	overhead_amount DECIMAL(12,2),
 	created_date DATETIME,
+	last_updated_date DATETIME,
 	is_deleted BIT DEFAULT 0,
-	deleted_date DATE,
-	last_updated_date DATETIME
+	deleted_date DATETIME
 )')
 
 EXECUTE sp_executesql @SqlCreateTableCommand
@@ -65,9 +65,9 @@ SELECT
 	ISNULL(appamt,0) as approved_amount,
 	ISNULL(ovhamt,0) as overhead_amount,
 	c.insdte as created_date,
+	c.upddte as last_updated_date,
 	0 as is_deleted,
-	null as deleted_date,
-	c.upddte as last_updated_date
+	null as deleted_date
 FROM ',QUOTENAME(@Client_DB_Name),'.dbo.prmchg c
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.actrec a on a.recnum = c.jobnum
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.chgtyp ct on ct.recnum = c.chgtyp')

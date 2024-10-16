@@ -31,9 +31,10 @@ CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Purchase_Orders'), '(
 	vendor_email NVARCHAR(75),
 	vendor_phone_number NVARCHAR(14),
 	delivery_via NVARCHAR(30),
-	created_date DATE,
+	created_date DATETIME,
+	last_updated_date DATETIME,
 	is_deleted BIT DEFAULT 0,
-	deleted_date DATE
+	deleted_date DATETIME
 )')
 
 EXECUTE sp_executesql @SqlCreateTableCommand
@@ -76,6 +77,7 @@ SELECT
 	a.phnnum as vendor_phone_number,
 	p.delvia as delivery_via,
 	p.insdte as created_date,
+	p.upddte as last_updated_date,
 	0 as is_deleted,
 	null as deleted_date
 FROM ',QUOTENAME(@Client_DB_Name),'.dbo.pchord p
