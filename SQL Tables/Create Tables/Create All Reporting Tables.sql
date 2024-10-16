@@ -1075,7 +1075,7 @@ LEFT JOIN
 		SUM(ovhamt) as overhead_amount, 
 		SUM(pftamt) as profit_amount, 
 		SUM(bidprc) as ext_price 
-	FROM tkflin 
+	FROM ',QUOTENAME(@Client_DB_Name),'.dbo.tkflin 
 	WHERE prtdsc NOT LIKE ''%labor%''
 	GROUP BY recnum
 ) tkof on tkof.recnum = a.recnum
