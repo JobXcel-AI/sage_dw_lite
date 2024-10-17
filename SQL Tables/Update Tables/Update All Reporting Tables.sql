@@ -1182,7 +1182,7 @@ SELECT
 		WHEN 1 THEN ''Subaccounts''
 		WHEN 2 THEN ''Departments''
 		ELSE ''Other''
-	END as subsidary_type,
+	END as subsidiary_type,
 	pa.lngnme as summary_account,
 	ct.typnme as cost_type,
 	a.endbal as ending_balance,

@@ -9,7 +9,7 @@ SET @SqlCreateTableCommand = CONCAT(N'
 CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Ledger_Accounts'), '(
 	ledger_account_id BIGINT,
 	ledger_account NVARCHAR(50),
-	subsidary_type NVARCHAR(12),
+	subsidiary_type NVARCHAR(12),
 	summary_account NVARCHAR(50),
 	cost_type NVARCHAR(30),
 	ending_balance DECIMAL(14,2),
@@ -87,7 +87,7 @@ SELECT
 		WHEN 1 THEN ''Subaccounts''
 		WHEN 2 THEN ''Departments''
 		ELSE ''Other''
-	END as subsidary_type,
+	END as subsidiary_type,
 	pa.lngnme as summary_account,
 	ct.typnme as cost_type,
 	a.endbal as ending_balance,
