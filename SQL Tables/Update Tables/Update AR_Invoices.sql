@@ -72,8 +72,8 @@ SELECT
 	ISNULL(pmt.dsctkn,0) as ar_invoice_payments_discount_taken,
 	ISNULL(pmt.aplcrd,0) as ar_invoice_payments_credit_taken,
 	pmt.chkdte as last_payment_received_date,
-	a.insdte as created_date,
-	a.upddte as last_updated_date,
+	acrinv.insdte as created_date,
+	acrinv.upddte as last_updated_date,
 	0 as is_deleted,
 	null as deleted_date
 FROM ',QUOTENAME(@Client_DB_Name),'.dbo.actrec a
@@ -102,7 +102,7 @@ SELECT *,
 	1 as is_deleted,
 	GETDATE() as deleted_date
 FROM #TempTbl t 
-WHERE t.job_number NOT IN (SELECT job_number FROM ',@Reporting_DB_Name,N'.dbo.AR_Invoices)
+WHERE t.ar_invoice_id NOT IN (SELECT ar_invoice_id FROM ',@Reporting_DB_Name,N'.dbo.AR_Invoices)
 UNION ALL 
 SELECT * FROM #DeletedRecords
 ')
