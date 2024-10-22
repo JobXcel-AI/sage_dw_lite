@@ -1,3 +1,6 @@
+--This patch has already been applied to all production instances.
+
+
 --Specify Client DB Name
 DECLARE @Client_DB_Name NVARCHAR(50) = 'Nvision';  
 --Specify Reporting DB Name
