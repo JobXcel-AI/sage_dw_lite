@@ -72,6 +72,7 @@ SELECT
 	ISNULL(pmt.dsctkn,0) as ar_invoice_payments_discount_taken,
 	ISNULL(pmt.aplcrd,0) as ar_invoice_payments_credit_taken,
 	pmt.chkdte as last_payment_received_date,
+	tc.last_date_worked,
 	acrinv.insdte as created_date,
 	acrinv.upddte as last_updated_date,
 	0 as is_deleted,
@@ -95,7 +96,14 @@ LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.reccln r on r.recnum = a.clnnum
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.taxent te on te.recnum = tax.entty1
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.taxent te2 on te2.recnum = tax.entty2
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.employ es on es.recnum = a.sprvsr 
-LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.employ e on e.recnum = a.slsemp;',
+LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.employ e on e.recnum = a.slsemp
+LEFT JOIN (
+	SELECT
+		MAX(dtewrk) last_date_worked,
+		jobnum
+	FROM ',QUOTENAME(@Client_DB_Name),'.dbo.tmcdln
+	GROUP BY jobnum
+) tc on tc.jobnum = a.recnum;',
 --Step 3. Find any values in Temp Table not in Reporting Table, insert them as records flagged as deleted
 'INSERT INTO ',@Reporting_DB_Name,N'.dbo.AR_Invoices
 SELECT *, 
