@@ -22,7 +22,24 @@ BEGIN
 	EXECUTE sp_executesql @NestedSQL
 END
 ')
-EXECUTE sp_executesql @DropConstraints
+SELECT @TranName = 'AR_Invoice_Drop_Constraint_Is_Deleted';
+BEGIN TRY
+	BEGIN TRANSACTION @TranName;
+
+	EXECUTE sp_executesql @DropConstraints
+
+	COMMIT TRANSACTION @TranName
+END TRY
+BEGIN CATCH
+	IF @@TRANCOUNT > 0
+		ROLLBACK TRANSACTION @TranName
+	SELECT   
+	@ErrorMessage = ERROR_MESSAGE(),  
+	@ErrorSeverity = ERROR_SEVERITY(),  
+	@ErrorState = ERROR_STATE();  
+	RAISERROR (@ErrorMessage, @ErrorSeverity, @ErrorState); 
+END CATCH
+
 
 --Insert last_date_worked column into AR_Invoices.  Also places it 5th from the last, temporarily removing and readding the last 4 columns in AR_Invoices
 SET @SqlPatchQuery = CONCAT(N'
