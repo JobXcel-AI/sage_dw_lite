@@ -783,6 +783,10 @@ SELECT
 		WHEN ct.typnme = ''Other'' THEN ISNULL(cstamt,0)
 		ELSE 0 
 	END as other_cost,
+	CASE 
+		WHEN ct.typnme = ''Subcontract'' THEN ISNULL(cstamt,0)
+		ELSE 0 
+	END as subcontract_cost,
 	ISNULL(j.blgqty,0) as billing_quantity,
 	ISNULL(j.blgamt,0) as billing_amount,
 	ISNULL(j.ovhamt,0) as overhead_amount,
