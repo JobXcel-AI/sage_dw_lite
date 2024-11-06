@@ -8,7 +8,7 @@ DECLARE @SqlCreateTableCommand NVARCHAR(MAX);
 SET @SqlCreateTableCommand = CONCAT(N'
 CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Job_Budget_Lines'), '(
 	job_number BIGINT,
-	cost_code BIGINT,
+	cost_code NVARCHAR(50),
 	total_budget DECIMAL(12,2),
 	materials DECIMAL(12,2),
 	labor DECIMAL(12,2),

@@ -15,7 +15,7 @@ CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Purchase_Order_Lines'), '(
 	purchase_order_type NVARCHAR(50),
 	purchase_order_status NVARCHAR(7),
 	equipment BIGINT,
-	cost_code BIGINT,
+	cost_code NVARCHAR(50),
 	committed_total DECIMAL(12,2),
 	total DECIMAL(12,2),
 	price DECIMAL(12,2),

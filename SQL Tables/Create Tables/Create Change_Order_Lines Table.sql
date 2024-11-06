@@ -22,7 +22,7 @@ CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Change_Order_Lines'), '(
 	approved_date DATE,
 	invoice_date DATE,
 	purchase_order_number NVARCHAR(30),
-	cost_code BIGINT,
+	cost_code NVARCHAR(50),
 	total_change_amount DECIMAL(12,2),
 	material DECIMAL(12,2), 
 	other DECIMAL(12,2), 
