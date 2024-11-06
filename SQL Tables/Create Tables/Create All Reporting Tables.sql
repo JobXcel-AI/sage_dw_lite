@@ -370,6 +370,7 @@ CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Job_Cost'), '(
 	labor_cost DECIMAL(12,2),
 	equipment_cost DECIMAL(12,2),
 	other_cost DECIMAL(12,2),
+	subcontract_cost DECIMAL(12,2),
 	billing_quantity DECIMAL(7,2),
 	billing_amount DECIMAL(12,2),
 	overhead_amount DECIMAL(12,2),
@@ -423,6 +424,10 @@ SELECT
 		WHEN ct.typnme = ''Other'' THEN ISNULL(cstamt,0)
 		ELSE 0 
 	END as other_cost,
+	CASE 
+		WHEN ct.typnme = ''Subcontract'' THEN ISNULL(cstamt,0)
+		ELSE 0 
+	END as subcontract_cost,
 	ISNULL(j.blgqty,0) as billing_quantity,
 	ISNULL(j.blgamt,0) as billing_amount,
 	ISNULL(j.ovhamt,0) as overhead_amount,
@@ -1780,6 +1785,353 @@ BEGIN
 		AND valid_to_date >= @DateVal
 	SET @DateVal = DATEADD(MONTH,1,@DateVal)
 END
+')
+
+EXECUTE sp_executesql @SqlInsertCommand
+
+
+
+SET @SqlCreateTableCommand = CONCAT(N'
+CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Purchase_Order_Lines'), '(
+	purchase_order_id BIGINT,
+	purchase_order_number NVARCHAR(20),
+	purchase_order_description NVARCHAR(50),
+	purchase_order_date DATE,
+	delivery_date DATE,
+	purchase_order_type NVARCHAR(50),
+	purchase_order_status NVARCHAR(7),
+	equipment BIGINT,
+	cost_code BIGINT,
+	committed_total DECIMAL(12,2),
+	total DECIMAL(12,2),
+	price DECIMAL(12,2),
+	quantity DECIMAL(12,2),
+	received_to_date DECIMAL(12,2),
+	canceled DECIMAL(12,2),
+	job_number BIGINT,
+	hot_list BIT,
+	vendor_id BIGINT,
+	vendor_name NVARCHAR(75),
+	vendor_account_number NVARCHAR(30),
+	vendor_type NVARCHAR(50),
+	vendor_email NVARCHAR(75),
+	vendor_phone_number NVARCHAR(14),
+	delivery_via NVARCHAR(30),
+	created_date DATETIME,
+	last_updated_date DATETIME,
+	is_deleted BIT DEFAULT 0,
+	deleted_date DATETIME
+)')
+
+EXECUTE sp_executesql @SqlCreateTableCommand
+
+--SQL data insertion Query
+SET @SqlInsertCommand = CONCAT(N'
+INSERT INTO ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Purchase_Order_Lines'),' 
+
+SELECT
+	p.recnum as purchase_order_id,
+	ordnum as purchase_order_number,
+	p.dscrpt as purchase_order_description,
+	orddte as purchase_order_date,
+	deldte as delivery_date,
+	pt.typnme as purchase_order_type,
+	CASE
+		WHEN p.status = 1 THEN ''Open''
+		WHEN p.status = 2 THEN ''Review''
+		WHEN p.status = 3 THEN ''Dispute''
+		WHEN p.status = 4 THEN ''Closed''
+		WHEN p.status = 5 THEN ''Void''
+		WHEN p.status = 6 THEN ''Master''
+	END as purchase_order_status,
+	e.eqpnme as equipment,
+	l.cstcde as cost_code,
+	l.committed_total,
+	l.total,
+	l.price,
+	l.quantity,
+	l.received_to_date,
+	l.canceled,
+	p.jobnum as job_number,
+	p.hotlst as hot_list,
+	a.recnum as vendor_id,
+	a.vndnme as vendor_name,
+	a.actnum as vendor_account_number,
+	vt.typnme as vendor_type,
+	a.e_mail as vendor_email,
+	a.phnnum as vendor_phone_number,
+	p.delvia as delivery_via,
+	p.insdte as created_date,
+	p.upddte as last_updated_date,
+	0 as is_deleted,
+	null as deleted_date
+FROM ',QUOTENAME(@Client_DB_Name),'.dbo.pchord p
+LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.actpay a on a.recnum = p.vndnum
+LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.vndtyp vt on vt.recnum = a.vndtyp
+LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.eqpmnt e on e.recnum = p.eqpmnt
+LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.pchtyp pt on pt.recnum = p.ordtyp
+LEFT JOIN (
+	SELECT 
+	recnum,
+	cstcde,
+	SUM(linprc) * (SUM(linqty) - SUM(rcvdte) - SUM(cancel)) as committed_total,
+	SUM(extttl) as total,
+	SUM(linprc) as price,
+	SUM(linqty) as quantity,
+	SUM(rcvdte) as received_to_date,
+	SUM(cancel) as canceled 
+	FROM ',QUOTENAME(@Client_DB_Name),'.dbo.pcorln 
+	GROUP BY recnum, cstcde
+) l on l.recnum = p.recnum 
+')
+
+EXECUTE sp_executesql @SqlInsertCommand
+
+
+
+SET @SqlCreateTableCommand = CONCAT(N'
+CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Change_Order_Lines'), '(
+	change_order_id BIGINT,
+	change_order_number NVARCHAR(20),
+	change_order_date DATE,
+	job_number BIGINT,
+	job_name NVARCHAR(75),
+	job_phase_number BIGINT,
+	status NVARCHAR(8),
+	status_number INT,
+	change_order_description NVARCHAR(50),
+	change_type NVARCHAR(50),
+	reason NVARCHAR(50),
+	submitted_date DATE,
+	approved_date DATE,
+	invoice_date DATE,
+	purchase_order_number NVARCHAR(30),
+	cost_code BIGINT,
+	total_change_amount DECIMAL(12,2),
+	material DECIMAL(12,2), 
+	other DECIMAL(12,2), 
+	subcontract DECIMAL(12,2), 
+	equipment DECIMAL(12,2),
+	labor DECIMAL(12,2),
+	user_defined6 DECIMAL(12,2),
+	user_defined7 DECIMAL(12,2),
+	user_defined8 DECIMAL(12,2),
+	user_defined9 DECIMAL(12,2),
+	created_date DATETIME,
+	last_updated_date DATETIME,
+	is_deleted BIT DEFAULT 0,
+	deleted_date DATETIME
+)')
+
+EXECUTE sp_executesql @SqlCreateTableCommand
+
+--SQL data insertion Query
+SET @SqlInsertCommand = CONCAT(N'
+INSERT INTO ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Change_Order_Lines'),' 
+
+SELECT 
+	c.recnum as change_order_id,
+	chgnum as change_order_number,
+	chgdte as change_order_date,
+	jobnum as job_number,
+	a.jobnme as job_name,
+	c.phsnum as job_phase_number,
+	CASE c.status
+		WHEN 1 THEN ''Approved''
+		WHEN 2 THEN ''Open''
+		WHEN 3 THEN ''Review''
+		WHEN 4 THEN ''Disputed''
+		WHEN 5 THEN ''Void''
+		WHen 6 THEN ''Rejected''
+	END as status,
+	c.status as status_number,
+	dscrpt as change_order_description,
+	ct.typnme as change_type,
+	reason,
+	subdte as submitted_date,
+	aprdte as approved_date,
+	invdte as invoice_date,
+	c.pchord as purchase_order_number,
+	s.cstcde as cost_code,	
+	s.total_change_amount,
+	s.material, 
+	s.other, 
+	s.subcontract, 
+	s.equipment,
+	s.labor,
+	s.user_defined6,
+	s.user_defined7,
+	s.user_defined8,
+	s.user_defined9,
+	c.insdte as created_date,
+	c.upddte as last_updated_date,
+	0 as is_deleted,
+	null as deleted_date
+FROM ',QUOTENAME(@Client_DB_Name),'.dbo.prmchg c
+LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.actrec a on a.recnum = c.jobnum
+LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.chgtyp ct on ct.recnum = c.chgtyp
+LEFT JOIN (
+	SELECT 
+	recnum, 
+	cstcde, 
+	SUM(Material) as material, 
+	SUM(Other) as other, 
+	SUM(Subcontract) as subcontract, 
+	SUM(Equipment) as equipment,
+	SUM(Labor) as labor,
+	SUM(user_defined6) as user_defined6,
+	SUM(user_defined7) as user_defined7,
+	SUM(user_defined8) as user_defined8,
+	SUM(user_defined9) as user_defined9,
+	SUM(Material) + SUM(Other) + SUM(Subcontract) + SUM(Equipment) + SUM(Labor) + SUM(user_defined6) + SUM(user_defined7) + SUM(user_defined8) + SUM(user_defined9) as total_change_amount
+	FROM (
+		SELECT
+		recnum, 
+		ISNULL(cstcde,0) as cstcde,
+		CASE WHEN csttyp = 1 THEN SUM(bdgprc) ELSE 0 END as Material,
+		CASE WHEN csttyp = 2 THEN SUM(bdgprc) ELSE 0 END as Labor,
+		CASE WHEN csttyp = 3 THEN SUM(bdgprc) ELSE 0 END as Equipment,
+		CASE WHEN csttyp = 4 THEN SUM(bdgprc) ELSE 0 END as Subcontract,
+		CASE WHEN csttyp = 5 THEN SUM(bdgprc) ELSE 0 END as Other,
+		CASE WHEN csttyp = 6 THEN SUM(bdgprc) ELSE 0 END as user_defined6,
+		CASE WHEN csttyp = 7 THEN SUM(bdgprc) ELSE 0 END as user_defined7,
+		CASE WHEN csttyp = 8 THEN SUM(bdgprc) ELSE 0 END as user_defined8,
+		CASE WHEN csttyp = 9 THEN SUM(bdgprc) ELSE 0 END as user_defined9
+		FROM ',QUOTENAME(@Client_DB_Name),'.dbo.sbcgln 
+		GROUP BY recnum, ISNULL(cstcde,0), csttyp
+  ) s2 
+  group by recnum, cstcde
+) s ON c.recnum = s.recnum
+')
+
+EXECUTE sp_executesql @SqlInsertCommand
+
+
+
+SET @SqlCreateTableCommand = CONCAT(N'
+CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Subcontract_Lines'), '(
+	subcontract_id BIGINT,
+	subcontract_number NVARCHAR(20),
+	subcontract_date DATE,
+	scheduled_start_date DATE,
+	scheduled_finish_date DATE,
+	actual_start_date DATE,
+	actual_finish_date DATE,
+	subcontract_status NVARCHAR(8),
+	job_number BIGINT,
+	cost_code BIGINT,
+	remaining_amount DECIMAL(12,2),
+	hot_list BIT,
+	vendor_id BIGINT,
+	vendor_name NVARCHAR(75),
+	vendor_account_number NVARCHAR(30),
+	vendor_type NVARCHAR(50),
+	vendor_email NVARCHAR(75),
+	vendor_phone_number NVARCHAR(14),
+	created_date DATETIME,
+	last_updated_date DATETIME,
+	is_deleted BIT DEFAULT 0,
+	deleted_date DATETIME
+)')
+
+EXECUTE sp_executesql @SqlCreateTableCommand
+
+--SQL data insertion Query
+SET @SqlInsertCommand = CONCAT(N'
+INSERT INTO ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Subcontract_Lines'),' 
+
+SELECT
+	p.recnum as subcontract_id,
+	p.ctcnum as subcontract_number,
+	p.condte as subcontract_date,
+	p.orgstr as scheduled_start_date,
+	p.orgfin as scheduled_finish_date,
+	p.strdte as actual_start_date,
+	p.findte as actual_finish_date,
+	CASE
+		WHEN p.status = 1 THEN ''Bid''
+		WHEN p.status = 2 THEN ''Refused''
+		WHEN p.status = 3 THEN ''Contract''
+		WHEN p.status = 4 THEN ''Current''
+		WHEN p.status = 5 THEN ''Complete''
+		WHEN p.status = 6 THEN ''Closed''
+	END as subcontract_status,
+	p.jobnum as job_number,
+	l.cstcde as cost_code,
+	l.remaining_amount,
+	p.hotlst as hot_list,
+	a.recnum as vendor_id,
+	a.vndnme as vendor_name,
+	a.actnum as vendor_account_number,
+	vt.typnme as vendor_type,
+	a.e_mail as vendor_email,
+	a.phnnum as vendor_phone_number,
+	p.insdte as created_date,
+	p.upddte as last_updated_date,
+	0 as is_deleted,
+	null as deleted_date
+FROM ',QUOTENAME(@Client_DB_Name),'.dbo.subcon p
+LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.actpay a on a.recnum = p.vndnum
+LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.vndtyp vt on vt.recnum = a.vndtyp
+LEFT JOIN (
+	SELECT 
+	recnum,
+	cstcde,
+	SUM(remain) as remaining_amount
+	FROM ',QUOTENAME(@Client_DB_Name),'.dbo.sbcnln
+	GROUP BY recnum, cstcde
+) l on l.recnum = p.recnum
+')
+
+EXECUTE sp_executesql @SqlInsertCommand
+
+
+
+SET @SqlCreateTableCommand = CONCAT(N'
+CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Job_Budget_Lines'), '(
+	job_number BIGINT,
+	cost_code BIGINT,
+	total_budget DECIMAL(12,2),
+	materials DECIMAL(12,2),
+	labor DECIMAL(12,2),
+	equipment DECIMAL(12,2),
+	subcontract DECIMAL(12,2),
+	other DECIMAL(12,2),
+	user_defined6 DECIMAL(12,2),
+	user_defined7 DECIMAL(12,2),
+	user_defined8 DECIMAL(12,2),
+	user_defined9 DECIMAL(12,2),
+	created_date DATETIME,
+	last_updated_date DATETIME,
+	is_deleted BIT DEFAULT 0,
+	deleted_date DATETIME
+)')
+
+EXECUTE sp_executesql @SqlCreateTableCommand
+
+--SQL data insertion Query
+SET @SqlInsertCommand = CONCAT(N'
+INSERT INTO ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Job_Budget_Lines'),' 
+
+SELECT
+	recnum as job_number,
+	cstcde as cost_code,
+	SUM(matbdg) + SUM(laborg) + SUM(eqpbdg) + SUM(subbdg) + SUM(othbdg) + SUM(cs6org) + SUM(cs7org) + SUM(cs8org) + SUM(cs9org) as total_budget,
+	SUM(matbdg) as materials, 
+	SUM(laborg) as labor, 
+	SUM(eqpbdg) as equipment, 
+	SUM(subbdg) as subcontract, 
+	SUM(othbdg) as other, 
+	SUM(cs6org) as user_defined6, 
+	SUM(cs7org) as user_defined7, 
+	SUM(cs8org) as user_defined8, 
+	SUM(cs9org) as user_defined9,
+	insdte as created_date,
+	upddte as last_updated_date,
+	0 as is_deleted,
+	null as deleted_date
+FROM ',QUOTENAME(@Client_DB_Name),'.dbo.bdglin
+GROUP BY recnum, cstcde, insdte, upddte
 ')
 
 EXECUTE sp_executesql @SqlInsertCommand
