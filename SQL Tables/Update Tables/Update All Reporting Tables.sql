@@ -123,6 +123,7 @@ UNION ALL
 SELECT * FROM #DeletedRecords
 ')
 
+SELECT 'AR_Invoices';
 SELECT @TranName = 'AR_Invoices';
 BEGIN TRY
 	BEGIN TRANSACTION @TranName;
@@ -197,6 +198,8 @@ WHERE t.change_order_id NOT IN (SELECT change_order_id FROM ',@Reporting_DB_Name
 UNION ALL 
 SELECT * FROM #DeletedRecords
 ')
+
+SELECT 'Change_Orders';
 SELECT @TranName = 'Change_Orders';
 BEGIN TRY
 	BEGIN TRANSACTION @TranName;
@@ -218,6 +221,7 @@ END CATCH
 
 
 --Update Change Order History
+SELECT 'Change_Order_History';
 SELECT @TranName = 'Change_Order_History';
 BEGIN TRY
 	BEGIN TRANSACTION @TranName;
@@ -455,6 +459,8 @@ WHERE t.employee_id NOT IN (SELECT employee_id FROM ',@Reporting_DB_Name,N'.dbo.
 UNION ALL 
 SELECT * FROM #DeletedRecords
 ')
+
+SELECT 'Employee';
 SELECT @TranName = 'Employee';
 BEGIN TRY
 	BEGIN TRANSACTION @TranName;
@@ -524,6 +530,8 @@ WHERE t.part_number NOT IN (SELECT part_number FROM ',@Reporting_DB_Name,N'.dbo.
 UNION ALL 
 SELECT * FROM #DeletedRecords
 ')
+
+SELECT 'Inventory';
 SELECT @TranName = 'Inventory';
 BEGIN TRY
 	BEGIN TRANSACTION @TranName;
@@ -714,6 +722,8 @@ UNION ALL
 SELECT * FROM #DeletedRecords
 ')
 SET @SqlInsertQuery = @SqlInsertQuery1 + @SqlInsertQuery2
+
+SELECT 'Jobs';
 SELECT @TranName = 'Jobs';
 BEGIN TRY
 	BEGIN TRANSACTION @TranName;
@@ -815,6 +825,7 @@ UNION ALL
 SELECT * FROM #DeletedRecords
 ')
 
+SELECT 'Job_Cost';
 SELECT @TranName = 'Job_Cost';
 BEGIN TRY
 	BEGIN TRANSACTION @TranName;
@@ -836,6 +847,7 @@ END CATCH
 
 
 --Update Job Status History
+SELECT 'Job_Status_History';
 SELECT @TranName = 'Job_Status_History';
 BEGIN TRY
 	BEGIN TRANSACTION @TranName;
@@ -968,6 +980,7 @@ END CATCH
 
 
 --Update Jobs Active History
+SELECT 'Jobs_Active_History';
 SELECT @TranName = 'Jobs_Active';
 BEGIN TRY
 	BEGIN TRANSACTION @TranName;
@@ -1009,6 +1022,7 @@ END CATCH
 
 
 --Update Job Cost Waterfall
+SELECT 'Job_Cost_Waterfall';
 SELECT @TranName = 'Job_Cost_Waterfall';
 BEGIN TRY
 	BEGIN TRANSACTION @TranName;
@@ -1406,6 +1420,8 @@ UNION ALL
 SELECT * FROM #DeletedRecords
 ')
 SET @SqlInsertQuery = @SqlInsertQuery1 + @SqlInsertQuery2
+
+SELECT 'Ledger_Accounts';
 SELECT @TranName = 'Ledger_Accounts';
 BEGIN TRY
 	BEGIN TRANSACTION @TranName;
@@ -1494,6 +1510,7 @@ UNION ALL
 SELECT * FROM #DeletedRecords
 ')
 
+SELECT 'Ledger_Transaction_Lines';
 SELECT @TranName = 'Ledger_Transaction_Lines';
 BEGIN TRY
 	BEGIN TRANSACTION @TranName;
@@ -1615,6 +1632,7 @@ UNION ALL
 SELECT * FROM #DeletedRecords
 ')
 
+SELECT 'Payroll_Records';
 SELECT @TranName = 'Payroll_Records';
 BEGIN TRY
 	BEGIN TRANSACTION @TranName;
@@ -1698,6 +1716,7 @@ UNION ALL
 SELECT * FROM #DeletedRecords
 ')
 
+SELECT 'Purchase_Orders';
 SELECT @TranName = 'Purchase_Orders';
 BEGIN TRY
 	BEGIN TRANSACTION @TranName;
@@ -1768,6 +1787,7 @@ UNION ALL
 SELECT * FROM #DeletedRecords
 ')
 
+SELECT 'Vendor Contacts';
 SELECT @TranName = 'Vendor_Contacts';
 BEGIN TRY
 	BEGIN TRANSACTION @TranName;
@@ -1785,3 +1805,368 @@ BEGIN CATCH
 	@ErrorState = ERROR_STATE();  
 	RAISERROR (@ErrorMessage, @ErrorSeverity, @ErrorState); 
 END CATCH
+
+
+
+--Update Subcontract_Lines Table
+SET @SqlInsertQuery = CONCAT(
+--Step 1. Temp table containing reporting table
+N'SELECT * INTO #TempTbl FROM ',@Reporting_DB_Name,N'.dbo.Subcontract_Lines;
+SELECT * INTO #DeletedRecords FROM #TempTbl WHERE is_deleted = 1;
+DELETE FROM #TempTbl WHERE is_deleted = 1;
+ALTER TABLE #TempTbl
+DROP COLUMN IF EXISTS is_deleted, deleted_date;',
+--Step 2. delete existing reporting table data and replace with updated values
+'DELETE FROM ',@Reporting_DB_Name,N'.dbo.Subcontract_Lines;
+INSERT INTO ',@Reporting_DB_Name,N'.dbo.Subcontract_Lines
+SELECT
+	p.recnum as subcontract_id,
+	p.ctcnum as subcontract_number,
+	p.condte as subcontract_date,
+	p.orgstr as scheduled_start_date,
+	p.orgfin as scheduled_finish_date,
+	p.strdte as actual_start_date,
+	p.findte as actual_finish_date,
+	CASE
+		WHEN p.status = 1 THEN ''Bid''
+		WHEN p.status = 2 THEN ''Refused''
+		WHEN p.status = 3 THEN ''Contract''
+		WHEN p.status = 4 THEN ''Current''
+		WHEN p.status = 5 THEN ''Complete''
+		WHEN p.status = 6 THEN ''Closed''
+	END as subcontract_status,
+	p.jobnum as job_number,
+	l.cstcde as cost_code,
+	l.remaining_amount,
+	p.hotlst as hot_list,
+	a.recnum as vendor_id,
+	a.vndnme as vendor_name,
+	a.actnum as vendor_account_number,
+	vt.typnme as vendor_type,
+	a.e_mail as vendor_email,
+	a.phnnum as vendor_phone_number,
+	p.insdte as created_date,
+	p.upddte as last_updated_date,
+	0 as is_deleted,
+	null as deleted_date
+FROM ',QUOTENAME(@Client_DB_Name),'.dbo.subcon p
+LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.actpay a on a.recnum = p.vndnum
+LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.vndtyp vt on vt.recnum = a.vndtyp
+LEFT JOIN (
+	SELECT 
+	recnum,
+	cstcde,
+	SUM(remain) as remaining_amount
+	FROM ',QUOTENAME(@Client_DB_Name),'.dbo.sbcnln
+	GROUP BY recnum, cstcde
+) l on l.recnum = p.recnum
+
+;',
+--Step 3. Find any values in Temp Table not in Reporting Table, insert them as records flagged as deleted
+'INSERT INTO ',@Reporting_DB_Name,N'.dbo.Change_Orders
+SELECT *, 
+	1 as is_deleted,
+	GETDATE() as deleted_date
+FROM #TempTbl t 
+WHERE t.subcontract_id NOT IN (SELECT subcontract_id FROM ',@Reporting_DB_Name,N'.dbo.Subcontract_Lines)
+UNION ALL 
+SELECT * FROM #DeletedRecords
+')
+
+SELECT 'Subcontract_Lines';
+SELECT @TranName = 'Subcontract_Lines';
+BEGIN TRY
+	BEGIN TRANSACTION @TranName;
+
+	EXECUTE sp_executesql @SqlInsertQuery
+
+	COMMIT TRANSACTION @TranName
+END TRY
+BEGIN CATCH
+	IF @@TRANCOUNT > 0
+		ROLLBACK TRANSACTION @TranName
+	SELECT   
+	@ErrorMessage = ERROR_MESSAGE(),  
+	@ErrorSeverity = ERROR_SEVERITY(),  
+	@ErrorState = ERROR_STATE();  
+	RAISERROR (@ErrorMessage, @ErrorSeverity, @ErrorState); 
+END CATCH
+
+
+--Update Change_Order_Lines Table
+SET @SqlInsertQuery = CONCAT(
+--Step 1. Temp table containing reporting table
+N'SELECT * INTO #TempTbl FROM ',@Reporting_DB_Name,N'.dbo.Change_Order_Lines;
+SELECT * INTO #DeletedRecords FROM #TempTbl WHERE is_deleted = 1;
+DELETE FROM #TempTbl WHERE is_deleted = 1;
+ALTER TABLE #TempTbl
+DROP COLUMN IF EXISTS is_deleted, deleted_date;',
+--Step 2. delete existing reporting table data and replace with updated values
+'DELETE FROM ',@Reporting_DB_Name,N'.dbo.Change_Order_Lines;
+INSERT INTO ',@Reporting_DB_Name,N'.dbo.Change_Order_Lines
+SELECT 
+	c.recnum as change_order_id,
+	chgnum as change_order_number,
+	chgdte as change_order_date,
+	jobnum as job_number,
+	a.jobnme as job_name,
+	c.phsnum as job_phase_number,
+	CASE c.status
+		WHEN 1 THEN ''Approved''
+		WHEN 2 THEN ''Open''
+		WHEN 3 THEN ''Review''
+		WHEN 4 THEN ''Disputed''
+		WHEN 5 THEN ''Void''
+		WHen 6 THEN ''Rejected''
+	END as status,
+	c.status as status_number,
+	dscrpt as change_order_description,
+	ct.typnme as change_type,
+	reason,
+	subdte as submitted_date,
+	aprdte as approved_date,
+	invdte as invoice_date,
+	c.pchord as purchase_order_number,
+	s.cstcde as cost_code,	
+	s.total_change_amount,
+	s.material, 
+	s.other, 
+	s.subcontract, 
+	s.equipment,
+	s.labor,
+	s.user_defined6,
+	s.user_defined7,
+	s.user_defined8,
+	s.user_defined9,
+	c.insdte as created_date,
+	c.upddte as last_updated_date,
+	0 as is_deleted,
+	null as deleted_date
+FROM ',QUOTENAME(@Client_DB_Name),'.dbo.prmchg c
+LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.actrec a on a.recnum = c.jobnum
+LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.chgtyp ct on ct.recnum = c.chgtyp
+LEFT JOIN (
+	SELECT 
+	recnum, 
+	cstcde, 
+	SUM(Material) as material, 
+	SUM(Other) as other, 
+	SUM(Subcontract) as subcontract, 
+	SUM(Equipment) as equipment,
+	SUM(Labor) as labor,
+	SUM(user_defined6) as user_defined6,
+	SUM(user_defined7) as user_defined7,
+	SUM(user_defined8) as user_defined8,
+	SUM(user_defined9) as user_defined9,
+	SUM(Material) + SUM(Other) + SUM(Subcontract) + SUM(Equipment) + SUM(Labor) + SUM(user_defined6) + SUM(user_defined7) + SUM(user_defined8) + SUM(user_defined9) as total_change_amount
+	FROM (
+		SELECT
+		recnum, 
+		ISNULL(cstcde,0) as cstcde,
+		CASE WHEN csttyp = 1 THEN SUM(bdgprc) ELSE 0 END as Material,
+		CASE WHEN csttyp = 2 THEN SUM(bdgprc) ELSE 0 END as Labor,
+		CASE WHEN csttyp = 3 THEN SUM(bdgprc) ELSE 0 END as Equipment,
+		CASE WHEN csttyp = 4 THEN SUM(bdgprc) ELSE 0 END as Subcontract,
+		CASE WHEN csttyp = 5 THEN SUM(bdgprc) ELSE 0 END as Other,
+		CASE WHEN csttyp = 6 THEN SUM(bdgprc) ELSE 0 END as user_defined6,
+		CASE WHEN csttyp = 7 THEN SUM(bdgprc) ELSE 0 END as user_defined7,
+		CASE WHEN csttyp = 8 THEN SUM(bdgprc) ELSE 0 END as user_defined8,
+		CASE WHEN csttyp = 9 THEN SUM(bdgprc) ELSE 0 END as user_defined9
+		FROM ',QUOTENAME(@Client_DB_Name),'.dbo.sbcgln 
+		GROUP BY recnum, ISNULL(cstcde,0), csttyp
+  ) s2 
+  group by recnum, cstcde
+) s ON c.recnum = s.recnum
+;',
+--Step 3. Find any values in Temp Table not in Reporting Table, insert them as records flagged as deleted
+'INSERT INTO ',@Reporting_DB_Name,N'.dbo.Change_Orders
+SELECT *, 
+	1 as is_deleted,
+	GETDATE() as deleted_date
+FROM #TempTbl t 
+WHERE t.change_order_id NOT IN (SELECT change_order_id FROM ',@Reporting_DB_Name,N'.dbo.Change_Order_Lines)
+UNION ALL 
+SELECT * FROM #DeletedRecords
+')
+
+
+SELECT 'Change_Order_Lines';
+SELECT @TranName = 'Change_Order_Lines';
+BEGIN TRY
+	BEGIN TRANSACTION @TranName;
+
+	EXECUTE sp_executesql @SqlInsertQuery
+
+	COMMIT TRANSACTION @TranName
+END TRY
+BEGIN CATCH
+	IF @@TRANCOUNT > 0
+		ROLLBACK TRANSACTION @TranName
+	SELECT   
+	@ErrorMessage = ERROR_MESSAGE(),  
+	@ErrorSeverity = ERROR_SEVERITY(),  
+	@ErrorState = ERROR_STATE();  
+	RAISERROR (@ErrorMessage, @ErrorSeverity, @ErrorState); 
+END CATCH
+
+
+
+--Update Purchase_Orders Table
+SET @SqlInsertQuery = CONCAT(
+--Step 1. Temp table containing reporting table
+N'SELECT * INTO #TempTbl FROM ',@Reporting_DB_Name,N'.dbo.Purchase_Order_Lines;
+SELECT * INTO #DeletedRecords FROM #TempTbl WHERE is_deleted = 1;
+DELETE FROM #TempTbl WHERE is_deleted = 1;
+ALTER TABLE #TempTbl
+DROP COLUMN IF EXISTS is_deleted, deleted_date;',
+--Step 2. delete existing reporting table data and replace with updated values
+'DELETE FROM ',@Reporting_DB_Name,N'.dbo.Purchase_Order_Lines;
+INSERT INTO ',@Reporting_DB_Name,N'.dbo.Purchase_Order_Lines
+SELECT
+	p.recnum as purchase_order_id,
+	ordnum as purchase_order_number,
+	p.dscrpt as purchase_order_description,
+	orddte as purchase_order_date,
+	deldte as delivery_date,
+	pt.typnme as purchase_order_type,
+	CASE
+		WHEN p.status = 1 THEN ''Open''
+		WHEN p.status = 2 THEN ''Review''
+		WHEN p.status = 3 THEN ''Dispute''
+		WHEN p.status = 4 THEN ''Closed''
+		WHEN p.status = 5 THEN ''Void''
+		WHEN p.status = 6 THEN ''Master''
+	END as purchase_order_status,
+	e.eqpnme as equipment,
+	l.cstcde as cost_code,
+	l.committed_total,
+	l.total,
+	l.price,
+	l.quantity,
+	l.received_to_date,
+	l.canceled,
+	p.jobnum as job_number,
+	p.hotlst as hot_list,
+	a.recnum as vendor_id,
+	a.vndnme as vendor_name,
+	a.actnum as vendor_account_number,
+	vt.typnme as vendor_type,
+	a.e_mail as vendor_email,
+	a.phnnum as vendor_phone_number,
+	p.delvia as delivery_via,
+	p.insdte as created_date,
+	p.upddte as last_updated_date,
+	0 as is_deleted,
+	null as deleted_date
+FROM ',QUOTENAME(@Client_DB_Name),'.dbo.pchord p
+LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.actpay a on a.recnum = p.vndnum
+LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.vndtyp vt on vt.recnum = a.vndtyp
+LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.eqpmnt e on e.recnum = p.eqpmnt
+LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.pchtyp pt on pt.recnum = p.ordtyp
+LEFT JOIN (
+	SELECT 
+	recnum,
+	cstcde,
+	SUM(linprc) * (SUM(linqty) - SUM(rcvdte) - SUM(cancel)) as committed_total,
+	SUM(extttl) as total,
+	SUM(linprc) as price,
+	SUM(linqty) as quantity,
+	SUM(rcvdte) as received_to_date,
+	SUM(cancel) as canceled 
+	FROM ',QUOTENAME(@Client_DB_Name),'.dbo.pcorln 
+	GROUP BY recnum, cstcde
+) l on l.recnum = p.recnum 
+
+;',
+--Step 3. Find any values in Temp Table not in Reporting Table, insert them as records flagged as deleted
+'INSERT INTO ',@Reporting_DB_Name,N'.dbo.Change_Orders
+SELECT *, 
+	1 as is_deleted,
+	GETDATE() as deleted_date
+FROM #TempTbl t 
+WHERE t.purchase_order_id NOT IN (SELECT purchase_order_id FROM ',@Reporting_DB_Name,N'.dbo.Purchase_Order_Lines)
+UNION ALL 
+SELECT * FROM #DeletedRecords
+')
+
+SELECT 'Purchase_Order_Lines';
+SELECT @TranName = 'Purchase_Order_Lines';
+BEGIN TRY
+	BEGIN TRANSACTION @TranName;
+
+	EXECUTE sp_executesql @SqlInsertQuery
+
+	COMMIT TRANSACTION @TranName
+END TRY
+BEGIN CATCH
+	IF @@TRANCOUNT > 0
+		ROLLBACK TRANSACTION @TranName
+	SELECT   
+	@ErrorMessage = ERROR_MESSAGE(),  
+	@ErrorSeverity = ERROR_SEVERITY(),  
+	@ErrorState = ERROR_STATE();  
+	RAISERROR (@ErrorMessage, @ErrorSeverity, @ErrorState); 
+END CATCH
+
+
+--Update Job_Budget_Lines Table
+SET @SqlInsertQuery = CONCAT(
+--Step 1. Temp table containing reporting table
+N'SELECT * INTO #TempTbl FROM ',@Reporting_DB_Name,N'.dbo.Job_Budget_Lines;
+SELECT * INTO #DeletedRecords FROM #TempTbl WHERE is_deleted = 1;
+DELETE FROM #TempTbl WHERE is_deleted = 1;
+ALTER TABLE #TempTbl
+DROP COLUMN IF EXISTS is_deleted, deleted_date;',
+--Step 2. delete existing reporting table data and replace with updated values
+'DELETE FROM ',@Reporting_DB_Name,N'.dbo.Job_Budget_Lines;
+INSERT INTO ',@Reporting_DB_Name,N'.dbo.Job_Budget_Lines
+SELECT
+	recnum as job_number,
+	cstcde as cost_code,
+	SUM(matbdg) + SUM(laborg) + SUM(eqpbdg) + SUM(subbdg) + SUM(othbdg) + SUM(cs6org) + SUM(cs7org) + SUM(cs8org) + SUM(cs9org) as total_budget,
+	SUM(matbdg) as materials, 
+	SUM(laborg) as labor, 
+	SUM(eqpbdg) as equipment, 
+	SUM(subbdg) as subcontract, 
+	SUM(othbdg) as other, 
+	SUM(cs6org) as user_defined6, 
+	SUM(cs7org) as user_defined7, 
+	SUM(cs8org) as user_defined8, 
+	SUM(cs9org) as user_defined9,
+	insdte as created_date,
+	upddte as last_updated_date,
+	0 as is_deleted,
+	null as deleted_date
+FROM ',QUOTENAME(@Client_DB_Name),'.dbo.bdglin
+GROUP BY recnum, cstcde, insdte, upddte
+;',
+--Step 3. Find any values in Temp Table not in Reporting Table, insert them as records flagged as deleted
+'INSERT INTO ',@Reporting_DB_Name,N'.dbo.Change_Orders
+SELECT *, 
+	1 as is_deleted,
+	GETDATE() as deleted_date
+FROM #TempTbl t 
+WHERE CONCAT(t.job_number,t.cost_code) NOT IN (SELECT CONCAT(job_number,cost_code) FROM ',@Reporting_DB_Name,N'.dbo.Job_Budget_Lines)
+UNION ALL 
+SELECT * FROM #DeletedRecords
+')
+
+SELECT 'Job_Budget_Lines';
+SELECT @TranName = 'Job_Budget_Lines';
+BEGIN TRY
+	BEGIN TRANSACTION @TranName;
+
+	EXECUTE sp_executesql @SqlInsertQuery
+
+	COMMIT TRANSACTION @TranName
+END TRY
+BEGIN CATCH
+	IF @@TRANCOUNT > 0
+		ROLLBACK TRANSACTION @TranName
+	SELECT   
+	@ErrorMessage = ERROR_MESSAGE(),  
+	@ErrorSeverity = ERROR_SEVERITY(),  
+	@ErrorState = ERROR_STATE();  
+	RAISERROR (@ErrorMessage, @ErrorSeverity, @ErrorState); 
+END CATCH
+
