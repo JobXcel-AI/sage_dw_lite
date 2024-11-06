@@ -73,7 +73,7 @@ LEFT JOIN (
 
 ;',
 --Step 3. Find any values in Temp Table not in Reporting Table, insert them as records flagged as deleted
-'INSERT INTO ',@Reporting_DB_Name,N'.dbo.Change_Orders
+'INSERT INTO ',@Reporting_DB_Name,N'.dbo.Purchase_Order_Lines
 SELECT *, 
 	1 as is_deleted,
 	GETDATE() as deleted_date
