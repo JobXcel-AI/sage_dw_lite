@@ -55,7 +55,6 @@ LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.sbcgln cl on cl.recnum = c.recnum
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.csttyp cst on cst.recnum = cl.csttyp
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.cstcde cd on cd.recnum = cl.cstcde
 GROUP BY c.recnum, c.chgnum, c.chgdte, jobnum, a.jobnme, c.phsnum, c.status, c.dscrpt, ct.typnme, reason, subdte, aprdte, invdte, c.pchord, cd.cdenme, cl.cstcde, cst.typnme, c.insdte,c.upddte
-) s ON c.recnum = s.recnum
 ;',
 --Step 3. Find any values in Temp Table not in Reporting Table, insert them as records flagged as deleted
 'INSERT INTO ',@Reporting_DB_Name,N'.dbo.Change_Order_Lines
