@@ -9,20 +9,9 @@ SET @SqlCreateTableCommand = CONCAT(N'
 CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Job_Budget_Lines'), '(
 	job_number BIGINT,
 	cost_code NVARCHAR(50),
-	total_budget DECIMAL(12,2),
-	materials DECIMAL(12,2),
-	labor DECIMAL(12,2),
-	equipment DECIMAL(12,2),
-	subcontract DECIMAL(12,2),
-	other DECIMAL(12,2),
-	user_defined6 DECIMAL(12,2),
-	user_defined7 DECIMAL(12,2),
-	user_defined8 DECIMAL(12,2),
-	user_defined9 DECIMAL(12,2),
-	created_date DATETIME,
-	last_updated_date DATETIME,
-	is_deleted BIT DEFAULT 0,
-	deleted_date DATETIME
+	cost_code_name NVARCHAR(50),
+	cost_type NVARCHAR(15),
+	budget DECIMAL(12,2)
 )')
 
 EXECUTE sp_executesql @SqlCreateTableCommand
@@ -33,24 +22,103 @@ SET @SqlInsertCommand = CONCAT(N'
 INSERT INTO ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Job_Budget_Lines'),' 
 
 SELECT
-	recnum as job_number,
+	b.recnum as job_number,
 	cstcde as cost_code,
-	SUM(matbdg) + SUM(laborg) + SUM(eqpbdg) + SUM(subbdg) + SUM(othbdg) + SUM(cs6org) + SUM(cs7org) + SUM(cs8org) + SUM(cs9org) as total_budget,
-	SUM(matbdg) as materials, 
-	SUM(laborg) as labor, 
-	SUM(eqpbdg) as equipment, 
-	SUM(subbdg) as subcontract, 
-	SUM(othbdg) as other, 
-	SUM(cs6org) as user_defined6, 
-	SUM(cs7org) as user_defined7, 
-	SUM(cs8org) as user_defined8, 
-	SUM(cs9org) as user_defined9,
-	insdte as created_date,
-	upddte as last_updated_date,
-	0 as is_deleted,
-	null as deleted_date
-FROM ',QUOTENAME(@Client_DB_Name),'.dbo.bdglin
-GROUP BY recnum, cstcde, insdte, upddte
+	cdenme as cost_code_name,
+	''Material'' as cost_type,
+	SUM(matbdg) as budget
+FROM ',QUOTENAME(@Client_DB_Name),'.dbo.bdglin b
+INNER JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.cstcde c on c.recnum = b.cstcde
+GROUP BY b.recnum, cstcde, cdenme
+HAVING SUM(matbdg) <> 0
+UNION ALL
+SELECT
+	b.recnum as job_number,
+	cstcde as cost_code,
+	cdenme as cost_code_name,
+	''Labor'' as cost_type,
+	SUM(laborg) as budget
+FROM ',QUOTENAME(@Client_DB_Name),'.dbo.bdglin b
+INNER JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.cstcde c on c.recnum = b.cstcde
+GROUP BY b.recnum, cstcde, cdenme
+HAVING SUM(laborg) <> 0
+UNION ALL
+SELECT
+	b.recnum as job_number,
+	cstcde as cost_code,
+	cdenme as cost_code_name,
+	''Equipment'' as cost_type,
+	SUM(eqpbdg) as budget
+FROM ',QUOTENAME(@Client_DB_Name),'.dbo.bdglin b
+INNER JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.cstcde c on c.recnum = b.cstcde
+GROUP BY b.recnum, cstcde, cdenme
+HAVING SUM(eqpbdg) <> 0
+UNION ALL
+SELECT
+	b.recnum as job_number,
+	cstcde as cost_code,
+	cdenme as cost_code_name,
+	''Subcontract'' as cost_type,
+	SUM(subbdg) as budget
+FROM ',QUOTENAME(@Client_DB_Name),'.dbo.bdglin b
+INNER JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.cstcde c on c.recnum = b.cstcde
+GROUP BY b.recnum, cstcde, cdenme
+HAVING SUM(subbdg) <> 0
+UNION ALL
+SELECT
+	b.recnum as job_number,
+	cstcde as cost_code,
+	cdenme as cost_code_name,
+	''Other'' as cost_type,
+	SUM(othbdg) as budget
+FROM ',QUOTENAME(@Client_DB_Name),'.dbo.bdglin b
+INNER JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.cstcde c on c.recnum = b.cstcde
+GROUP BY b.recnum, cstcde, cdenme
+HAVING SUM(othbdg) <> 0
+UNION ALL
+SELECT
+	b.recnum as job_number,
+	cstcde as cost_code,
+	cdenme as cost_code_name,
+	''User Def Type 6'' as cost_type,
+	SUM(usrcs6) as budget
+FROM ',QUOTENAME(@Client_DB_Name),'.dbo.bdglin b
+INNER JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.cstcde c on c.recnum = b.cstcde
+GROUP BY b.recnum, cstcde, cdenme
+HAVING SUM(usrcs6) <> 0
+UNION ALL
+SELECT
+	b.recnum as job_number,
+	cstcde as cost_code,
+	cdenme as cost_code_name,
+	''User Def Type 7'' as cost_type,
+	SUM(usrcs7) as budget
+FROM ',QUOTENAME(@Client_DB_Name),'.dbo.bdglin b
+INNER JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.cstcde c on c.recnum = b.cstcde
+GROUP BY b.recnum, cstcde, cdenme
+HAVING SUM(usrcs7) <> 0
+UNION ALL
+SELECT
+	b.recnum as job_number,
+	cstcde as cost_code,
+	cdenme as cost_code_name,
+	''User Def Type 8'' as cost_type,
+	SUM(usrcs8) as budget
+FROM ',QUOTENAME(@Client_DB_Name),'.dbo.bdglin b
+INNER JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.cstcde c on c.recnum = b.cstcde
+GROUP BY b.recnum, cstcde, cdenme
+HAVING SUM(usrcs8) <> 0
+UNION ALL
+SELECT
+	b.recnum as job_number,
+	cstcde as cost_code,
+	cdenme as cost_code_name,
+	''User Def Type 9'' as cost_type,
+	SUM(usrcs9) as budget
+FROM ',QUOTENAME(@Client_DB_Name),'.dbo.bdglin b
+INNER JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.cstcde c on c.recnum = b.cstcde
+GROUP BY b.recnum, cstcde, cdenme
+HAVING SUM(usrcs9) <> 0
 ')
 
 EXECUTE sp_executesql @SqlInsertCommand

@@ -18,6 +18,7 @@ DROP COLUMN IF EXISTS is_deleted, deleted_date;',
 INSERT INTO ',@Reporting_DB_Name,N'.dbo.Purchase_Order_Lines
 SELECT
 	p.recnum as purchase_order_id,
+	l.linnum as purchase_order_line_number,
 	ordnum as purchase_order_number,
 	p.dscrpt as purchase_order_description,
 	orddte as purchase_order_date,
@@ -33,12 +34,13 @@ SELECT
 	END as purchase_order_status,
 	e.eqpnme as equipment,
 	l.cstcde as cost_code,
-	l.committed_total,
-	l.total,
-	l.price,
-	l.quantity,
-	l.received_to_date,
-	l.canceled,
+	l.typnme as cost_type,
+	CASE WHEN p.status != 5 THEN ISNULL(l.committed_total,0) ELSE 0 END as committed_total,
+	ISNULL(l.total,0) as total,
+	ISNULL(l.price,0) as price,
+	ISNULL(l.quantity,0) as quantity,
+	ISNULL(l.received_to_date,0) as received_to_date,
+	ISNULL(l.canceled,0) as canceled,
 	p.jobnum as job_number,
 	p.hotlst as hot_list,
 	a.recnum as vendor_id,
@@ -59,18 +61,20 @@ LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.eqpmnt e on e.recnum = p.eqpmnt
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.pchtyp pt on pt.recnum = p.ordtyp
 LEFT JOIN (
 	SELECT 
-	recnum,
+	pl.recnum,
+	pl.linnum,
 	cstcde,
+	typnme,
 	SUM(linprc) * (SUM(linqty) - SUM(rcvdte) - SUM(cancel)) as committed_total,
 	SUM(extttl) as total,
 	SUM(linprc) as price,
 	SUM(linqty) as quantity,
 	SUM(rcvdte) as received_to_date,
 	SUM(cancel) as canceled 
-	FROM ',QUOTENAME(@Client_DB_Name),'.dbo.pcorln 
-	GROUP BY recnum, cstcde
+	FROM ',QUOTENAME(@Client_DB_Name),'.dbo.pcorln pl
+	LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.csttyp c on c.recnum = pl.csttyp
+	GROUP BY pl.recnum, pl.linnum, cstcde, typnme
 ) l on l.recnum = p.recnum 
-
 ;',
 --Step 3. Find any values in Temp Table not in Reporting Table, insert them as records flagged as deleted
 'INSERT INTO ',@Reporting_DB_Name,N'.dbo.Purchase_Order_Lines

@@ -28,7 +28,8 @@ SELECT
 		WHEN 5 THEN ''Complete''
 		WHEN 6 THEN ''Closed''
 	END as job_status,
-	cd.cdenme as job_cost_code,
+	cd.cdenme as job_cost_code_name,
+	j.cstcde as job_cost_code,
 	j.wrkord as work_order_number,
 	trnnum as transaction_number,
 	j.dscrpt as job_cost_description,

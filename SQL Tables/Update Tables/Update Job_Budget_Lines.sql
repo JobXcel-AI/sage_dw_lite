@@ -7,43 +7,105 @@ DECLARE @SqlInsertQuery NVARCHAR(MAX);
 
 --Update Job_Budget_Lines Table
 SET @SqlInsertQuery = CONCAT(
---Step 1. Temp table containing reporting table
-N'SELECT * INTO #TempTbl FROM ',@Reporting_DB_Name,N'.dbo.Job_Budget_Lines;
-SELECT * INTO #DeletedRecords FROM #TempTbl WHERE is_deleted = 1;
-DELETE FROM #TempTbl WHERE is_deleted = 1;
-ALTER TABLE #TempTbl
-DROP COLUMN IF EXISTS is_deleted, deleted_date;',
---Step 2. delete existing reporting table data and replace with updated values
 'DELETE FROM ',@Reporting_DB_Name,N'.dbo.Job_Budget_Lines;
 INSERT INTO ',@Reporting_DB_Name,N'.dbo.Job_Budget_Lines
 SELECT
-	recnum as job_number,
+	b.recnum as job_number,
 	cstcde as cost_code,
-	SUM(matbdg) + SUM(laborg) + SUM(eqpbdg) + SUM(subbdg) + SUM(othbdg) + SUM(cs6org) + SUM(cs7org) + SUM(cs8org) + SUM(cs9org) as total_budget,
-	SUM(matbdg) as materials, 
-	SUM(laborg) as labor, 
-	SUM(eqpbdg) as equipment, 
-	SUM(subbdg) as subcontract, 
-	SUM(othbdg) as other, 
-	SUM(cs6org) as user_defined6, 
-	SUM(cs7org) as user_defined7, 
-	SUM(cs8org) as user_defined8, 
-	SUM(cs9org) as user_defined9,
-	insdte as created_date,
-	upddte as last_updated_date,
-	0 as is_deleted,
-	null as deleted_date
-FROM ',QUOTENAME(@Client_DB_Name),'.dbo.bdglin
-GROUP BY recnum, cstcde, insdte, upddte
-;',
---Step 3. Find any values in Temp Table not in Reporting Table, insert them as records flagged as deleted
-'INSERT INTO ',@Reporting_DB_Name,N'.dbo.Job_Budget_Lines
-SELECT *, 
-	1 as is_deleted,
-	GETDATE() as deleted_date
-FROM #TempTbl t 
-WHERE CONCAT(t.job_number,t.cost_code) NOT IN (SELECT CONCAT(job_number,cost_code) FROM ',@Reporting_DB_Name,N'.dbo.Job_Budget_Lines)
-UNION ALL 
-SELECT * FROM #DeletedRecords
+	cdenme as cost_code_name,
+	''Material'' as cost_type,
+	SUM(matbdg) as budget
+FROM ',QUOTENAME(@Client_DB_Name),'.dbo.bdglin b
+INNER JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.cstcde c on c.recnum = b.cstcde
+GROUP BY b.recnum, cstcde, cdenme
+HAVING SUM(matbdg) <> 0
+UNION ALL
+SELECT
+	b.recnum as job_number,
+	cstcde as cost_code,
+	cdenme as cost_code_name,
+	''Labor'' as cost_type,
+	SUM(laborg) as budget
+FROM ',QUOTENAME(@Client_DB_Name),'.dbo.bdglin b
+INNER JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.cstcde c on c.recnum = b.cstcde
+GROUP BY b.recnum, cstcde, cdenme
+HAVING SUM(laborg) <> 0
+UNION ALL
+SELECT
+	b.recnum as job_number,
+	cstcde as cost_code,
+	cdenme as cost_code_name,
+	''Equipment'' as cost_type,
+	SUM(eqpbdg) as budget
+FROM ',QUOTENAME(@Client_DB_Name),'.dbo.bdglin b
+INNER JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.cstcde c on c.recnum = b.cstcde
+GROUP BY b.recnum, cstcde, cdenme
+HAVING SUM(eqpbdg) <> 0
+UNION ALL
+SELECT
+	b.recnum as job_number,
+	cstcde as cost_code,
+	cdenme as cost_code_name,
+	''Subcontract'' as cost_type,
+	SUM(subbdg) as budget
+FROM ',QUOTENAME(@Client_DB_Name),'.dbo.bdglin b
+INNER JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.cstcde c on c.recnum = b.cstcde
+GROUP BY b.recnum, cstcde, cdenme
+HAVING SUM(subbdg) <> 0
+UNION ALL
+SELECT
+	b.recnum as job_number,
+	cstcde as cost_code,
+	cdenme as cost_code_name,
+	''Other'' as cost_type,
+	SUM(othbdg) as budget
+FROM ',QUOTENAME(@Client_DB_Name),'.dbo.bdglin b
+INNER JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.cstcde c on c.recnum = b.cstcde
+GROUP BY b.recnum, cstcde, cdenme
+HAVING SUM(othbdg) <> 0
+UNION ALL
+SELECT
+	b.recnum as job_number,
+	cstcde as cost_code,
+	cdenme as cost_code_name,
+	''User Def Type 6'' as cost_type,
+	SUM(usrcs6) as budget
+FROM ',QUOTENAME(@Client_DB_Name),'.dbo.bdglin b
+INNER JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.cstcde c on c.recnum = b.cstcde
+GROUP BY b.recnum, cstcde, cdenme
+HAVING SUM(usrcs6) <> 0
+UNION ALL
+SELECT
+	b.recnum as job_number,
+	cstcde as cost_code,
+	cdenme as cost_code_name,
+	''User Def Type 7'' as cost_type,
+	SUM(usrcs7) as budget
+FROM ',QUOTENAME(@Client_DB_Name),'.dbo.bdglin b
+INNER JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.cstcde c on c.recnum = b.cstcde
+GROUP BY b.recnum, cstcde, cdenme
+HAVING SUM(usrcs7) <> 0
+UNION ALL
+SELECT
+	b.recnum as job_number,
+	cstcde as cost_code,
+	cdenme as cost_code_name,
+	''User Def Type 8'' as cost_type,
+	SUM(usrcs8) as budget
+FROM ',QUOTENAME(@Client_DB_Name),'.dbo.bdglin b
+INNER JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.cstcde c on c.recnum = b.cstcde
+GROUP BY b.recnum, cstcde, cdenme
+HAVING SUM(usrcs8) <> 0
+UNION ALL
+SELECT
+	b.recnum as job_number,
+	cstcde as cost_code,
+	cdenme as cost_code_name,
+	''User Def Type 9'' as cost_type,
+	SUM(usrcs9) as budget
+FROM ',QUOTENAME(@Client_DB_Name),'.dbo.bdglin b
+INNER JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.cstcde c on c.recnum = b.cstcde
+GROUP BY b.recnum, cstcde, cdenme
+HAVING SUM(usrcs9) <> 0;
 ')
 EXECUTE sp_executesql @SqlInsertQuery

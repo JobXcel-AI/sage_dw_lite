@@ -17,6 +17,8 @@ CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Subcontract_Lines'), '(
 	subcontract_status NVARCHAR(8),
 	job_number BIGINT,
 	cost_code NVARCHAR(50),
+	cost_type NVARCHAR(15),
+	committed_amount DECIMAL(12,2),
 	remaining_amount DECIMAL(12,2),
 	hot_list BIT,
 	vendor_id BIGINT,
@@ -56,7 +58,9 @@ SELECT
 	END as subcontract_status,
 	p.jobnum as job_number,
 	l.cstcde as cost_code,
-	l.remaining_amount,
+	l.typnme as cost_type,
+	CASE WHEN p.status in (3,4) THEN ISNULL(l.remaining_amount,0) ELSE 0 END as committed_amount,
+	ISNULL(l.remaining_amount,0) as remaining_amount,
 	p.hotlst as hot_list,
 	a.recnum as vendor_id,
 	a.vndnme as vendor_name,
@@ -73,11 +77,13 @@ LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.actpay a on a.recnum = p.vndnum
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.vndtyp vt on vt.recnum = a.vndtyp
 LEFT JOIN (
 	SELECT 
-	recnum,
+	s.recnum,
 	cstcde,
+	typnme,
 	SUM(remain) as remaining_amount
-	FROM ',QUOTENAME(@Client_DB_Name),'.dbo.sbcnln
-	GROUP BY recnum, cstcde
+	FROM ',QUOTENAME(@Client_DB_Name),'.dbo.sbcnln s
+	INNER JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.csttyp c on c.recnum = s.csttyp
+	GROUP BY s.recnum, cstcde, typnme
 ) l on l.recnum = p.recnum
 ')
 

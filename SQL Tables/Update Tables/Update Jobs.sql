@@ -70,11 +70,16 @@ SELECT
 	ISNULL(i.invnet,0) as invoice_net_due,
 	ISNULL(i.invbal,0) as invoice_balance,
 	i.chkdte as last_payment_received_date,
-	ISNULL(tkof.ext_cost,0) as takeoff_ext_cost_excl_labor, 
-	ISNULL(tkof.sales_tax,0) as takeoff_sales_tax_excl_labor, 
-	ISNULL(tkof.overhead_amount,0) as takeoff_overhead_amount_excl_labor, 
-	ISNULL(tkof.profit_amount,0) as takeoff_profit_amount_excl_labor, 
-	ISNULL(tkof.ext_price,0) as takeoff_ext_price_excl_labor,
+	ISNULL(tkof.ext_cost_excl_labor,0) as takeoff_ext_cost_excl_labor, 
+	ISNULL(tkof.sales_tax_excl_labor,0) as takeoff_sales_tax_excl_labor, 
+	ISNULL(tkof.overhead_amount_excl_labor,0) as takeoff_overhead_amount_excl_labor, 
+	ISNULL(tkof.profit_amount_excl_labor,0) as takeoff_profit_amount_excl_labor, 
+	ISNULL(tkof.ext_price_excl_labor,0) as takeoff_ext_price_excl_labor,
+	ISNULL(tkof.ext_cost,0) as takeoff_ext_cost, 
+	ISNULL(tkof.sales_tax,0) as takeoff_sales_tax, 
+	ISNULL(tkof.overhead_amount,0) as takeoff_overhead_amount, 
+	ISNULL(tkof.profit_amount,0) as takeoff_profit_amount, 
+	ISNULL(tkof.ext_price,0) as takeoff_ext_price,
 	a.insdte as created_date,
 	a.upddte as last_updated_date,
 	0 as is_deleted,
@@ -154,17 +159,37 @@ LEFT JOIN
 	GROUP BY jobnum
 ) co on co.jobnum = a.recnum
 LEFT JOIN 
-(
+(SELECT
+	recnum,
+	SUM(ext_cost) as ext_cost, 
+	SUM(sales_tax) as sales_tax, 
+	SUM(overhead_amount) as overhead_amount, 
+	SUM(profit_amount) as profit_amount, 
+	SUM(ext_price) as ext_price,
+	SUM(ext_cost_excl_labor) as ext_cost_excl_labor, 
+	SUM(sales_tax_excl_labor) as sales_tax_excl_labor, 
+	SUM(overhead_amount_excl_labor) as overhead_amount_excl_labor, 
+	SUM(profit_amount_excl_labor) as profit_amount_excl_labor, 
+	SUM(ext_price_excl_labor) as ext_price_excl_labor
+FROM (
 	SELECT 
 		recnum,
+		prtdsc,
 		SUM(extttl) as ext_cost, 
 		SUM(slstax) as sales_tax, 
 		SUM(ovhamt) as overhead_amount, 
 		SUM(pftamt) as profit_amount, 
-		SUM(bidprc) as ext_price 
+		SUM(bidprc) as ext_price,
+		CASE WHEN prtdsc NOT LIKE ''%labor%'' THEN SUM(extttl) ELSE 0 END as ext_cost_excl_labor, 
+		CASE WHEN prtdsc NOT LIKE ''%labor%'' THEN SUM(slstax) ELSE 0 END as sales_tax_excl_labor, 
+		CASE WHEN prtdsc NOT LIKE ''%labor%'' THEN SUM(ovhamt) ELSE 0 END as overhead_amount_excl_labor, 
+		CASE WHEN prtdsc NOT LIKE ''%labor%'' THEN SUM(pftamt) ELSE 0 END as profit_amount_excl_labor, 
+		CASE WHEN prtdsc NOT LIKE ''%labor%'' THEN SUM(bidprc) ELSE 0 END as ext_price_excl_labor 
+
 	FROM ',QUOTENAME(@Client_DB_Name),'.dbo.tkflin 
-	WHERE prtdsc NOT LIKE ''%labor%''
-	GROUP BY recnum
+	GROUP BY recnum, prtdsc
+) tkof2
+GROUP BY recnum
 ) tkof on tkof.recnum = a.recnum;',
 --Step 3. Find any values in Temp Table not in Reporting Table, insert them as records flagged as deleted
 'INSERT INTO ',@Reporting_DB_Name,N'.dbo.Jobs

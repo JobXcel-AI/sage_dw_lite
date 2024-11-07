@@ -11,6 +11,7 @@ CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Job_Cost'), '(
 	job_number BIGINT,
 	job_name NVARCHAR(75),
 	job_status NVARCHAR(8),
+	job_cost_code_name NVARCHAR(50),
 	job_cost_code NVARCHAR(50),
 	work_order_number NVARCHAR(20),
 	transaction_number NVARCHAR(20),
@@ -55,7 +56,8 @@ SELECT
 		WHEN 5 THEN ''Complete''
 		WHEN 6 THEN ''Closed''
 	END as job_status,
-	cd.cdenme as job_cost_code,
+	cd.cdenme as job_cost_code_name,
+	j.cstcde as job_cost_code,
 	j.wrkord as work_order_number,
 	trnnum as transaction_number,
 	j.dscrpt as job_cost_description,

@@ -157,8 +157,8 @@ DROP COLUMN IF EXISTS is_deleted, deleted_date;',
 INSERT INTO ',@Reporting_DB_Name,N'.dbo.Change_Orders
 SELECT 
 	c.recnum as change_order_id,
-	chgnum as change_order_number,
-	chgdte as change_order_date,
+	c.chgnum as change_order_number,
+	c.chgdte as change_order_date,
 	jobnum as job_number,
 	a.jobnme as job_name,
 	c.phsnum as job_phase_number,
@@ -171,23 +171,30 @@ SELECT
 		WHen 6 THEN ''Rejected''
 	END as status,
 	c.status as status_number,
-	dscrpt as change_order_description,
+	c.dscrpt as change_order_description,
 	ct.typnme as change_type,
 	reason,
 	subdte as submitted_date,
 	aprdte as approved_date,
 	invdte as invoice_date,
 	c.pchord as purchase_order_number,
-	ISNULL(reqamt,0) as requested_amount,
-	ISNULL(appamt,0) as approved_amount,
-	ISNULL(ovhamt,0) as overhead_amount,
+	cl.cstcde as cost_code,
+	cd.cdenme as cost_code_name,	
+	cst.typnme as cost_type,
+	CASE c.status WHEN 1 THEN SUM(ISNULL(cl.bdgprc,0)) ELSE 0 END as approved_change_amount,
+	SUM(ISNULL(cl.bdgprc,0)) as change_amount,
 	c.insdte as created_date,
 	c.upddte as last_updated_date,
 	0 as is_deleted,
 	null as deleted_date
 FROM ',QUOTENAME(@Client_DB_Name),'.dbo.prmchg c
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.actrec a on a.recnum = c.jobnum
-LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.chgtyp ct on ct.recnum = c.chgtyp;',
+LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.chgtyp ct on ct.recnum = c.chgtyp
+LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.sbcgln cl on cl.recnum = c.recnum
+LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.csttyp cst on cst.recnum = cl.csttyp
+LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.cstcde cd on cd.recnum = cl.cstcde
+GROUP BY c.recnum, c.chgnum, c.chgdte, jobnum, a.jobnme, c.phsnum, c.status, c.dscrpt, ct.typnme, reason, subdte, aprdte, invdte, c.pchord, cd.cdenme, cl.cstcde, cst.typnme, c.insdte,c.upddte
+;',
 --Step 3. Find any values in Temp Table not in Reporting Table, insert them as records flagged as deleted
 'INSERT INTO ',@Reporting_DB_Name,N'.dbo.Change_Orders
 SELECT *, 
@@ -615,11 +622,16 @@ SELECT
 	ISNULL(i.invnet,0) as invoice_net_due,
 	ISNULL(i.invbal,0) as invoice_balance,
 	i.chkdte as last_payment_received_date,
-	ISNULL(tkof.ext_cost,0) as takeoff_ext_cost_excl_labor, 
-	ISNULL(tkof.sales_tax,0) as takeoff_sales_tax_excl_labor, 
-	ISNULL(tkof.overhead_amount,0) as takeoff_overhead_amount_excl_labor, 
-	ISNULL(tkof.profit_amount,0) as takeoff_profit_amount_excl_labor, 
-	ISNULL(tkof.ext_price,0) as takeoff_ext_price_excl_labor,
+	ISNULL(tkof.ext_cost_excl_labor,0) as takeoff_ext_cost_excl_labor, 
+	ISNULL(tkof.sales_tax_excl_labor,0) as takeoff_sales_tax_excl_labor, 
+	ISNULL(tkof.overhead_amount_excl_labor,0) as takeoff_overhead_amount_excl_labor, 
+	ISNULL(tkof.profit_amount_excl_labor,0) as takeoff_profit_amount_excl_labor, 
+	ISNULL(tkof.ext_price_excl_labor,0) as takeoff_ext_price_excl_labor,
+	ISNULL(tkof.ext_cost,0) as takeoff_ext_cost, 
+	ISNULL(tkof.sales_tax,0) as takeoff_sales_tax, 
+	ISNULL(tkof.overhead_amount,0) as takeoff_overhead_amount, 
+	ISNULL(tkof.profit_amount,0) as takeoff_profit_amount, 
+	ISNULL(tkof.ext_price,0) as takeoff_ext_price,
 	a.insdte as created_date,
 	a.upddte as last_updated_date,
 	0 as is_deleted,
@@ -698,18 +710,37 @@ LEFT JOIN
 		status < 5
 	GROUP BY jobnum
 ) co on co.jobnum = a.recnum
-LEFT JOIN 
-(
+(SELECT
+	recnum,
+	SUM(ext_cost) as ext_cost, 
+	SUM(sales_tax) as sales_tax, 
+	SUM(overhead_amount) as overhead_amount, 
+	SUM(profit_amount) as profit_amount, 
+	SUM(ext_price) as ext_price,
+	SUM(ext_cost_excl_labor) as ext_cost_excl_labor, 
+	SUM(sales_tax_excl_labor) as sales_tax_excl_labor, 
+	SUM(overhead_amount_excl_labor) as overhead_amount_excl_labor, 
+	SUM(profit_amount_excl_labor) as profit_amount_excl_labor, 
+	SUM(ext_price_excl_labor) as ext_price_excl_labor
+FROM (
 	SELECT 
 		recnum,
+		prtdsc,
 		SUM(extttl) as ext_cost, 
 		SUM(slstax) as sales_tax, 
 		SUM(ovhamt) as overhead_amount, 
 		SUM(pftamt) as profit_amount, 
-		SUM(bidprc) as ext_price 
+		SUM(bidprc) as ext_price,
+		CASE WHEN prtdsc NOT LIKE ''%labor%'' THEN SUM(extttl) ELSE 0 END as ext_cost_excl_labor, 
+		CASE WHEN prtdsc NOT LIKE ''%labor%'' THEN SUM(slstax) ELSE 0 END as sales_tax_excl_labor, 
+		CASE WHEN prtdsc NOT LIKE ''%labor%'' THEN SUM(ovhamt) ELSE 0 END as overhead_amount_excl_labor, 
+		CASE WHEN prtdsc NOT LIKE ''%labor%'' THEN SUM(pftamt) ELSE 0 END as profit_amount_excl_labor, 
+		CASE WHEN prtdsc NOT LIKE ''%labor%'' THEN SUM(bidprc) ELSE 0 END as ext_price_excl_labor 
+
 	FROM ',QUOTENAME(@Client_DB_Name),'.dbo.tkflin 
-	WHERE prtdsc NOT LIKE ''%labor%''
-	GROUP BY recnum
+	GROUP BY recnum, prtdsc
+) tkof2
+GROUP BY recnum
 ) tkof on tkof.recnum = a.recnum;',
 --Step 3. Find any values in Temp Table not in Reporting Table, insert them as records flagged as deleted
 'INSERT INTO ',@Reporting_DB_Name,N'.dbo.Jobs
@@ -767,7 +798,8 @@ SELECT
 		WHEN 5 THEN ''Complete''
 		WHEN 6 THEN ''Closed''
 	END as job_status,
-	cd.cdenme as job_cost_code,
+	cd.cdenme as job_cost_code_name,
+	j.cstcde as job_cost_code,
 	j.wrkord as work_order_number,
 	trnnum as transaction_number,
 	j.dscrpt as job_cost_description,
@@ -1837,7 +1869,9 @@ SELECT
 	END as subcontract_status,
 	p.jobnum as job_number,
 	l.cstcde as cost_code,
-	l.remaining_amount,
+	l.typnme as cost_type,
+	CASE WHEN p.status in (3,4) THEN ISNULL(l.remaining_amount,0) ELSE 0 END as committed_amount,
+	ISNULL(l.remaining_amount,0) as remaining_amount,
 	p.hotlst as hot_list,
 	a.recnum as vendor_id,
 	a.vndnme as vendor_name,
@@ -1854,11 +1888,13 @@ LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.actpay a on a.recnum = p.vndnum
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.vndtyp vt on vt.recnum = a.vndtyp
 LEFT JOIN (
 	SELECT 
-	recnum,
+	s.recnum,
 	cstcde,
+	typnme,
 	SUM(remain) as remaining_amount
-	FROM ',QUOTENAME(@Client_DB_Name),'.dbo.sbcnln
-	GROUP BY recnum, cstcde
+	FROM ',QUOTENAME(@Client_DB_Name),'.dbo.sbcnln s
+	INNER JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.csttyp c on c.recnum = s.csttyp
+	GROUP BY s.recnum, cstcde, typnme
 ) l on l.recnum = p.recnum
 
 ;',
@@ -2024,6 +2060,7 @@ DROP COLUMN IF EXISTS is_deleted, deleted_date;',
 INSERT INTO ',@Reporting_DB_Name,N'.dbo.Purchase_Order_Lines
 SELECT
 	p.recnum as purchase_order_id,
+	l.linnum as purchase_order_line_number,
 	ordnum as purchase_order_number,
 	p.dscrpt as purchase_order_description,
 	orddte as purchase_order_date,
@@ -2039,12 +2076,13 @@ SELECT
 	END as purchase_order_status,
 	e.eqpnme as equipment,
 	l.cstcde as cost_code,
-	l.committed_total,
-	l.total,
-	l.price,
-	l.quantity,
-	l.received_to_date,
-	l.canceled,
+	l.typnme as cost_type,
+	CASE WHEN p.status != 5 THEN ISNULL(l.committed_total,0) ELSE 0 END as committed_total,
+	ISNULL(l.total,0) as total,
+	ISNULL(l.price,0) as price,
+	ISNULL(l.quantity,0) as quantity,
+	ISNULL(l.received_to_date,0) as received_to_date,
+	ISNULL(l.canceled,0) as canceled,
 	p.jobnum as job_number,
 	p.hotlst as hot_list,
 	a.recnum as vendor_id,
@@ -2065,18 +2103,20 @@ LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.eqpmnt e on e.recnum = p.eqpmnt
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.pchtyp pt on pt.recnum = p.ordtyp
 LEFT JOIN (
 	SELECT 
-	recnum,
+	pl.recnum,
+	pl.linnum,
 	cstcde,
+	typnme,
 	SUM(linprc) * (SUM(linqty) - SUM(rcvdte) - SUM(cancel)) as committed_total,
 	SUM(extttl) as total,
 	SUM(linprc) as price,
 	SUM(linqty) as quantity,
 	SUM(rcvdte) as received_to_date,
 	SUM(cancel) as canceled 
-	FROM ',QUOTENAME(@Client_DB_Name),'.dbo.pcorln 
-	GROUP BY recnum, cstcde
+	FROM ',QUOTENAME(@Client_DB_Name),'.dbo.pcorln pl
+	LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.csttyp c on c.recnum = pl.csttyp
+	GROUP BY pl.recnum, pl.linnum, cstcde, typnme
 ) l on l.recnum = p.recnum 
-
 ;',
 --Step 3. Find any values in Temp Table not in Reporting Table, insert them as records flagged as deleted
 'INSERT INTO ',@Reporting_DB_Name,N'.dbo.Purchase_Order_Lines
@@ -2111,44 +2151,106 @@ END CATCH
 
 --Update Job_Budget_Lines Table
 SET @SqlInsertQuery = CONCAT(
---Step 1. Temp table containing reporting table
-N'SELECT * INTO #TempTbl FROM ',@Reporting_DB_Name,N'.dbo.Job_Budget_Lines;
-SELECT * INTO #DeletedRecords FROM #TempTbl WHERE is_deleted = 1;
-DELETE FROM #TempTbl WHERE is_deleted = 1;
-ALTER TABLE #TempTbl
-DROP COLUMN IF EXISTS is_deleted, deleted_date;',
---Step 2. delete existing reporting table data and replace with updated values
 'DELETE FROM ',@Reporting_DB_Name,N'.dbo.Job_Budget_Lines;
 INSERT INTO ',@Reporting_DB_Name,N'.dbo.Job_Budget_Lines
 SELECT
-	recnum as job_number,
+	b.recnum as job_number,
 	cstcde as cost_code,
-	SUM(matbdg) + SUM(laborg) + SUM(eqpbdg) + SUM(subbdg) + SUM(othbdg) + SUM(cs6org) + SUM(cs7org) + SUM(cs8org) + SUM(cs9org) as total_budget,
-	SUM(matbdg) as materials, 
-	SUM(laborg) as labor, 
-	SUM(eqpbdg) as equipment, 
-	SUM(subbdg) as subcontract, 
-	SUM(othbdg) as other, 
-	SUM(cs6org) as user_defined6, 
-	SUM(cs7org) as user_defined7, 
-	SUM(cs8org) as user_defined8, 
-	SUM(cs9org) as user_defined9,
-	insdte as created_date,
-	upddte as last_updated_date,
-	0 as is_deleted,
-	null as deleted_date
-FROM ',QUOTENAME(@Client_DB_Name),'.dbo.bdglin
-GROUP BY recnum, cstcde, insdte, upddte
-;',
---Step 3. Find any values in Temp Table not in Reporting Table, insert them as records flagged as deleted
-'INSERT INTO ',@Reporting_DB_Name,N'.dbo.Job_Budget_Lines
-SELECT *, 
-	1 as is_deleted,
-	GETDATE() as deleted_date
-FROM #TempTbl t 
-WHERE CONCAT(t.job_number,t.cost_code) NOT IN (SELECT CONCAT(job_number,cost_code) FROM ',@Reporting_DB_Name,N'.dbo.Job_Budget_Lines)
-UNION ALL 
-SELECT * FROM #DeletedRecords
+	cdenme as cost_code_name,
+	''Material'' as cost_type,
+	SUM(matbdg) as budget
+FROM ',QUOTENAME(@Client_DB_Name),'.dbo.bdglin b
+INNER JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.cstcde c on c.recnum = b.cstcde
+GROUP BY b.recnum, cstcde, cdenme
+HAVING SUM(matbdg) <> 0
+UNION ALL
+SELECT
+	b.recnum as job_number,
+	cstcde as cost_code,
+	cdenme as cost_code_name,
+	''Labor'' as cost_type,
+	SUM(laborg) as budget
+FROM ',QUOTENAME(@Client_DB_Name),'.dbo.bdglin b
+INNER JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.cstcde c on c.recnum = b.cstcde
+GROUP BY b.recnum, cstcde, cdenme
+HAVING SUM(laborg) <> 0
+UNION ALL
+SELECT
+	b.recnum as job_number,
+	cstcde as cost_code,
+	cdenme as cost_code_name,
+	''Equipment'' as cost_type,
+	SUM(eqpbdg) as budget
+FROM ',QUOTENAME(@Client_DB_Name),'.dbo.bdglin b
+INNER JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.cstcde c on c.recnum = b.cstcde
+GROUP BY b.recnum, cstcde, cdenme
+HAVING SUM(eqpbdg) <> 0
+UNION ALL
+SELECT
+	b.recnum as job_number,
+	cstcde as cost_code,
+	cdenme as cost_code_name,
+	''Subcontract'' as cost_type,
+	SUM(subbdg) as budget
+FROM ',QUOTENAME(@Client_DB_Name),'.dbo.bdglin b
+INNER JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.cstcde c on c.recnum = b.cstcde
+GROUP BY b.recnum, cstcde, cdenme
+HAVING SUM(subbdg) <> 0
+UNION ALL
+SELECT
+	b.recnum as job_number,
+	cstcde as cost_code,
+	cdenme as cost_code_name,
+	''Other'' as cost_type,
+	SUM(othbdg) as budget
+FROM ',QUOTENAME(@Client_DB_Name),'.dbo.bdglin b
+INNER JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.cstcde c on c.recnum = b.cstcde
+GROUP BY b.recnum, cstcde, cdenme
+HAVING SUM(othbdg) <> 0
+UNION ALL
+SELECT
+	b.recnum as job_number,
+	cstcde as cost_code,
+	cdenme as cost_code_name,
+	''User Def Type 6'' as cost_type,
+	SUM(usrcs6) as budget
+FROM ',QUOTENAME(@Client_DB_Name),'.dbo.bdglin b
+INNER JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.cstcde c on c.recnum = b.cstcde
+GROUP BY b.recnum, cstcde, cdenme
+HAVING SUM(usrcs6) <> 0
+UNION ALL
+SELECT
+	b.recnum as job_number,
+	cstcde as cost_code,
+	cdenme as cost_code_name,
+	''User Def Type 7'' as cost_type,
+	SUM(usrcs7) as budget
+FROM ',QUOTENAME(@Client_DB_Name),'.dbo.bdglin b
+INNER JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.cstcde c on c.recnum = b.cstcde
+GROUP BY b.recnum, cstcde, cdenme
+HAVING SUM(usrcs7) <> 0
+UNION ALL
+SELECT
+	b.recnum as job_number,
+	cstcde as cost_code,
+	cdenme as cost_code_name,
+	''User Def Type 8'' as cost_type,
+	SUM(usrcs8) as budget
+FROM ',QUOTENAME(@Client_DB_Name),'.dbo.bdglin b
+INNER JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.cstcde c on c.recnum = b.cstcde
+GROUP BY b.recnum, cstcde, cdenme
+HAVING SUM(usrcs8) <> 0
+UNION ALL
+SELECT
+	b.recnum as job_number,
+	cstcde as cost_code,
+	cdenme as cost_code_name,
+	''User Def Type 9'' as cost_type,
+	SUM(usrcs9) as budget
+FROM ',QUOTENAME(@Client_DB_Name),'.dbo.bdglin b
+INNER JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.cstcde c on c.recnum = b.cstcde
+GROUP BY b.recnum, cstcde, cdenme
+HAVING SUM(usrcs9) <> 0;
 ')
 
 SELECT 'Job_Budget_Lines';
