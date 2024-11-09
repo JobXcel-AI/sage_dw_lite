@@ -941,6 +941,8 @@ CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Jobs'), '(
 	takeoff_overhead_amount DECIMAL(14,2) DEFAULT 0, 
 	takeoff_profit_amount DECIMAL(14,2) DEFAULT 0, 
 	takeoff_ext_price DECIMAL(14,2) DEFAULT 0,
+	tc.first_date_worked,
+	tc.last_date_worked,
 	created_date DATETIME,
 	last_updated_date DATETIME,
 	is_deleted BIT DEFAULT 0,
@@ -1015,6 +1017,8 @@ SELECT
 	ISNULL(tkof.overhead_amount,0) as takeoff_overhead_amount, 
 	ISNULL(tkof.profit_amount,0) as takeoff_profit_amount, 
 	ISNULL(tkof.ext_price,0) as takeoff_ext_price,
+	tc.first_date_worked,
+	tc.last_date_worked,
 	a.insdte as created_date,
 	a.upddte as last_updated_date,
 	0 as is_deleted,
@@ -1125,7 +1129,16 @@ FROM (
 	GROUP BY recnum, prtdsc
 ) tkof2
 GROUP BY recnum
-) tkof on tkof.recnum = a.recnum')
+) tkof on tkof.recnum = a.recnum
+LEFT JOIN (
+	SELECT
+		jobnum,
+		MIN(dtewrk) as first_date_worked,
+		MAX(dtewrk) as last_date_worked
+	FROM ',QUOTENAME(@Client_DB_Name),'.dbo.tmcdln
+	GROUP BY jobnum
+) tc on tc.jobnum = a.recnum
+')
 SET @SqlInsertCommand = @SqlInsertCommand1 + @SqlInsertCommand2
 EXECUTE sp_executesql @SqlInsertCommand
 

@@ -80,6 +80,8 @@ SELECT
 	ISNULL(tkof.overhead_amount,0) as takeoff_overhead_amount, 
 	ISNULL(tkof.profit_amount,0) as takeoff_profit_amount, 
 	ISNULL(tkof.ext_price,0) as takeoff_ext_price,
+	tc.first_date_worked,
+	tc.last_date_worked,
 	a.insdte as created_date,
 	a.upddte as last_updated_date,
 	0 as is_deleted,
@@ -190,7 +192,16 @@ FROM (
 	GROUP BY recnum, prtdsc
 ) tkof2
 GROUP BY recnum
-) tkof on tkof.recnum = a.recnum;',
+) tkof on tkof.recnum = a.recnum
+LEFT JOIN (
+	SELECT
+		jobnum,
+		MIN(dtewrk) as first_date_worked,
+		MAX(dtewrk) as last_date_worked
+	FROM ',QUOTENAME(@Client_DB_Name),'.dbo.tmcdln
+	GROUP BY jobnum
+) tc on tc.jobnum = a.recnum
+;',
 --Step 3. Find any values in Temp Table not in Reporting Table, insert them as records flagged as deleted
 'INSERT INTO ',@Reporting_DB_Name,N'.dbo.Jobs
 SELECT *, 
