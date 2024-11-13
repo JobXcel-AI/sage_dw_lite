@@ -941,8 +941,8 @@ CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Jobs'), '(
 	takeoff_overhead_amount DECIMAL(14,2) DEFAULT 0, 
 	takeoff_profit_amount DECIMAL(14,2) DEFAULT 0, 
 	takeoff_ext_price DECIMAL(14,2) DEFAULT 0,
-	tc.first_date_worked,
-	tc.last_date_worked,
+	first_date_worked,
+	last_date_worked,
 	created_date DATETIME,
 	last_updated_date DATETIME,
 	is_deleted BIT DEFAULT 0,
@@ -2013,7 +2013,6 @@ LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.sbcgln cl on cl.recnum = c.recnum
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.csttyp cst on cst.recnum = cl.csttyp
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.cstcde cd on cd.recnum = cl.cstcde
 GROUP BY c.recnum, c.chgnum, c.chgdte, jobnum, a.jobnme, c.phsnum, c.status, c.dscrpt, ct.typnme, reason, subdte, aprdte, invdte, c.pchord, cd.cdenme, cl.cstcde, cst.typnme, c.insdte,c.upddte
-) s ON c.recnum = s.recnum
 ')
 
 EXECUTE sp_executesql @SqlInsertCommand
