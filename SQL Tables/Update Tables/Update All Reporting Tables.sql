@@ -5,6 +5,7 @@ DECLARE @Reporting_DB_Name NVARCHAR(50) = QUOTENAME(CONCAT(@Client_DB_Name, ' Re
 --Initial variable declaration
 DECLARE @SqlInsertQuery1 NVARCHAR(MAX);
 DECLARE @SqlInsertQuery2 NVARCHAR(MAX);
+DECLARE @SqlInsertQuery3 NVARCHAR(MAX);
 DECLARE @SqlInsertQuery NVARCHAR(MAX);
 DECLARE @SqlDeleteCommand NVARCHAR(100);
 DECLARE @TranName VARCHAR(20);
@@ -627,6 +628,12 @@ SELECT
 	ISNULL(tkof.ext_price,0) as takeoff_ext_price,
 	tc.first_date_worked,
 	tc.last_date_worked,
+	ISNULL(i.invttl,0) - ISNULL(i.slstax,0) as invoice_billed,
+	CONCAT(a.recnum,'' - '',a.jobnme) as job_number_job_name,
+	ISNULL(a.cntrct,0) + ISNULL(co.appamt,0) as total_contract_amount,
+	ISNULL(jb.budget,0) as original_budget_amount,
+	ISNULL(jb.budget,0) + ISNULL(co.approved_budget,0) as total_budget_amount,
+	ISNULL(a.cntrct,0) + ISNULL(co.appamt,0) - ISNULL(jb.budget,0) - ISNULL(co.approved_budget,0) as estimated_gross_profit,
 	a.insdte as created_date,
 	a.upddte as last_updated_date,
 	0 as is_deleted,
@@ -639,6 +646,21 @@ LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.reccln r on r.recnum = a.clnnum
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.employ es on es.recnum = a.sprvsr 
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.employ e on e.recnum = a.slsemp
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),N'.dbo.employ est on est.recnum = a.estemp
+LEFT JOIN (
+	SELECT
+		recnum,
+		SUM(ISNULL(matbdg,0)) +
+		SUM(ISNULL(laborg,0)) +
+		SUM(ISNULL(eqpbdg,0)) +
+		SUM(ISNULL(subbdg,0)) +
+		SUM(ISNULL(othbdg,0)) +
+		SUM(ISNULL(usrcs6,0)) +
+		SUM(ISNULL(usrcs7,0)) +
+		SUM(ISNULL(usrcs8,0)) +
+		SUM(ISNULL(usrcs9,0)) as budget
+	FROM ',QUOTENAME(@Client_DB_Name),N'.dbo.bdglin
+	GROUP BY recnum
+) jb on jb.recnum = a.recnum
 LEFT JOIN (
 	SELECT
 		recnum,
@@ -694,15 +716,31 @@ LEFT JOIN (
 		AND status != 5
 	GROUP BY jobnum
 ) as i on a.recnum = i.jobnum
+')
+SET @SqlInsertQuery3 = CONCAT(N'
 LEFT JOIN 
 (
 	SELECT 
-		jobnum,
-		sum(appamt) as appamt
+		jobnum, 
+		SUM(appamt) as appamt, 
+		SUM(approved_budget) as approved_budget
 	FROM
-		',QUOTENAME(@Client_DB_Name),'.dbo.prmchg
-	WHERE
-		status < 5
+	(	
+		SELECT 
+			p.jobnum,
+			SUM(p.appamt) as appamt,
+			CASE p.status WHEN 1 THEN SUM(ISNULL(l.bdgprc,0)) ELSE 0 END as approved_budget
+		FROM
+			',QUOTENAME(@Client_DB_Name),'.dbo.prmchg p
+		LEFT JOIN (
+			SELECT recnum, SUM(bdgprc) as bdgprc
+			FROM ',QUOTENAME(@Client_DB_Name),'.dbo.sbcgln
+			GROUP BY recnum
+		) l on l.recnum = p.recnum 
+		WHERE
+			p.status < 5
+		GROUP BY p.jobnum, p.status
+	) changes
 	GROUP BY jobnum
 ) co on co.jobnum = a.recnum
 LEFT JOIN 
@@ -757,7 +795,7 @@ WHERE t.job_number NOT IN (SELECT job_number FROM ',@Reporting_DB_Name,N'.dbo.Jo
 UNION ALL 
 SELECT * FROM #DeletedRecords
 ')
-SET @SqlInsertQuery = @SqlInsertQuery1 + @SqlInsertQuery2
+SET @SqlInsertQuery = @SqlInsertQuery1 + @SqlInsertQuery2 + @SqlInsertQuery3
 
 SELECT 'Jobs';
 SELECT @TranName = 'Jobs';
