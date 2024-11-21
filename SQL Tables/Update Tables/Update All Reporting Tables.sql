@@ -124,7 +124,7 @@ UNION ALL
 SELECT * FROM #DeletedRecords
 ')
 
-SELECT 'AR_Invoices';
+SELECT 'AR_Invoices', getdate();
 SELECT @TranName = 'AR_Invoices';
 BEGIN TRY
 	BEGIN TRANSACTION @TranName;
@@ -200,7 +200,7 @@ UNION ALL
 SELECT * FROM #DeletedRecords
 ')
 
-SELECT 'Change_Orders';
+SELECT 'Change_Orders', getdate();
 SELECT @TranName = 'Change_Orders';
 BEGIN TRY
 	BEGIN TRANSACTION @TranName;
@@ -222,7 +222,7 @@ END CATCH
 
 
 --Update Change Order History
-SELECT 'Change_Order_History';
+SELECT 'Change_Order_History', getdate();
 SELECT @TranName = 'Change_Order_History';
 BEGIN TRY
 	BEGIN TRANSACTION @TranName;
@@ -386,6 +386,8 @@ BEGIN
 	SET @DateVal = DATEADD(MONTH,1,@DateVal)
 END
 ')
+
+SELECT 'Change_Order_Open_History', getdate();
 SELECT @TranName = 'Change_Order_Open_History';
 BEGIN TRY
 	BEGIN TRANSACTION @TranName;
@@ -461,7 +463,7 @@ UNION ALL
 SELECT * FROM #DeletedRecords
 ')
 
-SELECT 'Employee';
+SELECT 'Employee', getdate();
 SELECT @TranName = 'Employee';
 BEGIN TRY
 	BEGIN TRANSACTION @TranName;
@@ -532,7 +534,7 @@ UNION ALL
 SELECT * FROM #DeletedRecords
 ')
 
-SELECT 'Inventory';
+SELECT 'Inventory', getdate();
 SELECT @TranName = 'Inventory';
 BEGIN TRY
 	BEGIN TRANSACTION @TranName;
@@ -797,7 +799,7 @@ SELECT * FROM #DeletedRecords
 ')
 SET @SqlInsertQuery = @SqlInsertQuery1 + @SqlInsertQuery2 + @SqlInsertQuery3
 
-SELECT 'Jobs';
+SELECT 'Jobs', getdate();
 SELECT @TranName = 'Jobs';
 BEGIN TRY
 	BEGIN TRANSACTION @TranName;
@@ -900,7 +902,7 @@ UNION ALL
 SELECT * FROM #DeletedRecords
 ')
 
-SELECT 'Job_Cost';
+SELECT 'Job_Cost', getdate();
 SELECT @TranName = 'Job_Cost';
 BEGIN TRY
 	BEGIN TRANSACTION @TranName;
@@ -922,7 +924,7 @@ END CATCH
 
 
 --Update Job Status History
-SELECT 'Job_Status_History';
+SELECT 'Job_Status_History', getdate();
 SELECT @TranName = 'Job_Status_History';
 BEGIN TRY
 	BEGIN TRANSACTION @TranName;
@@ -1055,7 +1057,7 @@ END CATCH
 
 
 --Update Jobs Active History
-SELECT 'Jobs_Active_History';
+SELECT 'Jobs_Active_History', getdate();
 SELECT @TranName = 'Jobs_Active';
 BEGIN TRY
 	BEGIN TRANSACTION @TranName;
@@ -1097,7 +1099,7 @@ END CATCH
 
 
 --Update Job Cost Waterfall
-SELECT 'Job_Cost_Waterfall';
+SELECT 'Job_Cost_Waterfall', getdate();
 SELECT @TranName = 'Job_Cost_Waterfall';
 BEGIN TRY
 	BEGIN TRANSACTION @TranName;
@@ -1496,7 +1498,7 @@ SELECT * FROM #DeletedRecords
 ')
 SET @SqlInsertQuery = @SqlInsertQuery1 + @SqlInsertQuery2
 
-SELECT 'Ledger_Accounts';
+SELECT 'Ledger_Accounts', getdate();
 SELECT @TranName = 'Ledger_Accounts';
 BEGIN TRY
 	BEGIN TRANSACTION @TranName;
@@ -1585,7 +1587,7 @@ UNION ALL
 SELECT * FROM #DeletedRecords
 ')
 
-SELECT 'Ledger_Transaction_Lines';
+SELECT 'Ledger_Transaction_Lines', getdate();
 SELECT @TranName = 'Ledger_Transaction_Lines';
 BEGIN TRY
 	BEGIN TRANSACTION @TranName;
@@ -1707,7 +1709,7 @@ UNION ALL
 SELECT * FROM #DeletedRecords
 ')
 
-SELECT 'Payroll_Records';
+SELECT 'Payroll_Records', getdate();
 SELECT @TranName = 'Payroll_Records';
 BEGIN TRY
 	BEGIN TRANSACTION @TranName;
@@ -1791,7 +1793,7 @@ UNION ALL
 SELECT * FROM #DeletedRecords
 ')
 
-SELECT 'Purchase_Orders';
+SELECT 'Purchase_Orders', getdate();
 SELECT @TranName = 'Purchase_Orders';
 BEGIN TRY
 	BEGIN TRANSACTION @TranName;
@@ -1862,7 +1864,7 @@ UNION ALL
 SELECT * FROM #DeletedRecords
 ')
 
-SELECT 'Vendor Contacts';
+SELECT 'Vendor Contacts', getdate();
 SELECT @TranName = 'Vendor_Contacts';
 BEGIN TRY
 	BEGIN TRANSACTION @TranName;
@@ -1952,7 +1954,7 @@ UNION ALL
 SELECT * FROM #DeletedRecords
 ')
 
-SELECT 'Subcontract_Lines';
+SELECT 'Subcontract_Lines', getdate();
 SELECT @TranName = 'Subcontract_Lines';
 BEGIN TRY
 	BEGIN TRANSACTION @TranName;
@@ -2034,7 +2036,7 @@ SELECT * FROM #DeletedRecords
 ')
 
 
-SELECT 'Change_Order_Lines';
+SELECT 'Change_Order_Lines', getdate();
 SELECT @TranName = 'Change_Order_Lines';
 BEGIN TRY
 	BEGIN TRANSACTION @TranName;
@@ -2137,7 +2139,7 @@ UNION ALL
 SELECT * FROM #DeletedRecords
 ')
 
-SELECT 'Purchase_Order_Lines';
+SELECT 'Purchase_Order_Lines', getdate();
 SELECT @TranName = 'Purchase_Order_Lines';
 BEGIN TRY
 	BEGIN TRANSACTION @TranName;
@@ -2261,7 +2263,7 @@ GROUP BY b.recnum, cstcde, cdenme
 HAVING SUM(usrcs9) <> 0;
 ')
 
-SELECT 'Job_Budget_Lines';
+SELECT 'Job_Budget_Lines', getdate();
 SELECT @TranName = 'Job_Budget_Lines';
 BEGIN TRY
 	BEGIN TRANSACTION @TranName;
