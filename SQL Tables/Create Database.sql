@@ -12,7 +12,11 @@ SET @SqlCommand = CONCAT(N'CREATE DATABASE ', QUOTENAME(@Reporting_DB_Name), ' O
 	FILENAME = ''', @Reporting_DB_Path, '\', @Reporting_DB_Name, '_dat.mdf'')
 	LOG ON 
 	(NAME = ', QUOTENAME(CONCAT(@Reporting_DB_Name, '_log')), ', 
-	FILENAME = ''', @Reporting_DB_Path, '\', @Reporting_DB_Name, '_log.ldf'');')
+	FILENAME = ''', @Reporting_DB_Path, '\', @Reporting_DB_Name, '_log.ldf'');
+GO
+ALTER DATABASE QUOTENAME(@Reporting_DB_Name) SET AUTO_SHRINK ON
+GO
+')
 
 --Verify SQL Query
 --SELECT @SqlCommand  
