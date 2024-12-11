@@ -749,7 +749,7 @@ CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Purchase_Orders'), '(
 	delivery_date DATE,
 	purchase_order_type NVARCHAR(50),
 	purchase_order_status NVARCHAR(7),
-	equipment BIGINT,
+	equipment NVARCHAR(50),
 	received DECIMAL(12,2),
 	current_value DECIMAL(12,2),
 	canceled DECIMAL(12,2),
