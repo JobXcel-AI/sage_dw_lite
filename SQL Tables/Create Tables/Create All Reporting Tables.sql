@@ -2280,7 +2280,7 @@ CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Timecards'), '(
 	period_end DATE,
 	date_worked DATE,
 	day_worked NVARCHAR(10),
-	description NVARCHAR(20),
+	description NVARCHAR(50),
 	service_order_number NVARCHAR(20),
 	service_order_invoice_number NVARCHAR(20),
 	client_id BIGINT,
