@@ -1889,7 +1889,7 @@ CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Purchase_Order_Lines'), '(
 	delivery_date DATE,
 	purchase_order_type NVARCHAR(50),
 	purchase_order_status NVARCHAR(7),
-	equipment BIGINT,
+	equipment NVARCHAR(50),
 	cost_code NVARCHAR(50),
 	cost_type NVARCHAR(15),
 	committed_total DECIMAL(12,2),
