@@ -34,7 +34,7 @@ SELECT
 	a.status as job_status_number,
 	r.recnum as client_id,
 	r.clnnme as client_name,
-	j.typnme as job_type,
+	ISNULL(j.typnme,"None Specified") as job_type,
 	a.cntrct as contract_amount,
 	i.invttl as invoice_total,
 	i.amtpad as invoice_amount_paid,
