@@ -2,7 +2,6 @@ import subprocess
 import logging
 from logging.handlers import TimedRotatingFileHandler
 import os
-import time
 
 # Configure rolling log file with a retention of 5 days
 log_file_path = os.path.join(os.path.dirname(__file__), "vertex_update.log")
@@ -22,11 +21,32 @@ console_handler = logging.StreamHandler()
 console_handler.setFormatter(formatter)
 logger.addHandler(console_handler)
 
-# Path to the SQL file
-sql_file_path = os.path.join(os.path.dirname(__file__), "update_script_vertex.sql")
+# Path to the original and modified SQL files
+sql_file_path = os.path.join(
+    os.path.dirname(__file__), "SQL Tables", "Update Tables", "Update All Reporting Tables.sql"
+)
+modified_sql_file_path = os.path.join(
+    os.path.dirname(__file__), "SQL Tables", "Update Tables", "temp_Update_All_Reporting_Tables.sql"
+)
+
+# Placeholder and replacement for database name
+placeholder = "[CLIENT_DB_NAME]"
+client_db_name = "'Vertex Coatings'"
 
 try:
-    logger.info("Executing SQL script using sqlcmd...")
+    # Read the original SQL file
+    logger.info("Reading and modifying the SQL script...")
+    with open(sql_file_path, "r") as file:
+        sql_content = file.read()
+
+    # Replace the placeholder with the client DB name
+    modified_sql_content = sql_content.replace(placeholder, client_db_name)
+
+    # Save the modified SQL file
+    with open(modified_sql_file_path, "w") as file:
+        file.write(modified_sql_content)
+
+    logger.info("Modified SQL script saved.")
 
     # Command to run sqlcmd
     command = [
@@ -34,9 +54,10 @@ try:
         "-S", "206.71.70.82,50285",  # Server and port
         "-U", "jobxcel",              # Username
         "-P", "qn_uJYszjd4NCJuBcwFB", # Password
-        "-i", sql_file_path           # Input file
+        "-i", modified_sql_file_path  # Input file
     ]
 
+    logger.info("Executing SQL script using sqlcmd...")
     # Run the command and capture output
     process = subprocess.run(
         command,
@@ -55,3 +76,9 @@ try:
 
 except Exception as e:
     logger.error(f"Error occurred while running the SQL script: {e}")
+
+finally:
+    # Clean up the temporary modified file
+    if os.path.exists(modified_sql_file_path):
+        os.remove(modified_sql_file_path)
+        logger.info("Temporary modified SQL file removed.")
