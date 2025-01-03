@@ -25,8 +25,8 @@ command = [
     SQL_PASSWORD
 ]
 
-# Debug: Print the constructed command
-print(f"Running command: {' '.join(command)}")
+# Debug: Print constructed command for verification
+print(f"Constructed command: {' '.join(command)}")
 
 # Execute the script
 try:
@@ -38,7 +38,8 @@ try:
         print(result.stdout)
     else:
         print("Script execution failed.")
-        print(result.stderr)
+        print("Standard Output:", result.stdout)
+        print("Standard Error:", result.stderr)
 
 except Exception as e:
     print(f"Error occurred while running the script: {e}")
