@@ -25,7 +25,7 @@ console_handler.setFormatter(formatter)
 logger.addHandler(console_handler)
 
 # Ensure required arguments are passed
-if len(sys.argv) < 8:
+if len(sys.argv) < 7:
     logger.error("Usage: python update_table_script.py <CUSTOMER_NAME> <CUSTOMER_DB_NAME> <SQL_SERVER> <SQL_PORT> <SQL_USERNAME> <SQL_PASSWORD>")
     sys.exit(1)
 
