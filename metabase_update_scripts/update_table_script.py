@@ -21,12 +21,13 @@ console_handler = logging.StreamHandler()
 console_handler.setFormatter(formatter)
 logger.addHandler(console_handler)
 
-# Path to the original and modified SQL files
+# Full path to the original and modified SQL files
+base_dir = os.path.dirname(os.path.dirname(__file__))  # Move up one level to locate the base directory
 sql_file_path = os.path.join(
-    os.path.dirname(__file__), "SQL Tables", "Update Tables", "Update All Reporting Tables.sql"
+    base_dir, "SQL Tables", "Update Tables", "Update All Reporting Tables.sql"
 )
 modified_sql_file_path = os.path.join(
-    os.path.dirname(__file__), "SQL Tables", "Update Tables", "temp_Update_All_Reporting_Tables.sql"
+    base_dir, "SQL Tables", "Update Tables", "temp_Update_All_Reporting_Tables.sql"
 )
 
 # Placeholder and replacement for database name
