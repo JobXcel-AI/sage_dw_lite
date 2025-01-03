@@ -15,7 +15,7 @@ central_script_path = os.path.join(base_dir, "metabase_update_scripts", "update_
 
 # Command to execute the centralized script with connection details
 command = [
-    "python3",
+    "python3", 
     central_script_path,
     CUSTOMER_NAME,
     CUSTOMER_DB_NAME,
@@ -26,4 +26,16 @@ command = [
 ]
 
 # Execute the script
-subprocess.run(command)
+try:
+    result = subprocess.run(command, capture_output=True, text=True)
+
+    # Log output or errors
+    if result.returncode == 0:
+        print("Script executed successfully.")
+        print(result.stdout)
+    else:
+        print("Script execution failed.")
+        print(result.stderr)
+
+except Exception as e:
+    print(f"Error occurred while running the script: {e}")
