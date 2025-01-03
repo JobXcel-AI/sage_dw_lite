@@ -25,9 +25,6 @@ command = [
     SQL_PASSWORD
 ]
 
-# Debug: Print constructed command for verification
-print(f"Constructed command: {' '.join(command)}")
-
 # Execute the script
 try:
     result = subprocess.run(command, capture_output=True, text=True)
