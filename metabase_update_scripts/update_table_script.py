@@ -57,12 +57,6 @@ try:
     # Replace placeholders with actual values
     modified_sql_content = sql_content.replace(client_db_placeholder, f"'{CUSTOMER_DB_NAME}'")
 
-    logger.info("Original SQL content:")
-    logger.info(sql_content)
-
-    logger.info("Modified SQL content:")
-    logger.info(modified_sql_content)
-
     # Save the modified SQL file
     with open(modified_sql_file_path, "w") as file:
         file.write(modified_sql_content)
