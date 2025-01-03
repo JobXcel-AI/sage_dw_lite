@@ -40,26 +40,43 @@ base_dir = os.path.dirname(os.path.dirname(__file__))  # Move up to the base dir
 sql_file_path = os.path.join(
     base_dir, "SQL Tables", "Update Tables", "Update All Reporting Tables.sql"
 )
+modified_sql_file_path = os.path.join(
+    base_dir, "SQL Tables", "Update Tables", "temp_Update_All_Reporting_Tables.sql"
+)
+
+# Placeholder replacements
+client_db_placeholder = "[CLIENT_DB_NAME]"
 
 try:
-    # Check if the SQL file exists
-    if not os.path.exists(sql_file_path):
-        logger.error(f"SQL file not found: {sql_file_path}")
+    # Read and modify the SQL file
+    logger.info(f"Processing SQL script for customer: {CUSTOMER_NAME}")
+    with open(sql_file_path, "r") as file:
+        sql_content = file.read()
+
+    # Ensure the placeholder is matched exactly
+    if client_db_placeholder not in sql_content:
+        logger.error(f"Placeholder {client_db_placeholder} not found in {sql_file_path}.")
         sys.exit(1)
 
-    logger.info(f"Executing SQL script for customer: {CUSTOMER_NAME}")
-    logger.info(f"Using database: {CUSTOMER_DB_NAME}")
-    logger.info(f"SQL Server: {SQL_SERVER}, Port: {SQL_PORT}")
+    # Replace placeholders with actual values
+    modified_sql_content = sql_content.replace(client_db_placeholder, f"'{CUSTOMER_DB_NAME}'")
+
+    # Save the modified SQL file
+    with open(modified_sql_file_path, "w") as file:
+        file.write(modified_sql_content)
+
+    logger.info(f"SQL script modified for customer: {CUSTOMER_NAME}")
 
     # Command to run sqlcmd
     command = [
-        "/opt/mssql-tools/bin/sqlcmd",
+        "/opt/mssql-tools/bin/sqlcmd",  # Full path to sqlcmd
         "-S", f"{SQL_SERVER},{SQL_PORT}",  # Server and port
         "-U", SQL_USERNAME,               # Username
         "-P", SQL_PASSWORD,               # Password
-        "-i", sql_file_path               # Input file
+        "-i", modified_sql_file_path      # Input file
     ]
 
+    logger.info("Executing SQL script using sqlcmd...")
     # Run the command and capture output
     process = subprocess.run(
         command,
@@ -68,7 +85,7 @@ try:
         text=True
     )
 
-    # Log the result
+    # Log the output and errors
     if process.returncode == 0:
         logger.info("SQL script executed successfully.")
         logger.info(f"Output:\n{process.stdout}")
@@ -78,3 +95,9 @@ try:
 
 except Exception as e:
     logger.error(f"Error occurred while running the SQL script: {e}")
+
+finally:
+    # Clean up the temporary modified file
+    if os.path.exists(modified_sql_file_path):
+        os.remove(modified_sql_file_path)
+        logger.info(f"Temporary modified SQL file removed for customer: {CUSTOMER_NAME}")
