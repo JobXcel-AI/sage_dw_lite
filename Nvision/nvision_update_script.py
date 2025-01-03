@@ -25,6 +25,9 @@ command = [
     SQL_PASSWORD
 ]
 
+# Debug: Print the constructed command
+print(f"Running command: {' '.join(command)}")
+
 # Execute the script
 try:
     result = subprocess.run(command, capture_output=True, text=True)
