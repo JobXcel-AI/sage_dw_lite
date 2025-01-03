@@ -27,7 +27,7 @@ command = [
 
 # Execute the script
 try:
-    result = subprocess.run(command, capture_output=True, text=True)
+    result = subprocess.run(command, text=True)
 
     # Log output or errors
     if result.returncode == 0:
