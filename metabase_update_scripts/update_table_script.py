@@ -4,8 +4,6 @@ from logging.handlers import TimedRotatingFileHandler
 import os
 import sys
 
-print(f"Received arguments: {sys.argv}")
-
 # Configure rolling log file with a retention of 5 days
 log_file_path = os.path.join(os.path.dirname(__file__), "update_table_script.log")
 file_handler = TimedRotatingFileHandler(
