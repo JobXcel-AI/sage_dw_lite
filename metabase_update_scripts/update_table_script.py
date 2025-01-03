@@ -2,11 +2,12 @@ import subprocess
 import logging
 from logging.handlers import TimedRotatingFileHandler
 import os
+import sys
 
 # Configure rolling log file with a retention of 5 days
-log_file_path = os.path.join(os.path.dirname(__file__), "vertex_update.log")
+log_file_path = os.path.join(os.path.dirname(__file__), "update_table_script.log")
 file_handler = TimedRotatingFileHandler(
-    log_file_path, when="midnight", interval=1, backupCount=5  # Rotate daily, keep 5 days of logs
+    log_file_path, when="midnight", interval=1, backupCount=5
 )
 formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
 file_handler.setFormatter(formatter)
@@ -21,8 +22,17 @@ console_handler = logging.StreamHandler()
 console_handler.setFormatter(formatter)
 logger.addHandler(console_handler)
 
-# Full path to the original and modified SQL files
-base_dir = os.path.dirname(os.path.dirname(__file__))  # Move up one level to locate the base directory
+# Ensure required arguments are passed
+if len(sys.argv) < 3:
+    logger.error("Usage: python update_table_script.py <CUSTOMER_NAME> <CUSTOMER_DB_NAME>")
+    sys.exit(1)
+
+# Extract arguments
+CUSTOMER_NAME = sys.argv[1]
+CUSTOMER_DB_NAME = sys.argv[2]
+
+# Paths to the SQL files
+base_dir = os.path.dirname(os.path.dirname(__file__))  # Move up to the base directory
 sql_file_path = os.path.join(
     base_dir, "SQL Tables", "Update Tables", "Update All Reporting Tables.sql"
 )
@@ -30,18 +40,19 @@ modified_sql_file_path = os.path.join(
     base_dir, "SQL Tables", "Update Tables", "temp_Update_All_Reporting_Tables.sql"
 )
 
-# Placeholder and replacement for database name
-placeholder = "[CLIENT_DB_NAME]"
-client_db_name = "'Vertex Coatings'"
+# Placeholder replacements
+customer_name_placeholder = "[CUSTOMER_NAME]"
+customer_db_placeholder = "[CUSTOMER_DB_NAME]"
 
 try:
-    # Read the original SQL file
-    logger.info("Reading and modifying the SQL script...")
+    # Read and modify the SQL file
+    logger.info(f"Reading and modifying the SQL script for {CUSTOMER_NAME}...")
     with open(sql_file_path, "r") as file:
         sql_content = file.read()
 
-    # Replace the placeholder with the client DB name
-    modified_sql_content = sql_content.replace(placeholder, client_db_name)
+    # Replace placeholders with actual values
+    modified_sql_content = sql_content.replace(customer_name_placeholder, CUSTOMER_NAME)
+    modified_sql_content = modified_sql_content.replace(customer_db_placeholder, CUSTOMER_DB_NAME)
 
     # Save the modified SQL file
     with open(modified_sql_file_path, "w") as file:
