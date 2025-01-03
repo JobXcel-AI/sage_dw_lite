@@ -35,6 +35,9 @@ SQL_PORT = sys.argv[4]
 SQL_USERNAME = sys.argv[5]
 SQL_PASSWORD = sys.argv[6]
 
+# Debug: Log extracted arguments
+logger.info(f"Extracted arguments: CUSTOMER_NAME={CUSTOMER_NAME}, CUSTOMER_DB_NAME={CUSTOMER_DB_NAME}, SQL_SERVER={SQL_SERVER}, SQL_PORT={SQL_PORT}, SQL_USERNAME={SQL_USERNAME}")
+
 # Paths to the SQL files
 base_dir = os.path.dirname(os.path.dirname(__file__))  # Move up to the base directory
 sql_file_path = os.path.join(
