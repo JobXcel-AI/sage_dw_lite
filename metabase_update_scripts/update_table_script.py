@@ -48,9 +48,20 @@ try:
     logger.info(f"Processing SQL script for customer: {CUSTOMER_NAME}")
     with open(sql_file_path, "r") as file:
         sql_content = file.read()
+    
+    # Ensure the placeholder is matched exactly
+    if client_db_placeholder not in sql_content:
+        logger.error(f"Placeholder {client_db_placeholder} not found in {sql_file_path}.")
+        sys.exit(1)
 
     # Replace placeholders with actual values
     modified_sql_content = sql_content.replace(client_db_placeholder, f"'{CUSTOMER_DB_NAME}'")
+
+    logger.debug("Original SQL content:")
+    logger.debug(sql_content)
+
+    logger.debug("Modified SQL content:")
+    logger.debug(modified_sql_content)
 
     # Save the modified SQL file
     with open(modified_sql_file_path, "w") as file:
