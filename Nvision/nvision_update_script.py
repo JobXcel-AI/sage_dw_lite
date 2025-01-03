@@ -3,7 +3,7 @@ import subprocess
 
 # Customer-specific variables
 CUSTOMER_NAME = "Nvision"
-CUSTOMER_DB_NAME = "Nvision Reports"
+CUSTOMER_DB_NAME = "Nvision"
 
 # Path to the centralized script
 base_dir = os.path.dirname(os.path.dirname(__file__))  # Move up to the base directory
