@@ -41,24 +41,22 @@ modified_sql_file_path = os.path.join(
 )
 
 # Placeholder replacements
-customer_name_placeholder = "[CUSTOMER_NAME]"
-customer_db_placeholder = "[CUSTOMER_DB_NAME]"
+client_db_placeholder = "[CLIENT_DB_NAME]"
 
 try:
     # Read and modify the SQL file
-    logger.info(f"Reading and modifying the SQL script for {CUSTOMER_NAME}...")
+    logger.info(f"Processing SQL script for customer: {CUSTOMER_NAME}")
     with open(sql_file_path, "r") as file:
         sql_content = file.read()
 
     # Replace placeholders with actual values
-    modified_sql_content = sql_content.replace(customer_name_placeholder, CUSTOMER_NAME)
-    modified_sql_content = modified_sql_content.replace(customer_db_placeholder, CUSTOMER_DB_NAME)
+    modified_sql_content = sql_content.replace(client_db_placeholder, f"'{CUSTOMER_DB_NAME}'")
 
     # Save the modified SQL file
     with open(modified_sql_file_path, "w") as file:
         file.write(modified_sql_content)
 
-    logger.info("Modified SQL script saved.")
+    logger.info(f"SQL script modified for customer: {CUSTOMER_NAME}")
 
     # Command to run sqlcmd
     command = [
@@ -93,4 +91,4 @@ finally:
     # Clean up the temporary modified file
     if os.path.exists(modified_sql_file_path):
         os.remove(modified_sql_file_path)
-        logger.info("Temporary modified SQL file removed.")
+        logger.info(f"Temporary modified SQL file removed for customer: {CUSTOMER_NAME}")
