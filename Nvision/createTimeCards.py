@@ -25,9 +25,22 @@ logger.addHandler(console_handler)
 CUSTOMER_NAME = "Nvision"
 CUSTOMER_DB_NAME = "Nvision"
 
-# Test SQL query
-sql_query = """
-SELECT TOP 1 * FROM Jobs;
+# Test SQL query template
+sql_query = f"""
+--Specify Client DB Name
+DECLARE @Client_DB_Name NVARCHAR(50) = '{CUSTOMER_DB_NAME}';  
+--Specify Reporting DB Name
+DECLARE @Reporting_DB_Name NVARCHAR(50) = QUOTENAME(CONCAT(@Client_DB_Name, ' Reporting'));
+--Initial variable declaration
+DECLARE @SqlQuery NVARCHAR(MAX);
+
+--Query: Select TOP 1 row from Jobs table in the specified Client DB
+SET @SqlQuery = CONCAT(
+    N'SELECT TOP 1 * FROM ', @Client_DB_Name, N'.dbo.Jobs;'
+);
+
+--Execute the query
+EXEC sp_executesql @SqlQuery;
 """
 
 # Temporary SQL file to execute the query
@@ -40,7 +53,7 @@ try:
         file.write(sql_query)
 
     logger.info(f"Running test query for customer: {CUSTOMER_NAME}")
-    logger.info(f"Query: {sql_query.strip()}")
+    logger.info(f"Query: \n{sql_query.strip()}")
 
     # Command to run sqlcmd
     command = [
