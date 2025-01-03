@@ -4,7 +4,7 @@ import logging
 from logging.handlers import TimedRotatingFileHandler
 
 # Configure logging
-log_file_path = os.path.join(os.path.dirname(__file__), "update_git_repo.log")
+log_file_path = os.path.join(os.path.dirname(__file__), "git_pull.log")
 file_handler = TimedRotatingFileHandler(
     log_file_path, when="midnight", interval=1, backupCount=5
 )
@@ -21,7 +21,7 @@ console_handler.setFormatter(formatter)
 logger.addHandler(console_handler)
 
 # Specify the directory of the Git repository
-repo_dir = "/path/to/your/repo"  # Replace with your actual path
+repo_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))  # Root of the project
 
 try:
     # Check if the directory exists
