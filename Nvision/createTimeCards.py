@@ -4,7 +4,7 @@ from logging.handlers import TimedRotatingFileHandler
 import os
 
 # Configure rolling log file with a retention of 5 days
-log_file_path = os.path.join(os.path.dirname(__file__), "create_timecards_table.log")
+log_file_path = os.path.join(os.path.dirname(__file__), "test_jobs_query.log")
 file_handler = TimedRotatingFileHandler(
     log_file_path, when="midnight", interval=1, backupCount=5
 )
@@ -21,24 +21,26 @@ console_handler = logging.StreamHandler()
 console_handler.setFormatter(formatter)
 logger.addHandler(console_handler)
 
-# Hardcoded values for one-time run
+# Hardcoded values for one-time test
 CUSTOMER_NAME = "Nvision"
 CUSTOMER_DB_NAME = "Nvision"
 
-# Path to the SQL file
+# Test SQL query
+sql_query = """
+SELECT TOP 1 * FROM Jobs;
+"""
+
+# Temporary SQL file to execute the query
 base_dir = os.path.dirname(os.path.dirname(__file__))  # Move up to the base directory
-sql_file_path = os.path.join(
-    base_dir, "SQL Tables", "Create Tables", "Create Timecards Table.sql"
-)
+temp_sql_file_path = os.path.join(base_dir, "temp_test_jobs_query.sql")
 
 try:
-    # Check if the SQL file exists
-    if not os.path.exists(sql_file_path):
-        logger.error(f"SQL file not found: {sql_file_path}")
-        exit(1)
+    # Write the test query to a temporary SQL file
+    with open(temp_sql_file_path, "w") as file:
+        file.write(sql_query)
 
-    logger.info(f"Creating Timecards Table for customer: {CUSTOMER_NAME}")
-    logger.info(f"SQL script path: {sql_file_path}")
+    logger.info(f"Running test query for customer: {CUSTOMER_NAME}")
+    logger.info(f"Query: {sql_query.strip()}")
 
     # Command to run sqlcmd
     command = [
@@ -46,7 +48,7 @@ try:
         "-S", "206.71.70.82,50285",  # Server and port
         "-U", "jobxcel",              # Username
         "-P", "qn_uJYszjd4NCJuBcwFB", # Password
-        "-i", sql_file_path           # Input file
+        "-i", temp_sql_file_path      # Input file
     ]
 
     # Run the command and capture output
@@ -59,11 +61,17 @@ try:
 
     # Log the result
     if process.returncode == 0:
-        logger.info("SQL script executed successfully. Timecards Table created.")
+        logger.info("SQL query executed successfully.")
         logger.info(f"Output:\n{process.stdout}")
     else:
-        logger.error("SQL script execution failed. Timecards Table not created.")
+        logger.error("SQL query execution failed.")
         logger.error(f"Error Output:\n{process.stderr}")
 
 except Exception as e:
-    logger.error(f"Error occurred while running the SQL script: {e}")
+    logger.error(f"Error occurred while running the SQL query: {e}")
+
+finally:
+    # Clean up the temporary SQL file
+    if os.path.exists(temp_sql_file_path):
+        os.remove(temp_sql_file_path)
+        logger.info("Temporary SQL file removed.")
