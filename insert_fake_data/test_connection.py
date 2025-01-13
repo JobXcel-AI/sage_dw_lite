@@ -38,8 +38,12 @@ def random_date(start, end):
 # Helper function to map job status to corresponding number
 def get_job_status():
     status_mapping = {
+        "Closed": 6,
         "Complete": 5,
         "Current": 4,
+        "Contract": 3,
+        "Refused": 2,
+        "Bid": 1,
     }
     status = random.choice(list(status_mapping.keys()))
     return status, status_mapping[status]
@@ -71,17 +75,23 @@ try:
         zip_code = fake.zipcode()
         phone_number = fake.phone_number()[:12]
         job_contact_phone_number = fake.phone_number()[:12]
-
-        # Occasionally set some dates to NULL for testing
-        project_start_date = (
-            random_date(datetime(2022, 1, 1), datetime(2024, 12, 31)).strftime('%Y-%m-%d')
-            if random.random() > 0.1 else None
-        )
-        project_complete_date = (
-            random_date(datetime(2022, 1, 1), datetime(2024, 12, 31)).strftime('%Y-%m-%d')
-            if random.random() > 0.1 else None
-        )
-
+        bid_opening_date = random_date(datetime(2022, 1, 1), datetime(2024, 12, 31)).strftime('%Y-%m-%d')
+        plans_received_date = random_date(datetime(2022, 1, 1), datetime(2024, 12, 31)).strftime('%Y-%m-%d')
+        bid_completed_date = random_date(datetime(2022, 1, 1), datetime(2024, 12, 31)).strftime('%Y-%m-%d')
+        contract_signed_date = random_date(datetime(2022, 1, 1), datetime(2024, 12, 31)).strftime('%Y-%m-%d')
+        pre_lien_filed_date = random_date(datetime(2022, 1, 1), datetime(2024, 12, 31)).strftime('%Y-%m-%d')
+        project_start_date = random_date(datetime(2022, 1, 1), datetime(2024, 12, 31)).strftime('%Y-%m-%d')
+        project_complete_date = random_date(datetime(2022, 1, 1), datetime(2024, 12, 31)).strftime('%Y-%m-%d')
+        lien_release_date = random_date(datetime(2022, 1, 1), datetime(2024, 12, 31)).strftime('%Y-%m-%d')
+        material_cost = round(random.uniform(500, 10000), 2)
+        labor_cost = round(random.uniform(500, 10000), 2)
+        equipment_cost = round(random.uniform(500, 10000), 2)
+        other_cost = round(random.uniform(500, 10000), 2)
+        job_cost_overhead = round(material_cost * 0.1, 2)
+        change_order_approved_amount = round(random.uniform(500, 10000), 2)
+        retention = round(invoice_total * 0.05, 2)
+        invoice_net_due = invoice_total - invoice_amount_paid
+        invoice_balance = invoice_total - invoice_amount_paid - retention
         created_date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         last_updated_date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         is_deleted = random.choice([0, 1])
@@ -94,16 +104,20 @@ try:
             job_number, job_name, job_status, job_status_number, client_id, client_name, job_type, 
             contract_amount, invoice_total, invoice_amount_paid, invoice_sales_tax, supervisor_id, supervisor, 
             salesperson_id, salesperson, estimator_id, estimator, contact, address1, address2, city, state, zip_code, 
-            phone_number, job_contact_phone_number, project_start_date, project_complete_date, 
-            created_date, last_updated_date, is_deleted, deleted_date
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            phone_number, job_contact_phone_number, bid_opening_date, plans_received_date, bid_completed_date, 
+            contract_signed_date, pre_lien_filed_date, project_start_date, project_complete_date, lien_release_date, 
+            material_cost, labor_cost, equipment_cost, other_cost, job_cost_overhead, change_order_approved_amount, 
+            retention, invoice_net_due, invoice_balance, created_date, last_updated_date, is_deleted, deleted_date
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """
         cursor.execute(job_insert_sql, (
             job_number, job_name, job_status, job_status_number, client_id, client_name, job_type,
             contract_amount, invoice_total, invoice_amount_paid, invoice_sales_tax, supervisor_id, supervisor,
             salesperson_id, salesperson, estimator_id, estimator, contact, address1, address2, city, state, zip_code,
-            phone_number, job_contact_phone_number, project_start_date, project_complete_date,
-            created_date, last_updated_date, is_deleted, deleted_date
+            phone_number, job_contact_phone_number, bid_opening_date, plans_received_date, bid_completed_date,
+            contract_signed_date, pre_lien_filed_date, project_start_date, project_complete_date, lien_release_date,
+            material_cost, labor_cost, equipment_cost, other_cost, job_cost_overhead, change_order_approved_amount,
+            retention, invoice_net_due, invoice_balance, created_date, last_updated_date, is_deleted, deleted_date
         ))
 
     # Commit all changes
