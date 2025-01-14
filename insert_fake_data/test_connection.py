@@ -7,9 +7,9 @@ from datetime import datetime, timedelta
 fake = Faker()
 
 # Number of rows to generate
-num_jobs = 5
-num_job_costs_per_job = 2
-num_ar_invoices_per_job = 2
+num_jobs = 55
+num_job_costs_per_job = 12
+num_ar_invoices_per_job = 12
 
 # Database connection configuration
 db_config = {
@@ -56,6 +56,7 @@ try:
     for job_number in range(3000, num_jobs + 3001):
         # Generate data for Jobs table
         job_name = fake.company()
+        job_number_job_name = f"{job_number} - {job_name}"
         job_status, job_status_number = get_job_status()
         client_id = random.randint(1000, 9999)
         client_name = fake.company()
@@ -110,28 +111,35 @@ try:
         )
 
         job_insert_sql = """
-        INSERT INTO Jobs (
-            job_number, job_name, job_status, job_status_number, client_id, client_name, job_type, 
-            total_contract_amount, invoice_total, invoice_amount_paid, invoice_sales_tax, supervisor_id, supervisor, 
-            salesperson_id, salesperson, estimator_id, estimator, contact, address1, address2, city, state, zip_code, 
-            phone_number, job_contact_phone_number, bid_opening_date, plans_received_date, bid_completed_date, 
-            contract_signed_date, pre_lien_filed_date, project_start_date, project_complete_date, lien_release_date, 
-            material_cost, labor_cost, equipment_cost, other_cost, job_cost_overhead, change_order_approved_amount, 
-            retention, invoice_net_due, invoice_balance, created_date, last_updated_date, is_deleted, deleted_date
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO Jobs (
+                job_number_job_name, job_number, job_name, job_status, job_status_number, client_id, client_name, job_type, 
+                total_contract_amount, invoice_total, invoice_billed, original_budget_amount, invoice_amount_paid,
+                total_budget_amount, invoice_sales_tax, supervisor_id, supervisor, 
+                salesperson_id, salesperson, estimator_id, estimator, contact, address1, address2, city, state, zip_code, 
+                phone_number, job_contact_phone_number, bid_opening_date, plans_received_date, bid_completed_date, 
+                contract_signed_date, pre_lien_filed_date, project_start_date, project_complete_date, lien_release_date, 
+                material_cost, labor_cost, equipment_cost, other_cost, job_cost_overhead, change_order_approved_amount, 
+                retention, invoice_net_due, invoice_balance, created_date, last_updated_date, is_deleted, deleted_date
+            ) 
+            VALUES (
+                ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+            )
         """
+
         cursor.execute(job_insert_sql, (
-            job_number, job_name, job_status, job_status_number, client_id, client_name, job_type,
-            total_contract_amount, invoice_total, invoice_amount_paid, invoice_sales_tax, supervisor_id, supervisor,
-            salesperson_id, salesperson, estimator_id, estimator, contact, address1, address2, city, state, zip_code,
-            phone_number, job_contact_phone_number, bid_opening_date, plans_received_date, bid_completed_date,
-            contract_signed_date, pre_lien_filed_date, project_start_date, project_complete_date, lien_release_date,
-            material_cost, labor_cost, equipment_cost, other_cost, job_cost_overhead, change_order_approved_amount,
-            retention, invoice_net_due, invoice_balance, created_date, last_updated_date, is_deleted, deleted_date
-            ))
+            job_number_job_name, job_number, job_name, job_status, job_status_number, client_id, client_name, job_type,
+            total_contract_amount, invoice_total, invoice_billed, original_budget_amount, invoice_amount_paid,
+            total_budget_amount, invoice_sales_tax, supervisor_id, supervisor, salesperson_id, salesperson, estimator_id, estimator,
+            contact, address1, address2, city, state, zip_code, phone_number, job_contact_phone_number, bid_opening_date,
+            plans_received_date, bid_completed_date, contract_signed_date, pre_lien_filed_date, project_start_date,
+            project_complete_date, lien_release_date, material_cost, labor_cost, equipment_cost, other_cost,
+            job_cost_overhead, change_order_approved_amount, retention, invoice_net_due, invoice_balance,
+            created_date, last_updated_date, is_deleted, deleted_date
+        ))
 
         # Step 2: Populate Job_Costs for the current job
         for _ in range(num_job_costs_per_job):
+            job_cost_id = random.randint(10000, 99999)
             job_cost_code_name = fake.bs()
             job_cost_code = fake.ean(length=8)
             work_order_number = fake.ean(length=13)
@@ -158,15 +166,15 @@ try:
 
             job_cost_insert_sql = """
             INSERT INTO Job_Cost (
-                job_number, job_cost_code_name, job_cost_code, work_order_number, transaction_number, 
+                job_number, job_cost_id, job_name, job_status, job_cost_code_name, job_cost_code, work_order_number, transaction_number, 
                 job_cost_description, job_cost_source, vendor_id, vendor, cost_type, cost_in_hours, 
                 cost_amount, material_cost, labor_cost, equipment_cost, other_cost, subcontract_cost, 
                 billing_quantity, billing_amount, overhead_amount, job_cost_status, created_date, 
                 last_updated_date, is_deleted
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? ,?, ?)
             """
             cursor.execute(job_cost_insert_sql, (
-                job_number, job_cost_code_name, job_cost_code, work_order_number, transaction_number,
+                job_number, job_cost_id, job_name, job_status, job_cost_code_name, job_cost_code, work_order_number, transaction_number,
                 job_cost_description, job_cost_source, vendor_id, vendor, cost_type, cost_in_hours,
                 cost_amount, material_cost, labor_cost, equipment_cost, other_cost, subcontract_cost,
                 billing_quantity, billing_amount, overhead_amount, job_cost_status, created_date,
