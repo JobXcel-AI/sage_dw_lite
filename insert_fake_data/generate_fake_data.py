@@ -41,8 +41,8 @@ def get_job_status():
         "Complete": 5,
         "Current": 4,
         "Contract": 3,
-        "Refused": 2,
-        "Bid": 1,
+        # "Refused": 2,
+        # "Bid": 1,
     }
     status = random.choice(list(status_mapping.keys()))
     return status, status_mapping[status]
@@ -61,85 +61,220 @@ try:
         client_id = random.randint(1000, 9999)
         client_name = fake.company()
         job_type = random.choice(['Commercial', 'Residential', 'Government'])
+        supervisor_id = random.randint(1, 100)
+        supervisor = fake.name()
+        salesperson_id = random.randint(1, 100)
+        salesperson = fake.name()
+        estimator_id = random.randint(1, 100)
+        estimator = fake.name()
+        contact = fake.name()
+        address1 = fake.street_address()
+        address2 = fake.secondary_address()
+        city = fake.city()
+        state = fake.state_abbr()
+        zip_code = fake.zipcode()
+        phone_number = fake.phone_number()[:12]
+        job_contact_phone_number = fake.phone_number()[:12]
+        bid_opening_date = random_date(datetime(2022, 1, 1), datetime(2024, 12, 31)).strftime('%Y-%m-%d')
+        plans_received_date = random_date(datetime(2022, 1, 1), datetime(2024, 12, 31)).strftime('%Y-%m-%d')
+        bid_completed_date = random_date(datetime(2022, 1, 1), datetime(2024, 12, 31)).strftime('%Y-%m-%d')
 
-        # Contract and budget details
-        total_contract_amount = round(random.uniform(100000, 5000000), 2)
-        original_budget_amount = round(total_contract_amount * random.uniform(0.7, 0.9), 2)
-        total_budget_amount = round(original_budget_amount + random.uniform(10000, 50000), 2)
+        # Populate key fields with meaningful random data
+
+        # Contract and Budget
+        contract_amount = round(random.uniform(100000, 5000000), 2)
+        total_contract_amount = contract_amount
+        original_budget_amount = round(total_contract_amount * random.uniform(0.8, 0.95), 2)
+        total_budget_amount = round(original_budget_amount + random.uniform(1000, 5000), 2)
         estimated_gross_profit = round(total_contract_amount - total_budget_amount, 2)
 
-        # Percent Complete based on random progress
-        percent_complete = round(random.uniform(0.05, 1.0), 2)  # 5% to 100% progress
-        costs = round(original_budget_amount * percent_complete, 2)
-        billed = round(total_contract_amount * percent_complete, 2)
-
-        # Earned Revenue calculation
-        earned_revenue = round(total_contract_amount * percent_complete, 2)
-
-        # Overbilled and underbilled calculation
-        overbilled = max(0, billed - earned_revenue)
-        underbilled = max(0, earned_revenue - billed)
-
-        # Other financial details
-        invoice_total = round(billed * 1.05, 2)  # Include retention
+        # Invoice Details
+        invoice_billed = round(total_contract_amount * random.uniform(0.8, 1.0), 2)
+        invoice_total = round(invoice_billed * random.uniform(0.9, 1.0), 2)
+        invoice_sales_tax = round(invoice_total * 0.1, 2)
         invoice_amount_paid = round(invoice_total * random.uniform(0.5, 1.0), 2)
         retention = round(invoice_total * 0.05, 2)
+        invoice_net_due = round(invoice_total - invoice_amount_paid, 2)
+        invoice_balance = round(invoice_total - invoice_amount_paid - retention, 2)
 
         # Costs
-        cost_of_revenue = costs
-        gross_profit = round(earned_revenue - cost_of_revenue, 2)
+        # Ensure costs align with invoice_total and profitability
+        material_cost = round(random.uniform(0.2, 0.4) * original_budget_amount, 2)
+        labor_cost = round(random.uniform(0.3, 0.5) * original_budget_amount, 2)
+        equipment_cost = round(random.uniform(0.1, 0.3) * original_budget_amount, 2)
+        other_cost = round(random.uniform(0.05, 0.15) * original_budget_amount, 2)
+        job_cost_overhead = round((material_cost + labor_cost) * 0.1, 2)
+        change_order_approved_amount = round(random.uniform(1000, 5000), 2)
 
-        # Dates
+        # Ensure Total Costs Match Budget
+        total_cost = material_cost + labor_cost + equipment_cost + other_cost + job_cost_overhead
+        profit = round(total_contract_amount - total_cost, 2)
+        profit_margin = round(profit / total_contract_amount, 2)
+
+        # Ensure profitability 80% of the time
+        is_profitable = profit > 0 and random.random() < 0.8
+        if not is_profitable:
+            # Adjust costs to simulate loss
+            total_cost = total_contract_amount + random.uniform(500, 5000)
+            profit = round(total_contract_amount - total_cost, 2)
+            profit_margin = round(profit / total_contract_amount, 2)
+
+        created_date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        last_updated_date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        is_deleted = random.choice([0, 1])
+        deleted_date = (
+            (datetime.now() - timedelta(days=random.randint(0, 365))).strftime('%Y-%m-%d') if is_deleted else None
+        )
+        # Ensure dates are logically consistent
         project_start_date = random_date(datetime(2022, 1, 1), datetime(2024, 12, 31))
         project_complete_date = random_date(
             project_start_date + timedelta(days=1),
             min(project_start_date + timedelta(days=random.randint(30, 365)), datetime(2024, 12, 31))
         )
+        # Ensure contract_signed_date is earlier than or equal to project start date
+        contract_signed_date = random_date(datetime(2022, 1, 1), datetime(2024, 12, 31))
+        if contract_signed_date > project_start_date:
+            contract_signed_date = project_start_date - timedelta(days=10)
 
-        # Job insertion
+        # Ensure project_complete_date does not exceed the overall limit
+        if project_complete_date > datetime(2024, 12, 31):
+            project_complete_date = datetime(2024, 12, 31)
+
+        first_date_worked = random_date(
+            project_start_date + timedelta(days=1),
+            max(project_complete_date - timedelta(days=1), project_start_date + timedelta(days=1))
+        )
+
+        last_date_worked = random_date(
+            project_start_date + timedelta(days=1),
+            max(project_complete_date - timedelta(days=1), project_start_date + timedelta(days=1))
+        )
+
+        # Ensure first_date_worked is earlier than or equal to last_date_worked
+        if first_date_worked > last_date_worked:
+            first_date_worked, last_date_worked = last_date_worked, first_date_worked
+
+        # Handle last_payment_received_date
+        start_date = project_complete_date + timedelta(days=1)
+        end_date = datetime(2024, 12, 31)
+        # Ensure valid range for last_payment_received_date
+        if start_date > end_date:
+            start_date = end_date  # Adjust start_date to avoid invalid range
+        last_payment_received_date = random_date(start_date, end_date).strftime('%Y-%m-%d')
+
+        # Handle pre_lien_filed_date
+        start_date = project_complete_date + timedelta(days=60)
+        end_date = datetime(2024, 12, 31)
+        # Ensure valid range for pre_lien_filed_date
+        if start_date > end_date:
+            start_date = end_date  # Adjust start_date to avoid invalid range
+        pre_lien_filed_date = random_date(start_date, end_date).strftime('%Y-%m-%d')
+
+
+        # Handle lien_release_date > pre_lien_filed_date
+        lien_release_date = random_date(datetime(2022, 1, 1), datetime(2024, 12, 31)).strftime('%Y-%m-%d')
+        if lien_release_date < pre_lien_filed_date:
+            lien_release_date = pre_lien_filed_date + timedelta(days=random.randint(1, 30))
+
         job_insert_sql = """
             INSERT INTO Jobs (
                 job_number_job_name, job_number, job_name, job_status, job_status_number, client_id, client_name, job_type, 
-                total_contract_amount, original_budget_amount, total_budget_amount, estimated_gross_profit, 
-                percent_complete, billed, costs, earned_revenue, overbilled, underbilled, 
-                project_start_date, project_complete_date
+                contract_amount, total_contract_amount, invoice_total, invoice_billed, original_budget_amount, invoice_amount_paid,
+                total_budget_amount, estimated_gross_profit, invoice_sales_tax, supervisor_id, supervisor, 
+                salesperson_id, salesperson, estimator_id, estimator, contact, address1, address2, city, state, zip_code, 
+                phone_number, job_contact_phone_number, bid_opening_date, plans_received_date, bid_completed_date, 
+                contract_signed_date, pre_lien_filed_date, project_start_date, project_complete_date, lien_release_date, 
+                material_cost, labor_cost, equipment_cost, other_cost, job_cost_overhead, change_order_approved_amount, 
+                retention, invoice_net_due, invoice_balance, created_date, last_updated_date, is_deleted, deleted_date, first_date_worked, last_date_worked, last_payment_received_date
             ) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES (
+                ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+            )
         """
 
         cursor.execute(job_insert_sql, (
             job_number_job_name, job_number, job_name, job_status, job_status_number, client_id, client_name, job_type,
-            total_contract_amount, original_budget_amount, total_budget_amount, estimated_gross_profit,
-            percent_complete, billed, costs, earned_revenue, overbilled, underbilled,
-            project_start_date, project_complete_date
+            contract_amount, total_contract_amount, invoice_total, invoice_billed, original_budget_amount, invoice_amount_paid,
+            total_budget_amount, estimated_gross_profit, invoice_sales_tax, supervisor_id, supervisor, salesperson_id, salesperson, estimator_id, estimator,
+            contact, address1, address2, city, state, zip_code, phone_number, job_contact_phone_number, bid_opening_date,
+            plans_received_date, bid_completed_date, contract_signed_date, pre_lien_filed_date, project_start_date,
+            project_complete_date, lien_release_date, material_cost, labor_cost, equipment_cost, other_cost,
+            job_cost_overhead, change_order_approved_amount, retention, invoice_net_due, invoice_balance,
+            created_date, last_updated_date, is_deleted, deleted_date, first_date_worked, last_date_worked, last_payment_received_date
         ))
 
         # Step 2: Populate Job_Costs for the current job
         for _ in range(num_job_costs_per_job):
             job_cost_id = random.randint(10000, 99999)
+            job_cost_code_name = fake.bs()
+            job_cost_code = fake.ean(length=8)
+            work_order_number = fake.ean(length=13)
+            transaction_number = fake.uuid4()[:10]
+            job_cost_description = fake.sentence(nb_words=3)
+            job_cost_source = random.choice(["Material", "Labor", "Equipment", "Other"])
+            vendor_id = random.randint(1000, 9999)
+            vendor = fake.company()
             cost_type = random.choice(["Material", "Labor", "Equipment", "Other"])
-            cost_amount = round(costs / num_job_costs_per_job, 2)
+            cost_in_hours = round(random.uniform(1, 100), 2)
+            cost_amount = round(random.uniform(100.0, 5000.0), 2)
+            material_cost = round(cost_amount if cost_type == "Material" else 0, 2)
+            labor_cost = round(cost_amount if cost_type == "Labor" else 0, 2)
+            equipment_cost = round(cost_amount if cost_type == "Equipment" else 0, 2)
+            other_cost = round(cost_amount if cost_type == "Other" else 0, 2)
+            subcontract_cost = round(random.uniform(0, 1000), 2)
+            billing_quantity = round(random.uniform(1, 20), 2)
+            billing_amount = round(random.uniform(500, 10000), 2)
+            overhead_amount = round(random.uniform(50, 500), 2)
+            job_cost_status = random.choice(["Open", "Void"])
+            created_date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            last_updated_date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            is_deleted = 0
 
             job_cost_insert_sql = """
-                INSERT INTO Job_Cost (
-                    job_number, job_cost_id, cost_type, cost_amount
-                ) 
-                VALUES (?, ?, ?, ?)
+            INSERT INTO Job_Cost (
+                job_number, job_cost_id, job_name, job_status, job_cost_code_name, job_cost_code, work_order_number, transaction_number, 
+                job_cost_description, job_cost_source, vendor_id, vendor, cost_type, cost_in_hours, 
+                cost_amount, material_cost, labor_cost, equipment_cost, other_cost, subcontract_cost, 
+                billing_quantity, billing_amount, overhead_amount, job_cost_status, created_date, 
+                last_updated_date, is_deleted
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? ,?, ?)
             """
-            cursor.execute(job_cost_insert_sql, (job_number, job_cost_id, cost_type, cost_amount))
+            cursor.execute(job_cost_insert_sql, (
+                job_number, job_cost_id, job_name, job_status, job_cost_code_name, job_cost_code, work_order_number, transaction_number,
+                job_cost_description, job_cost_source, vendor_id, vendor, cost_type, cost_in_hours,
+                cost_amount, material_cost, labor_cost, equipment_cost, other_cost, subcontract_cost,
+                billing_quantity, billing_amount, overhead_amount, job_cost_status, created_date,
+                last_updated_date, is_deleted
+            ))
 
         # Step 3: Populate AR_Invoices for the current job
         for _ in range(num_ar_invoices_per_job):
             ar_invoice_id = random.randint(10000, 99999)
-            ar_invoice_total = round(billed / num_ar_invoices_per_job, 2)
+            ar_invoice_date = random_date(datetime(2022, 1, 1), datetime(2024, 12, 31)).strftime('%Y-%m-%d')
+            ar_invoice_description = fake.text(max_nb_chars=50)
+            ar_invoice_number = f"INV-{random.randint(100000, 999999)}"
+            ar_invoice_status = random.choice(['Paid', 'Unpaid', 'Overdue'])
+            ar_invoice_total = round(random.uniform(1000, 50000), 2)
+            ar_invoice_sales_tax = round(ar_invoice_total * 0.1, 2)
+            ar_invoice_amount_paid = round(ar_invoice_total * random.uniform(0.0, 1.0), 2)
+            ar_invoice_balance = ar_invoice_total - ar_invoice_amount_paid
+            ar_invoice_due_date = random_date(datetime(2022, 1, 1), datetime(2024, 12, 31)).strftime('%Y-%m-%d')
+            created_date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            last_updated_date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            is_deleted = 0
 
             ar_invoice_insert_sql = """
-                INSERT INTO AR_Invoices (
-                    job_number, ar_invoice_id, ar_invoice_total
-                ) 
-                VALUES (?, ?, ?)
+            INSERT INTO AR_Invoices (
+                job_number, ar_invoice_id, ar_invoice_date, ar_invoice_description, ar_invoice_number, 
+                ar_invoice_status, ar_invoice_total, ar_invoice_sales_tax, ar_invoice_amount_paid, 
+                ar_invoice_balance, ar_invoice_due_date, created_date, last_updated_date, is_deleted
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """
-            cursor.execute(ar_invoice_insert_sql, (job_number, ar_invoice_id, ar_invoice_total))
+            cursor.execute(ar_invoice_insert_sql, (
+                job_number, ar_invoice_id, ar_invoice_date, ar_invoice_description, ar_invoice_number,
+                ar_invoice_status, ar_invoice_total, ar_invoice_sales_tax, ar_invoice_amount_paid,
+                ar_invoice_balance, ar_invoice_due_date, created_date, last_updated_date, is_deleted
+            ))
 
     # Commit all changes
     conn.commit()
