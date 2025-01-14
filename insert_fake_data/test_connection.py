@@ -57,10 +57,17 @@ try:
         client_id = random.randint(1000, 9999)
         client_name = fake.company()
         job_type = random.choice(['Commercial', 'Residential', 'Government'])
-        contract_amount = round(random.uniform(10000, 500000), 2)
-        invoice_total = round(random.uniform(1000, 50000), 2)
+
+        # Populate key fields with meaningful random data
+        total_contract_amount = round(random.uniform(100000, 5000000), 2)
+        original_budget_amount = round(total_contract_amount * random.uniform(0.8, 1.0), 2)
+        total_budget_amount = round(original_budget_amount + random.uniform(10000, 50000), 2)
+        invoice_billed = round(total_contract_amount * random.uniform(0.6, 1.0), 2)
+
+        invoice_total = round(invoice_billed * random.uniform(0.8, 1.0), 2)
         invoice_amount_paid = round(invoice_total * random.uniform(0.5, 1.0), 2)
         invoice_sales_tax = round(invoice_total * 0.1, 2)
+
         supervisor_id = random.randint(1, 100)
         supervisor = fake.name()
         salesperson_id = random.randint(1, 100)
@@ -102,7 +109,7 @@ try:
         job_insert_sql = """
         INSERT INTO Jobs (
             job_number, job_name, job_status, job_status_number, client_id, client_name, job_type, 
-            contract_amount, invoice_total, invoice_amount_paid, invoice_sales_tax, supervisor_id, supervisor, 
+            total_contract_amount, invoice_total, invoice_amount_paid, invoice_sales_tax, supervisor_id, supervisor, 
             salesperson_id, salesperson, estimator_id, estimator, contact, address1, address2, city, state, zip_code, 
             phone_number, job_contact_phone_number, bid_opening_date, plans_received_date, bid_completed_date, 
             contract_signed_date, pre_lien_filed_date, project_start_date, project_complete_date, lien_release_date, 
@@ -112,7 +119,7 @@ try:
         """
         cursor.execute(job_insert_sql, (
             job_number, job_name, job_status, job_status_number, client_id, client_name, job_type,
-            contract_amount, invoice_total, invoice_amount_paid, invoice_sales_tax, supervisor_id, supervisor,
+            total_contract_amount, invoice_total, invoice_amount_paid, invoice_sales_tax, supervisor_id, supervisor,
             salesperson_id, salesperson, estimator_id, estimator, contact, address1, address2, city, state, zip_code,
             phone_number, job_contact_phone_number, bid_opening_date, plans_received_date, bid_completed_date,
             contract_signed_date, pre_lien_filed_date, project_start_date, project_complete_date, lien_release_date,
