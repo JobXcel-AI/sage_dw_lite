@@ -41,8 +41,8 @@ def get_job_status():
         "Complete": 5,
         "Current": 4,
         "Contract": 3,
-        "Refused": 2,
-        "Bid": 1,
+        # "Refused": 2,
+        # "Bid": 1,
     }
     status = random.choice(list(status_mapping.keys()))
     return status, status_mapping[status]
@@ -63,14 +63,37 @@ try:
         job_type = random.choice(['Commercial', 'Residential', 'Government'])
 
         # Populate key fields with meaningful random data
-        total_contract_amount = round(random.uniform(100000, 5000000), 2)
+        contract_amount = round(random.uniform(100000, 5000000), 2)
+        total_contract_amount = contract_amount
         original_budget_amount = round(total_contract_amount * random.uniform(0.8, 1.0), 2)
-        total_budget_amount = round(original_budget_amount + random.uniform(10000, 50000), 2)
+        total_budget_amount = round(original_budget_amount + random.uniform(10000, 5000), 2)
+        estimated_gross_profit = round(total_contract_amount - total_budget_amount, 2)
         invoice_billed = round(total_contract_amount * random.uniform(0.6, 1.0), 2)
 
         invoice_total = round(invoice_billed * random.uniform(0.8, 1.0), 2)
         invoice_amount_paid = round(invoice_total * random.uniform(0.5, 1.0), 2)
         invoice_sales_tax = round(invoice_total * 0.1, 2)
+
+        # Percent Complete based on random progress
+        percent_complete = round(random.uniform(0.05, 1.0), 2)  # 5% to 100% progress
+        costs = round(original_budget_amount * percent_complete, 2)
+        billed = round(total_contract_amount * percent_complete, 2)
+
+        # Earned Revenue calculation
+        earned_revenue = round(total_contract_amount * percent_complete, 2)
+
+        # Overbilled and underbilled calculation
+        overbilled = max(0, billed - earned_revenue)
+        underbilled = max(0, earned_revenue - billed)
+
+        # Other financial details
+        invoice_total = round(billed * 1.05, 2)  # Include retention
+        invoice_amount_paid = round(invoice_total * random.uniform(0.5, 1.0), 2)
+        retention = round(invoice_total * 0.05, 2)
+
+        # Costs
+        cost_of_revenue = costs
+        gross_profit = round(earned_revenue - cost_of_revenue, 2)
 
         supervisor_id = random.randint(1, 100)
         supervisor = fake.name()
@@ -89,11 +112,7 @@ try:
         bid_opening_date = random_date(datetime(2022, 1, 1), datetime(2024, 12, 31)).strftime('%Y-%m-%d')
         plans_received_date = random_date(datetime(2022, 1, 1), datetime(2024, 12, 31)).strftime('%Y-%m-%d')
         bid_completed_date = random_date(datetime(2022, 1, 1), datetime(2024, 12, 31)).strftime('%Y-%m-%d')
-        contract_signed_date = random_date(datetime(2022, 1, 1), datetime(2024, 12, 31)).strftime('%Y-%m-%d')
-        pre_lien_filed_date = random_date(datetime(2022, 1, 1), datetime(2024, 12, 31)).strftime('%Y-%m-%d')
-        project_start_date = random_date(datetime(2022, 1, 1), datetime(2024, 12, 31)).strftime('%Y-%m-%d')
-        project_complete_date = random_date(datetime(2022, 1, 1), datetime(2024, 12, 31)).strftime('%Y-%m-%d')
-        lien_release_date = random_date(datetime(2022, 1, 1), datetime(2024, 12, 31)).strftime('%Y-%m-%d')
+
         material_cost = round(random.uniform(500, 10000), 2)
         labor_cost = round(random.uniform(500, 10000), 2)
         equipment_cost = round(random.uniform(500, 10000), 2)
@@ -109,32 +128,79 @@ try:
         deleted_date = (
             (datetime.now() - timedelta(days=random.randint(0, 365))).strftime('%Y-%m-%d') if is_deleted else None
         )
+        # Ensure dates are logically consistent
+        project_start_date = random_date(datetime(2022, 1, 1), datetime(2024, 12, 31))
+        project_complete_date = random_date(
+            project_start_date + timedelta(days=1),
+            min(project_start_date + timedelta(days=random.randint(30, 365)), datetime(2024, 12, 31))
+        )
+
+        # Ensure project_complete_date does not exceed the overall limit
+        if project_complete_date > datetime(2024, 12, 31):
+            project_complete_date = datetime(2024, 12, 31)
+
+        first_date_worked = random_date(
+            project_start_date + timedelta(days=1),
+            max(project_complete_date - timedelta(days=1), project_start_date + timedelta(days=1))
+        )
+
+        last_date_worked = random_date(
+            project_start_date + timedelta(days=1),
+            max(project_complete_date - timedelta(days=1), project_start_date + timedelta(days=1))
+        )
+
+        # Ensure first_date_worked is earlier than or equal to last_date_worked
+        if first_date_worked > last_date_worked:
+            first_date_worked, last_date_worked = last_date_worked, first_date_worked
+
+        # Ensure contract_signed_date is earlier than or equal to project start date
+        contract_signed_date = random_date(datetime(2022, 1, 1), datetime(2024, 12, 31))
+        if contract_signed_date > project_start_date:
+            contract_signed_date = project_start_date - timedelta(days=10)
+
+        # Handle last_payment_received_date
+        start_date = project_complete_date + timedelta(days=1)
+        end_date = datetime(2024, 12, 31)
+
+        # Ensure valid range for last_payment_received_date
+        if start_date > end_date:
+            start_date = end_date  # Adjust start_date to avoid invalid range
+
+        last_payment_received_date = random_date(start_date, end_date).strftime('%Y-%m-%d')
+
+
+
+    pre_lien_filed_date = random_date(datetime(2022, 1, 1), datetime(2024, 12, 31)).strftime('%Y-%m-%d')
+    if contract_signed_date > project_start_date:
+        contract_signed_date = project_start_date - timedelta(days=10)
+
+    lien_release_date = random_date(datetime(2022, 1, 1), datetime(2024, 12, 31)).strftime('%Y-%m-%d')
 
         job_insert_sql = """
             INSERT INTO Jobs (
                 job_number_job_name, job_number, job_name, job_status, job_status_number, client_id, client_name, job_type, 
-                total_contract_amount, invoice_total, invoice_billed, original_budget_amount, invoice_amount_paid,
-                total_budget_amount, invoice_sales_tax, supervisor_id, supervisor, 
+                contract_amount, total_contract_amount, invoice_total, invoice_billed, original_budget_amount, invoice_amount_paid,
+                total_budget_amount, estimated_gross_profit, invoice_sales_tax, supervisor_id, supervisor, 
                 salesperson_id, salesperson, estimator_id, estimator, contact, address1, address2, city, state, zip_code, 
                 phone_number, job_contact_phone_number, bid_opening_date, plans_received_date, bid_completed_date, 
                 contract_signed_date, pre_lien_filed_date, project_start_date, project_complete_date, lien_release_date, 
                 material_cost, labor_cost, equipment_cost, other_cost, job_cost_overhead, change_order_approved_amount, 
-                retention, invoice_net_due, invoice_balance, created_date, last_updated_date, is_deleted, deleted_date
+                retention, invoice_net_due, invoice_balance, created_date, last_updated_date, is_deleted, deleted_date, first_date_worked, last_date_worked, last_payment_received_date
             ) 
             VALUES (
-                ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+                ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
             )
         """
 
         cursor.execute(job_insert_sql, (
             job_number_job_name, job_number, job_name, job_status, job_status_number, client_id, client_name, job_type,
-            total_contract_amount, invoice_total, invoice_billed, original_budget_amount, invoice_amount_paid,
-            total_budget_amount, invoice_sales_tax, supervisor_id, supervisor, salesperson_id, salesperson, estimator_id, estimator,
+            contract_amount, total_contract_amount, invoice_total, invoice_billed, original_budget_amount, invoice_amount_paid,
+            total_budget_amount, estimated_gross_profit, invoice_sales_tax, supervisor_id, supervisor, salesperson_id, salesperson, estimator_id, estimator,
             contact, address1, address2, city, state, zip_code, phone_number, job_contact_phone_number, bid_opening_date,
             plans_received_date, bid_completed_date, contract_signed_date, pre_lien_filed_date, project_start_date,
             project_complete_date, lien_release_date, material_cost, labor_cost, equipment_cost, other_cost,
             job_cost_overhead, change_order_approved_amount, retention, invoice_net_due, invoice_balance,
-            created_date, last_updated_date, is_deleted, deleted_date
+            created_date, last_updated_date, is_deleted, deleted_date, first_date_worked, last_date_worked, last_payment_received_date
         ))
 
         # Step 2: Populate Job_Costs for the current job
