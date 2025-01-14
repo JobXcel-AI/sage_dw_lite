@@ -89,8 +89,8 @@ try:
         estimated_gross_profit = round(total_contract_amount - total_budget_amount, 2)
 
         # Invoice Details
-        invoice_billed = round(total_contract_amount * random.uniform(0.9, 1.7), 2)
-        invoice_total = round(invoice_billed * random.uniform(0.9, 1.0), 2)
+        invoice_total = round(total_contract_amount * random.uniform(0.8, 1.4), 2)
+        invoice_billed = round(invoice_total * random.uniform(0.61, 1), 2)
         invoice_sales_tax = round(invoice_total * 0.1, 2)
         invoice_amount_paid = round(invoice_total * random.uniform(0.5, 1.0), 2)
         retention = round(invoice_total * 0.05, 2)
@@ -225,7 +225,7 @@ try:
             vendor = fake.company()
             cost_type = random.choice(["Material", "Labor", "Equipment", "Other"])
             cost_in_hours = round(random.uniform(1, 100), 2)
-            cost_amount = round(random.uniform(100.0, 5000.0), 2)
+            cost_amount = round(total_contract_amount * random.uniform(0.7, 1.08), 2)
             material_cost = round(cost_amount if cost_type == "Material" else 0, 2)
             labor_cost = round(cost_amount if cost_type == "Labor" else 0, 2)
             equipment_cost = round(cost_amount if cost_type == "Equipment" else 0, 2)
