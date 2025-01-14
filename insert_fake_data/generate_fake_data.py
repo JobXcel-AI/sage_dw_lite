@@ -89,7 +89,7 @@ try:
         estimated_gross_profit = round(total_contract_amount - total_budget_amount, 2)
 
         # Invoice Details
-        invoice_billed = round(total_contract_amount * random.uniform(0.8, 1.0), 2)
+        invoice_billed = round(total_contract_amount * random.uniform(0.9, 1.7), 2)
         invoice_total = round(invoice_billed * random.uniform(0.9, 1.0), 2)
         invoice_sales_tax = round(invoice_total * 0.1, 2)
         invoice_amount_paid = round(invoice_total * random.uniform(0.5, 1.0), 2)
@@ -97,17 +97,25 @@ try:
         invoice_net_due = round(invoice_total - invoice_amount_paid, 2)
         invoice_balance = round(invoice_total - invoice_amount_paid - retention, 2)
 
-        # Costs
-        # Ensure costs align with invoice_total and profitability
+        # Costs: Ensure Costs Do Not Exceed Budget
         material_cost = round(random.uniform(0.2, 0.4) * original_budget_amount, 2)
         labor_cost = round(random.uniform(0.3, 0.5) * original_budget_amount, 2)
         equipment_cost = round(random.uniform(0.1, 0.3) * original_budget_amount, 2)
         other_cost = round(random.uniform(0.05, 0.15) * original_budget_amount, 2)
         job_cost_overhead = round((material_cost + labor_cost) * 0.1, 2)
-        change_order_approved_amount = round(random.uniform(1000, 5000), 2)
+        change_order_approved_amount = round(random.uniform(0, 900), 2)
 
-        # Ensure Total Costs Match Budget
+        # Adjust total costs to ensure ratio is <= 1
         total_cost = material_cost + labor_cost + equipment_cost + other_cost + job_cost_overhead
+        if total_cost > original_budget_amount:
+            scale_factor = original_budget_amount / total_cost
+            material_cost *= scale_factor
+            labor_cost *= scale_factor
+            equipment_cost *= scale_factor
+            other_cost *= scale_factor
+            job_cost_overhead *= scale_factor
+            total_cost = material_cost + labor_cost + equipment_cost + other_cost + job_cost_overhead
+
         profit = round(total_contract_amount - total_cost, 2)
         profit_margin = round(profit / total_contract_amount, 2)
 
@@ -172,9 +180,10 @@ try:
 
 
         # Handle lien_release_date > pre_lien_filed_date
-        lien_release_date = random_date(datetime(2022, 1, 1), datetime(2024, 12, 31)).strftime('%Y-%m-%d')
-        if lien_release_date < pre_lien_filed_date:
-            lien_release_date = pre_lien_filed_date + timedelta(days=random.randint(1, 30))
+        lien_release_date = random_date(datetime(2022, 1, 1), datetime(2024, 12, 31))
+        if lien_release_date < datetime.strptime(pre_lien_filed_date, '%Y-%m-%d'):
+            lien_release_date = datetime.strptime(pre_lien_filed_date, '%Y-%m-%d') + timedelta(days=random.randint(1, 30))
+        lien_release_date = lien_release_date.strftime('%Y-%m-%d')
 
         job_insert_sql = """
             INSERT INTO Jobs (
