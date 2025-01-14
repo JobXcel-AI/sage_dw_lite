@@ -61,40 +61,6 @@ try:
         client_id = random.randint(1000, 9999)
         client_name = fake.company()
         job_type = random.choice(['Commercial', 'Residential', 'Government'])
-
-        # Populate key fields with meaningful random data
-        contract_amount = round(random.uniform(100000, 5000000), 2)
-        total_contract_amount = contract_amount
-        original_budget_amount = round(total_contract_amount * random.uniform(0.8, 1.0), 2)
-        total_budget_amount = round(original_budget_amount + random.uniform(10000, 5000), 2)
-        estimated_gross_profit = round(total_contract_amount - total_budget_amount, 2)
-        invoice_billed = round(total_contract_amount * random.uniform(0.6, 1.0), 2)
-
-        invoice_total = round(invoice_billed * random.uniform(0.8, 1.0), 2)
-        invoice_amount_paid = round(invoice_total * random.uniform(0.5, 1.0), 2)
-        invoice_sales_tax = round(invoice_total * 0.1, 2)
-
-        # Percent Complete based on random progress
-        percent_complete = round(random.uniform(0.05, 1.0), 2)  # 5% to 100% progress
-        costs = round(original_budget_amount * percent_complete, 2)
-        billed = round(total_contract_amount * percent_complete, 2)
-
-        # Earned Revenue calculation
-        earned_revenue = round(total_contract_amount * percent_complete, 2)
-
-        # Overbilled and underbilled calculation
-        overbilled = max(0, billed - earned_revenue)
-        underbilled = max(0, earned_revenue - billed)
-
-        # Other financial details
-        invoice_total = round(billed * 1.05, 2)  # Include retention
-        invoice_amount_paid = round(invoice_total * random.uniform(0.5, 1.0), 2)
-        retention = round(invoice_total * 0.05, 2)
-
-        # Costs
-        cost_of_revenue = costs
-        gross_profit = round(earned_revenue - cost_of_revenue, 2)
-
         supervisor_id = random.randint(1, 100)
         supervisor = fake.name()
         salesperson_id = random.randint(1, 100)
@@ -113,15 +79,46 @@ try:
         plans_received_date = random_date(datetime(2022, 1, 1), datetime(2024, 12, 31)).strftime('%Y-%m-%d')
         bid_completed_date = random_date(datetime(2022, 1, 1), datetime(2024, 12, 31)).strftime('%Y-%m-%d')
 
-        material_cost = round(random.uniform(500, 10000), 2)
-        labor_cost = round(random.uniform(500, 10000), 2)
-        equipment_cost = round(random.uniform(500, 10000), 2)
-        other_cost = round(random.uniform(500, 10000), 2)
-        job_cost_overhead = round(material_cost * 0.1, 2)
-        change_order_approved_amount = round(random.uniform(500, 10000), 2)
+        # Populate key fields with meaningful random data
+
+        # Contract and Budget
+        contract_amount = round(random.uniform(100000, 5000000), 2)
+        total_contract_amount = contract_amount
+        original_budget_amount = round(total_contract_amount * random.uniform(0.8, 0.95), 2)
+        total_budget_amount = round(original_budget_amount + random.uniform(1000, 5000), 2)
+        estimated_gross_profit = round(total_contract_amount - total_budget_amount, 2)
+
+        # Invoice Details
+        invoice_billed = round(total_contract_amount * random.uniform(0.8, 1.0), 2)
+        invoice_total = round(invoice_billed * random.uniform(0.9, 1.0), 2)
+        invoice_sales_tax = round(invoice_total * 0.1, 2)
+        invoice_amount_paid = round(invoice_total * random.uniform(0.5, 1.0), 2)
         retention = round(invoice_total * 0.05, 2)
-        invoice_net_due = invoice_total - invoice_amount_paid
-        invoice_balance = invoice_total - invoice_amount_paid - retention
+        invoice_net_due = round(invoice_total - invoice_amount_paid, 2)
+        invoice_balance = round(invoice_total - invoice_amount_paid - retention, 2)
+
+        # Costs
+        # Ensure costs align with invoice_total and profitability
+        material_cost = round(random.uniform(0.2, 0.4) * original_budget_amount, 2)
+        labor_cost = round(random.uniform(0.3, 0.5) * original_budget_amount, 2)
+        equipment_cost = round(random.uniform(0.1, 0.3) * original_budget_amount, 2)
+        other_cost = round(random.uniform(0.05, 0.15) * original_budget_amount, 2)
+        job_cost_overhead = round((material_cost + labor_cost) * 0.1, 2)
+        change_order_approved_amount = round(random.uniform(1000, 5000), 2)
+
+        # Ensure Total Costs Match Budget
+        total_cost = material_cost + labor_cost + equipment_cost + other_cost + job_cost_overhead
+        profit = round(total_contract_amount - total_cost, 2)
+        profit_margin = round(profit / total_contract_amount, 2)
+
+        # Ensure profitability 80% of the time
+        is_profitable = profit > 0 and random.random() < 0.8
+        if not is_profitable:
+            # Adjust costs to simulate loss
+            total_cost = total_contract_amount + random.uniform(500, 5000)
+            profit = round(total_contract_amount - total_cost, 2)
+            profit_margin = round(profit / total_contract_amount, 2)
+
         created_date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         last_updated_date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         is_deleted = random.choice([0, 1])
@@ -134,6 +131,10 @@ try:
             project_start_date + timedelta(days=1),
             min(project_start_date + timedelta(days=random.randint(30, 365)), datetime(2024, 12, 31))
         )
+        # Ensure contract_signed_date is earlier than or equal to project start date
+        contract_signed_date = random_date(datetime(2022, 1, 1), datetime(2024, 12, 31))
+        if contract_signed_date > project_start_date:
+            contract_signed_date = project_start_date - timedelta(days=10)
 
         # Ensure project_complete_date does not exceed the overall limit
         if project_complete_date > datetime(2024, 12, 31):
@@ -153,28 +154,27 @@ try:
         if first_date_worked > last_date_worked:
             first_date_worked, last_date_worked = last_date_worked, first_date_worked
 
-        # Ensure contract_signed_date is earlier than or equal to project start date
-        contract_signed_date = random_date(datetime(2022, 1, 1), datetime(2024, 12, 31))
-        if contract_signed_date > project_start_date:
-            contract_signed_date = project_start_date - timedelta(days=10)
-
         # Handle last_payment_received_date
         start_date = project_complete_date + timedelta(days=1)
         end_date = datetime(2024, 12, 31)
-
         # Ensure valid range for last_payment_received_date
         if start_date > end_date:
             start_date = end_date  # Adjust start_date to avoid invalid range
-
         last_payment_received_date = random_date(start_date, end_date).strftime('%Y-%m-%d')
 
+        # Handle pre_lien_filed_date
+        start_date = project_complete_date + timedelta(days=60)
+        end_date = datetime(2024, 12, 31)
+        # Ensure valid range for pre_lien_filed_date
+        if start_date > end_date:
+            start_date = end_date  # Adjust start_date to avoid invalid range
+        pre_lien_filed_date = random_date(start_date, end_date).strftime('%Y-%m-%d')
 
 
-    pre_lien_filed_date = random_date(datetime(2022, 1, 1), datetime(2024, 12, 31)).strftime('%Y-%m-%d')
-    if contract_signed_date > project_start_date:
-        contract_signed_date = project_start_date - timedelta(days=10)
-
-    lien_release_date = random_date(datetime(2022, 1, 1), datetime(2024, 12, 31)).strftime('%Y-%m-%d')
+        # Handle lien_release_date > pre_lien_filed_date
+        lien_release_date = random_date(datetime(2022, 1, 1), datetime(2024, 12, 31)).strftime('%Y-%m-%d')
+        if lien_release_date < pre_lien_filed_date:
+            lien_release_date = pre_lien_filed_date + timedelta(days=random.randint(1, 30))
 
         job_insert_sql = """
             INSERT INTO Jobs (
