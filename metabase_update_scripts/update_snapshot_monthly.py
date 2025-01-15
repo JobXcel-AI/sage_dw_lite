@@ -5,7 +5,7 @@ import os
 import sys
 
 # Configure rolling log file with a retention of 5 days
-log_file_path = os.path.join(os.path.dirname(__file__), "update_table_script.log")
+log_file_path = os.path.join(os.path.dirname(__file__), "monthly_snapshot_script.log")
 file_handler = TimedRotatingFileHandler(
     log_file_path, when="midnight", interval=1, backupCount=5
 )
@@ -41,10 +41,10 @@ logger.info(f"Extracted arguments: CUSTOMER_NAME={CUSTOMER_NAME}, CUSTOMER_DB_NA
 # Paths to the SQL files
 base_dir = os.path.dirname(os.path.dirname(__file__))  # Move up to the base directory
 sql_file_path = os.path.join(
-    base_dir, "SQL Tables", "Update Tables", "Update All Reporting Tables.sql"
+    base_dir, "SQL Tables", "Update Tables", "Monthly Snapshot.sql"
 )
 modified_sql_file_path = os.path.join(
-    base_dir, "SQL Tables", "Update Tables", "temp_Update_All_Reporting_Tables.sql"
+    base_dir, "SQL Tables", "Update Tables", "temp_Monthly_Snapshot.sql"
 )
 
 # Placeholder replacements
