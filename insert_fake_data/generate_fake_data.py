@@ -7,9 +7,9 @@ from datetime import datetime, timedelta
 fake = Faker()
 
 # Number of rows to generate
-num_jobs = 55
-num_job_costs_per_job = 12
-num_ar_invoices_per_job = 12
+num_jobs = 348
+num_job_costs_per_job = 27
+num_ar_invoices_per_job = 22
 
 # Database connection configuration
 db_config = {
@@ -46,6 +46,21 @@ def get_job_status():
     }
     status = random.choice(list(status_mapping.keys()))
     return status, status_mapping[status]
+
+# Helper function to adjust costs to budget
+def adjust_costs_to_budget(material_cost, labor_cost, equipment_cost, other_cost, overhead, budget):
+    """Ensure total costs do not exceed the budget."""
+    total_cost = material_cost + labor_cost + equipment_cost + other_cost + overhead
+    if total_cost > budget:
+        scale_factor = budget / total_cost
+        material_cost *= scale_factor
+        labor_cost *= scale_factor
+        equipment_cost *= scale_factor
+        other_cost *= scale_factor
+        overhead *= scale_factor
+        total_cost = material_cost + labor_cost + equipment_cost + other_cost + overhead
+    return material_cost, labor_cost, equipment_cost, other_cost, overhead, total_cost
+
 
 try:
     # Establish database connection
@@ -96,29 +111,21 @@ try:
         retention = round(invoice_total * 0.05, 2)
         invoice_net_due = round(invoice_total - invoice_amount_paid, 2)
         invoice_balance = round(invoice_total - invoice_amount_paid - retention, 2)
+        change_order_approved_amount = round(random.uniform(0, 900), 2)
 
-        # Costs: Ensure Costs Do Not Exceed Budget
+        # Generate costs
         material_cost = round(random.uniform(0.2, 0.4) * original_budget_amount, 2)
         labor_cost = round(random.uniform(0.3, 0.5) * original_budget_amount, 2)
         equipment_cost = round(random.uniform(0.1, 0.3) * original_budget_amount, 2)
         other_cost = round(random.uniform(0.05, 0.15) * original_budget_amount, 2)
         job_cost_overhead = round((material_cost + labor_cost) * 0.1, 2)
-        change_order_approved_amount = round(random.uniform(0, 900), 2)
 
-        # Adjust total costs to ensure ratio is <= 1
-        total_cost = material_cost + labor_cost + equipment_cost + other_cost + job_cost_overhead
-        if total_cost > original_budget_amount:
-            scale_factor = original_budget_amount / total_cost
-            material_cost *= scale_factor
-            labor_cost *= scale_factor
-            equipment_cost *= scale_factor
-            other_cost *= scale_factor
-            job_cost_overhead *= scale_factor
-            total_cost = material_cost + labor_cost + equipment_cost + other_cost + job_cost_overhead
+        # Adjust costs to fit budget
+        material_cost, labor_cost, equipment_cost, other_cost, job_cost_overhead, total_cost = adjust_costs_to_budget(
+            material_cost, labor_cost, equipment_cost, other_cost, job_cost_overhead, original_budget_amount
+        )
 
         profit = round(total_contract_amount - total_cost, 2)
-        profit_margin = round(profit / total_contract_amount, 2)
-
         # Ensure profitability 80% of the time
         is_profitable = profit > 0 and random.random() < 0.8
         if not is_profitable:
@@ -225,7 +232,7 @@ try:
             vendor = fake.company()
             cost_type = random.choice(["Material", "Labor", "Equipment", "Other"])
             cost_in_hours = round(random.uniform(1, 100), 2)
-            cost_amount = round(total_contract_amount * random.uniform(0.7, 1.08), 2)
+            cost_amount = round(total_contract_amount * random.uniform((1 /num_job_costs_per_job), (1/(num_job_costs_per_job-3))), 2)
             material_cost = round(cost_amount if cost_type == "Material" else 0, 2)
             labor_cost = round(cost_amount if cost_type == "Labor" else 0, 2)
             equipment_cost = round(cost_amount if cost_type == "Equipment" else 0, 2)
