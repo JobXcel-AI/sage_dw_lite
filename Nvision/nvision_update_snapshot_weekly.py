@@ -2,12 +2,12 @@ import os
 import subprocess
 
 # Customer-specific variables
-CUSTOMER_NAME = "Vertex"
-CUSTOMER_DB_NAME = "Vertex Coatings"
-SQL_SERVER = "vertexcoatings.servernova.net\\SN-30147"
-SQL_PORT = "50285"
+CUSTOMER_NAME = "Nvision"
+CUSTOMER_DB_NAME = "Nvision"
+SQL_SERVER = "nvisionglass.servernova.net"
+SQL_PORT = "50366"
 SQL_USERNAME = "jobxcel"
-SQL_PASSWORD = "qn_uJYszjd4NCJuBcwFB"
+SQL_PASSWORD = "bH2RqTYVPgtF4bH9LTD!"
 
 # Path to the centralized script
 base_dir = os.path.dirname(os.path.dirname(__file__))  # Move up to the base directory
@@ -32,14 +32,11 @@ try:
     # Log output or errors
     if result.returncode == 0:
         print("Script executed successfully.")
-        print("Standard Output:")
         print(result.stdout)
     else:
         print("Script execution failed.")
-        print("Standard Output:")
-        print(result.stdout)
-        print("Standard Error:")
-        print(result.stderr)
+        print("Standard Output:", result.stdout)
+        print("Standard Error:", result.stderr)
 
 except Exception as e:
     print(f"Error occurred while running the script: {e}")
