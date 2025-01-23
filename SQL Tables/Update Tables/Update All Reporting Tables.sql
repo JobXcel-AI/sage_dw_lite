@@ -21,7 +21,7 @@ N'SELECT * INTO #TempTbl FROM ',@Reporting_DB_Name,N'.dbo.AR_Invoices;
 SELECT * INTO #DeletedRecords FROM #TempTbl WHERE is_deleted = 1;
 DELETE FROM #TempTbl WHERE is_deleted = 1;
 ALTER TABLE #TempTbl
-DROP COLUMN  is_deleted, deleted_date;',
+DROP COLUMN is_deleted, deleted_date;',
 --Step 2. delete existing reporting table data and replace with updated values
 'DELETE FROM ',@Reporting_DB_Name,N'.dbo.AR_Invoices;
 INSERT INTO ',@Reporting_DB_Name,N'.dbo.AR_Invoices
@@ -152,7 +152,7 @@ N'SELECT * INTO #TempTbl FROM ',@Reporting_DB_Name,N'.dbo.Change_Orders;
 SELECT * INTO #DeletedRecords FROM #TempTbl WHERE is_deleted = 1;
 DELETE FROM #TempTbl WHERE is_deleted = 1;
 ALTER TABLE #TempTbl
-DROP COLUMN  is_deleted, deleted_date;',
+DROP COLUMN is_deleted, deleted_date;',
 --Step 2. delete existing reporting table data and replace with updated values
 'DELETE FROM ',@Reporting_DB_Name,N'.dbo.Change_Orders;
 INSERT INTO ',@Reporting_DB_Name,N'.dbo.Change_Orders
@@ -415,7 +415,7 @@ N'SELECT * INTO #TempTbl FROM ',@Reporting_DB_Name,N'.dbo.Employees;
 SELECT * INTO #DeletedRecords FROM #TempTbl WHERE is_deleted = 1;
 DELETE FROM #TempTbl WHERE is_deleted = 1;
 ALTER TABLE #TempTbl
-DROP COLUMN  is_deleted, deleted_date;',
+DROP COLUMN is_deleted, deleted_date;',
 --Step 2. delete existing reporting table data and replace with updated values
 'DELETE FROM ',@Reporting_DB_Name,N'.dbo.Employees;
 INSERT INTO ',@Reporting_DB_Name,N'.dbo.Employees
@@ -491,7 +491,7 @@ N'SELECT * INTO #TempTbl FROM ',@Reporting_DB_Name,N'.dbo.Inventory;
 SELECT * INTO #DeletedRecords FROM #TempTbl WHERE is_deleted = 1;
 DELETE FROM #TempTbl WHERE is_deleted = 1;
 ALTER TABLE #TempTbl
-DROP COLUMN  is_deleted, deleted_date;',
+DROP COLUMN is_deleted, deleted_date;',
 --Step 2. delete existing reporting table data and replace with updated values
 'DELETE FROM ',@Reporting_DB_Name,N'.dbo.Inventory;
 INSERT INTO ',@Reporting_DB_Name,N'.dbo.Inventory
@@ -562,7 +562,7 @@ N'SELECT * INTO #TempTbl FROM ',@Reporting_DB_Name,N'.dbo.Jobs;
 SELECT * INTO #DeletedRecords FROM #TempTbl WHERE is_deleted = 1;
 DELETE FROM #TempTbl WHERE is_deleted = 1;
 ALTER TABLE #TempTbl
-DROP COLUMN  is_deleted, deleted_date;',
+DROP COLUMN is_deleted, deleted_date;',
 --Step 2. delete existing reporting table data and replace with updated values
 'DELETE FROM ',@Reporting_DB_Name,N'.dbo.Jobs;
 INSERT INTO ',@Reporting_DB_Name,N'.dbo.Jobs
@@ -827,7 +827,7 @@ N'SELECT * INTO #TempTbl FROM ',@Reporting_DB_Name,N'.dbo.Job_Cost;
 SELECT * INTO #DeletedRecords FROM #TempTbl WHERE is_deleted = 1;
 DELETE FROM #TempTbl WHERE is_deleted = 1;
 ALTER TABLE #TempTbl
-DROP COLUMN  is_deleted, deleted_date;',
+DROP COLUMN is_deleted, deleted_date;',
 --Step 2. delete existing reporting table data and replace with updated values
 'DELETE FROM ',@Reporting_DB_Name,N'.dbo.Job_Cost;
 INSERT INTO ',@Reporting_DB_Name,N'.dbo.Job_Cost
@@ -1273,7 +1273,7 @@ N'SELECT * INTO #TempTbl FROM ',@Reporting_DB_Name,N'.dbo.Ledger_Accounts;
 SELECT * INTO #DeletedRecords FROM #TempTbl WHERE is_deleted = 1;
 DELETE FROM #TempTbl WHERE is_deleted = 1;
 ALTER TABLE #TempTbl
-DROP COLUMN  is_deleted, deleted_date;',
+DROP COLUMN is_deleted, deleted_date;',
 --Step 2. delete existing reporting table data and replace with updated values
 'DELETE FROM ',@Reporting_DB_Name,N'.dbo.Ledger_Accounts;
 INSERT INTO ',@Reporting_DB_Name,N'.dbo.Ledger_Accounts
@@ -1526,7 +1526,7 @@ N'SELECT * INTO #TempTbl FROM ',@Reporting_DB_Name,N'.dbo.Ledger_Transaction_Lin
 SELECT * INTO #DeletedRecords FROM #TempTbl WHERE is_deleted = 1;
 DELETE FROM #TempTbl WHERE is_deleted = 1;
 ALTER TABLE #TempTbl
-DROP COLUMN  is_deleted, deleted_date;',
+DROP COLUMN is_deleted, deleted_date;',
 --Step 2. delete existing reporting table data and replace with updated values
 'DELETE FROM ',@Reporting_DB_Name,N'.dbo.Ledger_Transaction_Lines;
 INSERT INTO ',@Reporting_DB_Name,N'.dbo.Ledger_Transaction_Lines
@@ -1615,7 +1615,7 @@ N'SELECT * INTO #TempTbl FROM ',@Reporting_DB_Name,N'.dbo.Payroll_Records;
 SELECT * INTO #DeletedRecords FROM #TempTbl WHERE is_deleted = 1;
 DELETE FROM #TempTbl WHERE is_deleted = 1;
 ALTER TABLE #TempTbl
-DROP COLUMN  is_deleted, deleted_date;',
+DROP COLUMN is_deleted, deleted_date;',
 --Step 2. delete existing reporting table data and replace with updated values
 'DELETE FROM ',@Reporting_DB_Name,N'.dbo.Payroll_Records;
 INSERT INTO ',@Reporting_DB_Name,N'.dbo.Payroll_Records
@@ -1737,7 +1737,7 @@ N'SELECT * INTO #TempTbl FROM ',@Reporting_DB_Name,N'.dbo.Purchase_Orders;
 SELECT * INTO #DeletedRecords FROM #TempTbl WHERE is_deleted = 1;
 DELETE FROM #TempTbl WHERE is_deleted = 1;
 ALTER TABLE #TempTbl
-DROP COLUMN  is_deleted, deleted_date;',
+DROP COLUMN is_deleted, deleted_date;',
 --Step 2. delete existing reporting table data and replace with updated values
 'DELETE FROM ',@Reporting_DB_Name,N'.dbo.Purchase_Orders;
 INSERT INTO ',@Reporting_DB_Name,N'.dbo.Purchase_Orders
@@ -1821,7 +1821,7 @@ N'SELECT * INTO #TempTbl FROM ',@Reporting_DB_Name,N'.dbo.Vendor_Contacts;
 SELECT * INTO #DeletedRecords FROM #TempTbl WHERE is_deleted = 1;
 DELETE FROM #TempTbl WHERE is_deleted = 1;
 ALTER TABLE #TempTbl
-DROP COLUMN  is_deleted, deleted_date;',
+DROP COLUMN is_deleted, deleted_date;',
 --Step 2. delete existing reporting table data and replace with updated values
 'DELETE FROM ',@Reporting_DB_Name,N'.dbo.Vendor_Contacts;
 INSERT INTO ',@Reporting_DB_Name,N'.dbo.Vendor_Contacts
@@ -1892,7 +1892,7 @@ N'SELECT * INTO #TempTbl FROM ',@Reporting_DB_Name,N'.dbo.Subcontract_Lines;
 SELECT * INTO #DeletedRecords FROM #TempTbl WHERE is_deleted = 1;
 DELETE FROM #TempTbl WHERE is_deleted = 1;
 ALTER TABLE #TempTbl
-DROP COLUMN  is_deleted, deleted_date;',
+DROP COLUMN is_deleted, deleted_date;',
 --Step 2. delete existing reporting table data and replace with updated values
 'DELETE FROM ',@Reporting_DB_Name,N'.dbo.Subcontract_Lines;
 INSERT INTO ',@Reporting_DB_Name,N'.dbo.Subcontract_Lines
@@ -1981,7 +1981,7 @@ N'SELECT * INTO #TempTbl FROM ',@Reporting_DB_Name,N'.dbo.Change_Order_Lines;
 SELECT * INTO #DeletedRecords FROM #TempTbl WHERE is_deleted = 1;
 DELETE FROM #TempTbl WHERE is_deleted = 1;
 ALTER TABLE #TempTbl
-DROP COLUMN  is_deleted, deleted_date;',
+DROP COLUMN is_deleted, deleted_date;',
 --Step 2. delete existing reporting table data and replace with updated values
 'DELETE FROM ',@Reporting_DB_Name,N'.dbo.Change_Order_Lines;
 INSERT INTO ',@Reporting_DB_Name,N'.dbo.Change_Order_Lines
@@ -2064,7 +2064,7 @@ N'SELECT * INTO #TempTbl FROM ',@Reporting_DB_Name,N'.dbo.Purchase_Order_Lines;
 SELECT * INTO #DeletedRecords FROM #TempTbl WHERE is_deleted = 1;
 DELETE FROM #TempTbl WHERE is_deleted = 1;
 ALTER TABLE #TempTbl
-DROP COLUMN  is_deleted, deleted_date;',
+DROP COLUMN is_deleted, deleted_date;',
 --Step 2. delete existing reporting table data and replace with updated values
 'DELETE FROM ',@Reporting_DB_Name,N'.dbo.Purchase_Order_Lines;
 INSERT INTO ',@Reporting_DB_Name,N'.dbo.Purchase_Order_Lines
@@ -2291,7 +2291,7 @@ N'SELECT * INTO #TempTbl FROM ',@Reporting_DB_Name,N'.dbo.Timecards;
 SELECT * INTO #DeletedRecords FROM #TempTbl WHERE is_deleted = 1;
 DELETE FROM #TempTbl WHERE is_deleted = 1;
 ALTER TABLE #TempTbl
-DROP COLUMN  is_deleted, deleted_date;',
+DROP COLUMN is_deleted, deleted_date;',
 --Step 2. delete existing reporting table data and replace with updated values
 'DELETE FROM ',@Reporting_DB_Name,N'.dbo.Timecards;
 INSERT INTO ',@Reporting_DB_Name,N'.dbo.Timecards
