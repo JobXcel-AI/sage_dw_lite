@@ -8,8 +8,10 @@ DECLARE @SQLdeleteCommand NVARCHAR(100);
 SET @SQLdeleteCommand = CONCAT('DELETE FROM ',@Reporting_DB_Name,'.dbo.Job_Status_History;')
 EXECUTE sp_executesql @SQLdeleteCommand;
 
+DECLARE @SQLinsertJobHistory1 NVARCHAR(MAX);
+DECLARE @SQLinsertJobHistory2 NVARCHAR(MAX);
 DECLARE @SQLinsertJobHistory NVARCHAR(MAX);
-SET @SQLinsertJobHistory = CONCAT(N'
+SET @SQLinsertJobHistory1 = CONCAT(N'
 DECLARE @JobHistory TABLE (job_number BIGINT, version_date DATETIME, job_status_number INT, job_status NVARCHAR(8), deleted_date DATETIME)
 INSERT INTO @JobHistory 
 
@@ -74,7 +76,8 @@ SELECT
 	deleted_date
 FROM ',@Reporting_DB_Name,'.dbo.Jobs
 WHERE last_updated_date IS NOT NULL
-
+')
+SET @SQLinsertJobHistory2 = CONCAT(N'
 DECLARE @JobHistory2 TABLE (id BIGINT, job_number BIGINT, version_date DATETIME, job_status_number INT, job_status NVARCHAR(8), can_be_removed BIT, deleted_date DATETIME)
 INSERT INTO @JobHistory2 
 	
@@ -117,4 +120,5 @@ FROM
 ) q
 ')
 
+SET @SQLinsertJobHistory = @SQLinsertJobHistory1 + @SQLinsertJobHistory2
 EXECUTE sp_executesql @SQLinsertJobHistory

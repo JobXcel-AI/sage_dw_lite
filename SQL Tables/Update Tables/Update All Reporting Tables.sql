@@ -932,7 +932,7 @@ BEGIN TRY
 SET @SqlDeleteCommand = CONCAT('DELETE FROM ',@Reporting_DB_Name,'.dbo.Job_Status_History;')
 EXECUTE sp_executesql @SqlDeleteCommand;
 
-SET @SqlInsertQuery = CONCAT(N'
+SET @SqlInsertQuery1 = CONCAT(N'
 DECLARE @JobHistory TABLE (job_number BIGINT, version_date DATETIME, job_status_number INT, job_status NVARCHAR(8), deleted_date DATETIME)
 INSERT INTO @JobHistory 
 
@@ -997,7 +997,9 @@ SELECT
 	deleted_date
 FROM ',@Reporting_DB_Name,'.dbo.Jobs
 WHERE last_updated_date IS NOT NULL
+')
 
+SET @SqlInsertQuery2 = CONCAT(N'
 DECLARE @JobHistory2 TABLE (id BIGINT, job_number BIGINT, version_date DATETIME, job_status_number INT, job_status NVARCHAR(8), can_be_removed BIT, deleted_date DATETIME)
 INSERT INTO @JobHistory2 
 	
@@ -1039,7 +1041,7 @@ FROM
 	WHERE version_date IS NOT NULL AND can_be_removed = 0
 ) q
 ')
-
+SET @SqlInsertQuery = @SqlInsertQuery1 + @SqlInsertQuery2
 EXECUTE sp_executesql @SqlInsertQuery
 
 	COMMIT TRANSACTION @TranName
