@@ -5,7 +5,7 @@ import os
 import sys
 
 # Configure rolling log file with a retention of 5 days
-log_file_path = os.path.join(os.path.dirname(__file__), "update_table_script.log")
+log_file_path = os.path.join(os.path.dirname(__file__), "weekly_snapshot_script.log")
 file_handler = TimedRotatingFileHandler(
     log_file_path, when="midnight", interval=1, backupCount=5
 )
@@ -24,7 +24,9 @@ logger.addHandler(console_handler)
 
 # Ensure required arguments are passed
 if len(sys.argv) < 7:
-    logger.error("Usage: python update_table_script.py <CUSTOMER_NAME> <CUSTOMER_DB_NAME> <SQL_SERVER> <SQL_PORT> <SQL_USERNAME> <SQL_PASSWORD>")
+    logger.error(
+        "Usage: python update_table_script.py <CUSTOMER_NAME> <CUSTOMER_DB_NAME> <SQL_SERVER> <SQL_PORT> <SQL_USERNAME> <SQL_PASSWORD>"
+    )
     sys.exit(1)
 
 # Extract arguments
@@ -40,12 +42,8 @@ logger.info(f"Extracted arguments: CUSTOMER_NAME={CUSTOMER_NAME}, CUSTOMER_DB_NA
 
 # Paths to the SQL files
 base_dir = os.path.dirname(os.path.dirname(__file__))  # Move up to the base directory
-sql_file_path = os.path.join(
-    base_dir, "SQL Tables", "Update Tables", "Update All Reporting Tables.sql"
-)
-modified_sql_file_path = os.path.join(
-    base_dir, "SQL Tables", "Update Tables", "temp_Update_All_Reporting_Tables.sql"
-)
+sql_file_path = os.path.join(base_dir, "SQL Tables", "Update Tables", "Weekly Snapshot.sql")
+modified_sql_file_path = os.path.join(base_dir, "SQL Tables", "Update Tables", "temp_weekly_snapshot.sql")
 
 # Placeholder replacements
 client_db_placeholder = "[CLIENT_DB_NAME]"
@@ -56,13 +54,19 @@ try:
     with open(sql_file_path, "r") as file:
         sql_content = file.read()
 
+    logger.info(f"Original SQL Content:\n{sql_content}")
+
     # Ensure the placeholder is matched exactly
-    if client_db_placeholder not in sql_content:
-        logger.error(f"Placeholder {client_db_placeholder} not found in {sql_file_path}.")
+    placeholder_index = sql_content.find(client_db_placeholder)
+    if placeholder_index == -1:
+        logger.error(f"Placeholder '{client_db_placeholder}' not found in {sql_file_path}.")
         sys.exit(1)
+    logger.info(f"Placeholder found at index: {placeholder_index}")
 
     # Replace placeholders with actual values
     modified_sql_content = sql_content.replace(client_db_placeholder, f"'{CUSTOMER_DB_NAME}'")
+
+    logger.info(f"Modified SQL Content:\n{modified_sql_content}")
 
     # Save the modified SQL file
     with open(modified_sql_file_path, "w") as file:
