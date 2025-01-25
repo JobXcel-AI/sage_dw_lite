@@ -10,6 +10,8 @@ TARGET_API_KEY = "mb_/eIVf6avszWL2YkjlUU21gfD2//Ip2iLgzhuVs+g2rI="
 SOURCE_DATABASE_ID = 2  # Set the source database ID
 TARGET_DATABASE_ID = 2  # Set the target database ID
 
+# List of dashboards to migrate
+DASHBOARDS = [4, 5, 6]  # Replace with your actual dashboard IDs
 
 HEADERS_SOURCE = {
     "x-api-key": SOURCE_API_KEY,
@@ -22,7 +24,7 @@ HEADERS_TARGET = {
 }
 
 # Configure logger
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 
@@ -173,27 +175,32 @@ def main():
     target_fields = fetch_resource(TARGET_API_URL, f"database/{TARGET_DATABASE_ID}/fields", HEADERS_TARGET)
     field_mapping = get_field_mapping(source_fields, target_fields)
 
-    # Fetch and migrate cards
-    dashboard_id = 4  # Replace with your dashboard ID
-    card_mapping = migrate_cards(
-        SOURCE_API_URL, TARGET_API_URL, HEADERS_SOURCE, HEADERS_TARGET, dashboard_id, table_mapping, field_mapping
-    )
+    # Iterate over dashboards
+    for dashboard_id in DASHBOARDS:
+        logger.info(f"Processing dashboard ID: {dashboard_id}")
 
-    # Fetch the source dashboard
-    source_dashboard = fetch_resource(SOURCE_API_URL, f"dashboard/{dashboard_id}", HEADERS_SOURCE)
-    if not source_dashboard:
-        logger.error("Failed to fetch source dashboard. Aborting.")
-        return
+        # Fetch and migrate cards
+        card_mapping = migrate_cards(
+            SOURCE_API_URL, TARGET_API_URL, HEADERS_SOURCE, HEADERS_TARGET, dashboard_id, table_mapping, field_mapping
+        )
 
-    # Update dashboard with new cards
-    updated_dashboard = update_dashboard_with_cards(source_dashboard, card_mapping)
-    if not updated_dashboard:
-        logger.error("Failed to update the dashboard. Aborting.")
-        return
+        # Fetch the source dashboard
+        source_dashboard = fetch_resource(SOURCE_API_URL, f"dashboard/{dashboard_id}", HEADERS_SOURCE)
+        if not source_dashboard:
+            logger.error(f"Failed to fetch dashboard ID {dashboard_id}. Skipping.")
+            continue
 
-    # Create the updated dashboard in the target
-    create_resource(TARGET_API_URL, "dashboard", HEADERS_TARGET, updated_dashboard)
-    logger.info("Dashboard migration completed successfully.")
+        # Update dashboard with new cards
+        updated_dashboard = update_dashboard_with_cards(source_dashboard, card_mapping)
+        if not updated_dashboard:
+            logger.error(f"Failed to update dashboard ID {dashboard_id}. Skipping.")
+            continue
+
+        # Create the updated dashboard in the target
+        create_resource(TARGET_API_URL, "dashboard", HEADERS_TARGET, updated_dashboard)
+        logger.info(f"Dashboard ID {dashboard_id} migrated successfully.")
+
+    logger.info("Migration process completed.")
 
 
 if __name__ == "__main__":
