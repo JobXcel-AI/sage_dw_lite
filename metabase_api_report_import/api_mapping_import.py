@@ -124,39 +124,56 @@ def fetch_cards(api_url, dashboard_id, headers):
     return dashboard.get("dashcards", [])
 
 
-def migrate_cards(source_api_url, target_api_url, headers_source, headers_target, dashboard_id, table_mapping, field_mapping):
+def migrate_cards(source_api_url, target_api_url, headers_source, headers_target, dashboard_id, table_mapping, field_mapping, collection_mapping):
+    """
+    Migrate cards from source to target. Update the database, collection, and field references.
+    """
     source_cards = fetch_cards(source_api_url, dashboard_id, headers_source)
     card_mapping = {}
 
     for card in source_cards:
-        updated_card = card.get("card", {})
-        if not updated_card:
+        source_card = card.get("card", {})
+        if not source_card:
             logger.warning("Skipping dashcard without a valid card.")
             continue
 
-        dataset_query = updated_card.get("dataset_query", {})
-        query = dataset_query.get("query", {})
+        # Transform the source card JSON
+        updated_card = source_card.copy()
 
-        # Update table IDs
-        if "source-query" in query and "table_id" in query["source-query"]:
-            query["source-query"]["table_id"] = table_mapping.get(
-                query["source-query"]["table_id"], query["source-query"]["table_id"]
-            )
+        # Update database ID
+        updated_card["database_id"] = table_mapping.get(source_card.get("database_id"), source_card.get("database_id"))
 
-        # Update field IDs
-        for agg in query.get("aggregation", []):
-            if isinstance(agg, list) and len(agg) > 1 and isinstance(agg[1], dict):
-                field_id = agg[1].get("id")
-                if field_id:
-                    agg[1]["id"] = field_mapping.get(field_id, field_id)
+        # Update collection ID
+        source_collection_id = source_card.get("collection_id")
+        if source_collection_id and source_collection_id in collection_mapping:
+            updated_card["collection_id"] = collection_mapping[source_collection_id]
 
-        for breakout in query.get("breakout", []):
-            if isinstance(breakout, list) and len(breakout) > 1 and isinstance(breakout[1], dict):
-                field_id = breakout[1].get("id")
-                if field_id:
-                    breakout[1]["id"] = field_mapping.get(field_id, field_id)
+        # Update dataset_query
+        dataset_query = source_card.get("dataset_query", {})
+        if dataset_query:
+            if "database" in dataset_query:
+                dataset_query["database"] = table_mapping.get(dataset_query["database"], dataset_query["database"])
 
-        # Create the updated card
+            # Update fields in query
+            query = dataset_query.get("query", {})
+            if query:
+                # Update field IDs in aggregations
+                for agg in query.get("aggregation", []):
+                    if isinstance(agg, list) and len(agg) > 1 and isinstance(agg[1], dict):
+                        field_id = agg[1].get("id")
+                        if field_id:
+                            agg[1]["id"] = field_mapping.get(field_id, field_id)
+
+                # Update field IDs in breakouts
+                for breakout in query.get("breakout", []):
+                    if isinstance(breakout, list) and len(breakout) > 1 and isinstance(breakout[1], dict):
+                        field_id = breakout[1].get("id")
+                        if field_id:
+                            breakout[1]["id"] = field_mapping.get(field_id, field_id)
+
+        updated_card["dataset_query"] = dataset_query
+
+        # Create the updated card in the target
         created_card = create_resource(target_api_url, "card", headers_target, updated_card)
         if created_card:
             card_mapping[card["id"]] = created_card["id"]
@@ -202,7 +219,7 @@ def main():
 
         # Fetch and migrate cards
         card_mapping = migrate_cards(
-            SOURCE_API_URL, TARGET_API_URL, HEADERS_SOURCE, HEADERS_TARGET, dashboard_id, table_mapping, field_mapping
+            SOURCE_API_URL, TARGET_API_URL, HEADERS_SOURCE, HEADERS_TARGET, dashboard_id, table_mapping, field_mapping, collection_mapping
         )
 
         # Fetch the source dashboard
