@@ -185,14 +185,11 @@ def migrate_cards(source_api_url, target_api_url, headers_source, headers_target
                 if not isinstance(query, dict):
                     return query
 
-                # Update table_id and source-table in source-query
-                if "source-query" in query:
-                    if "table_id" in query["source-query"]:
-                        query["source-query"]["table_id"] = table_mapping.get(
-                            query["source-query"]["table_id"],
-                            query["source-query"]["table_id"]
-                        )
-                    query["source-query"] = update_query(query["source-query"])
+                # Update source-table and table_id
+                if "source-table" in query:
+                    query["source-table"] = table_mapping.get(query["source-table"], query["source-table"])
+                if "table_id" in query:
+                    query["table_id"] = table_mapping.get(query["table_id"], query["table_id"])
 
                 # Update joins in the query
                 if "joins" in query:
@@ -223,9 +220,9 @@ def migrate_cards(source_api_url, target_api_url, headers_source, headers_target
                                     breakout[1]["fk_target_field_id"]
                                 )
 
-                # Update top-level source-table
-                if "source-table" in query:
-                    query["source-table"] = table_mapping.get(query["source-table"], query["source-table"])
+                # Update nested source-query
+                if "source-query" in query:
+                    query["source-query"] = update_query(query["source-query"])
 
                 return query
 
@@ -233,6 +230,10 @@ def migrate_cards(source_api_url, target_api_url, headers_source, headers_target
             dataset_query["query"] = update_query(dataset_query.get("query", {}))
 
         updated_card["dataset_query"] = dataset_query
+
+        # Update table_id in the card metadata
+        if "table_id" in updated_card:
+            updated_card["table_id"] = table_mapping.get(updated_card["table_id"], updated_card["table_id"])
 
         # Update metadata fields such as fk_target_field_id in result_metadata
         if "result_metadata" in updated_card:
