@@ -6,6 +6,8 @@ SOURCE_API_URL = "https://sagexcel.jobxcel.report/api"
 TARGET_API_URL = "https://asg.xcel.report/api"
 SOURCE_API_KEY = "mb_blLUnFYZ+diBCC1OY8zBmLXRkKZiRy5f+iFHf1Cj+9E="
 TARGET_API_KEY = "mb_/eIVf6avszWL2YkjlUU21gfD2//Ip2iLgzhuVs+g2rI="
+SOURCE_DATABASE_ID = 2  # Set the source database ID
+TARGET_DATABASE_ID = 2  # Set the target database ID
 
 HEADERS_SOURCE = {
     "x-api-key": SOURCE_API_KEY,
@@ -49,6 +51,13 @@ def fetch_resource(api_url, endpoint, headers):
     except requests.exceptions.RequestException as e:
         print(f"Error fetching resource from {api_url}/{endpoint}: {e}")
         return None
+
+def fetch_fields(api_url, database_id, headers):
+    """
+    Fetch all fields for a given database ID.
+    """
+    endpoint = f"database/{database_id}/fields"
+    return fetch_resource(api_url, endpoint, headers)
 
 def update_dashboard_and_cards(source_dashboard, table_mapping, field_mapping):
     """
@@ -97,24 +106,27 @@ def validate_dashboard_id(dashboard_id):
     return dashboard_id
 
 def main():
-    # Step 1: Fetch tables and fields from source and target databases
-    source_tables = fetch_resource(SOURCE_API_URL, "table", HEADERS_SOURCE)
-    target_tables = fetch_resource(TARGET_API_URL, "table", HEADERS_TARGET)
+    # Fetch tables from source and target databases
+    source_tables = fetch_resource(SOURCE_API_URL, f"database/{SOURCE_DATABASE_ID}/metadata", HEADERS_SOURCE).get("tables", [])
+    target_tables = fetch_resource(TARGET_API_URL, f"database/{TARGET_DATABASE_ID}/metadata", HEADERS_TARGET).get("tables", [])
+
     if not source_tables or not target_tables:
         print("Failed to fetch tables. Aborting.")
         return
 
     table_mapping = get_table_mapping(source_tables, target_tables)
 
-    source_fields = fetch_resource(SOURCE_API_URL, "field", HEADERS_SOURCE)
-    target_fields = fetch_resource(TARGET_API_URL, "field", HEADERS_TARGET)
+    # Fetch fields from source and target databases
+    source_fields = fetch_fields(SOURCE_API_URL, SOURCE_DATABASE_ID, HEADERS_SOURCE)
+    target_fields = fetch_fields(TARGET_API_URL, TARGET_DATABASE_ID, HEADERS_TARGET)
+
     if not source_fields or not target_fields:
         print("Failed to fetch fields. Aborting.")
         return
 
     field_mapping = get_field_mapping(source_fields, target_fields)
 
-    # Step 2: Fetch the source dashboard
+    # Fetch the source dashboard
     dashboard_id = 4  # Replace with your dashboard ID
     try:
         dashboard_id = validate_dashboard_id(dashboard_id)
@@ -123,13 +135,13 @@ def main():
         print(e)
         return
 
-    # Step 3: Update dashboard with target IDs
+    # Update dashboard with target IDs
     updated_dashboard = update_dashboard_and_cards(source_dashboard, table_mapping, field_mapping)
     if not updated_dashboard:
         print("Failed to update the dashboard. Aborting.")
         return
 
-    # Step 4: Create the updated dashboard in the target Metabase
+    # Create the updated dashboard in the target Metabase
     try:
         response = requests.post(
             f"{TARGET_API_URL}/dashboard",
