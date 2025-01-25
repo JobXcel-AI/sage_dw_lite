@@ -151,7 +151,7 @@ def fetch_cards(api_url, dashboard_id, headers):
 
 def migrate_cards(source_api_url, target_api_url, headers_source, headers_target, dashboard_id, table_mapping, field_mapping, collection_mapping):
     """
-    Migrate cards from source to target. Update the database, collection, field, and table references.
+    Migrate cards from source to target. Update the database, collection, table, field references, and fk_target_field_id.
     """
     source_cards = fetch_cards(source_api_url, dashboard_id, headers_source)
     card_mapping = {}
@@ -177,31 +177,55 @@ def migrate_cards(source_api_url, target_api_url, headers_source, headers_target
         # Update dataset_query
         dataset_query = source_card.get("dataset_query", {})
         if dataset_query:
-            # Update database reference in dataset_query
             if "database" in dataset_query:
-                dataset_query["database"] = table_mapping.get(dataset_query["database"], dataset_query["database"])
+                dataset_query["database"] = TARGET_DATABASE_ID
 
-            # Update the source-query recursively
+            # Update nested queries, joins, and fk_target_field_id
             def update_query(query):
                 if not isinstance(query, dict):
                     return query
 
-                # Update table_id in source-query
-                if "source-query" in query and "table_id" in query["source-query"]:
-                    query["source-query"]["table_id"] = table_mapping.get(
-                        query["source-query"]["table_id"],
-                        query["source-query"]["table_id"]
-                    )
+                # Update table_id and source-table in source-query
+                if "source-query" in query:
+                    if "table_id" in query["source-query"]:
+                        query["source-query"]["table_id"] = table_mapping.get(
+                            query["source-query"]["table_id"],
+                            query["source-query"]["table_id"]
+                        )
+                    query["source-query"] = update_query(query["source-query"])
 
                 # Update joins in the query
                 if "joins" in query:
                     for join in query["joins"]:
                         if "source-table" in join:
-                            join["source-table"] = table_mapping.get(join["source-table"], join["source-table"])
+                            join["source-table"] = table_mapping.get(
+                                join["source-table"],
+                                join["source-table"]
+                            )
 
-                # Recursively update nested source-queries
-                if "source-query" in query:
-                    query["source-query"] = update_query(query["source-query"])
+                # Update fk_target_field_id in fields
+                if "aggregation" in query:
+                    for agg in query["aggregation"]:
+                        if isinstance(agg, list) and len(agg) > 1 and isinstance(agg[1], dict):
+                            if "fk_target_field_id" in agg[1]:
+                                agg[1]["fk_target_field_id"] = field_mapping.get(
+                                    agg[1]["fk_target_field_id"],
+                                    agg[1]["fk_target_field_id"]
+                                )
+
+                # Update fk_target_field_id in breakout fields
+                if "breakout" in query:
+                    for breakout in query["breakout"]:
+                        if isinstance(breakout, list) and len(breakout) > 1 and isinstance(breakout[1], dict):
+                            if "fk_target_field_id" in breakout[1]:
+                                breakout[1]["fk_target_field_id"] = field_mapping.get(
+                                    breakout[1]["fk_target_field_id"],
+                                    breakout[1]["fk_target_field_id"]
+                                )
+
+                # Update top-level source-table
+                if "source-table" in query:
+                    query["source-table"] = table_mapping.get(query["source-table"], query["source-table"])
 
                 return query
 
@@ -209,6 +233,15 @@ def migrate_cards(source_api_url, target_api_url, headers_source, headers_target
             dataset_query["query"] = update_query(dataset_query.get("query", {}))
 
         updated_card["dataset_query"] = dataset_query
+
+        # Update metadata fields such as fk_target_field_id in result_metadata
+        if "result_metadata" in updated_card:
+            for metadata in updated_card["result_metadata"]:
+                if "fk_target_field_id" in metadata and metadata["fk_target_field_id"] is not None:
+                    metadata["fk_target_field_id"] = field_mapping.get(
+                        metadata["fk_target_field_id"],
+                        metadata["fk_target_field_id"]
+                    )
 
         # Create the updated card in the target
         created_card = create_resource(target_api_url, "card", headers_target, updated_card)
