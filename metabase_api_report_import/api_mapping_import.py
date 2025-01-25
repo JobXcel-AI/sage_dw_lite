@@ -24,11 +24,14 @@ def get_table_mapping(source_tables, target_tables):
     Map source table names to target table IDs.
     """
     mapping = {}
-    target_table_lookup = {table["name"]: table["id"] for table in target_tables}
+    target_table_lookup = {table["name"].lower(): table["id"] for table in target_tables}  # Normalize case
     for source_table in source_tables:
-        target_id = target_table_lookup.get(source_table["name"])
+        source_table_name = source_table["name"].lower()
+        target_id = target_table_lookup.get(source_table_name)
         if target_id:
             mapping[source_table["id"]] = target_id
+        else:
+            print(f"Source table '{source_table['name']}' not found in target tables.")
     return mapping
 
 def get_field_mapping(source_fields, target_fields):
@@ -36,11 +39,14 @@ def get_field_mapping(source_fields, target_fields):
     Map source field names to target field IDs.
     """
     mapping = {}
-    target_field_lookup = {field["name"]: field["id"] for field in target_fields}
+    target_field_lookup = {field["name"].lower(): field["id"] for field in target_fields}  # Normalize case
     for source_field in source_fields:
-        target_id = target_field_lookup.get(source_field["name"])
+        source_field_name = source_field["name"].lower()
+        target_id = target_field_lookup.get(source_field_name)
         if target_id:
             mapping[source_field["id"]] = target_id
+        else:
+            print(f"Source field '{source_field['name']}' not found in target fields.")
     return mapping
 
 def fetch_resource(api_url, endpoint, headers):
@@ -57,7 +63,8 @@ def fetch_fields(api_url, database_id, headers):
     Fetch all fields for a given database ID.
     """
     endpoint = f"database/{database_id}/fields"
-    return fetch_resource(api_url, endpoint, headers)
+    fields = fetch_resource(api_url, endpoint, headers)
+    return fields if fields else []
 
 def update_dashboard_and_cards(source_dashboard, table_mapping, field_mapping):
     """
@@ -75,12 +82,15 @@ def update_dashboard_and_cards(source_dashboard, table_mapping, field_mapping):
                 query = dataset_query.get("query")
 
                 # Update table IDs
-                if "source-query" in query:
-                    query["source-query"]["table_id"] = table_mapping.get(query["source-query"].get("table_id"), query["source-query"].get("table_id"))
+                if "source-query" in query and "table_id" in query["source-query"]:
+                    query["source-query"]["table_id"] = table_mapping.get(
+                        query["source-query"]["table_id"],
+                        query["source-query"]["table_id"]
+                    )
 
                 # Update field IDs in aggregations and breakout
                 for agg in query.get("aggregation", []):
-                    if isinstance(agg, list) and len(agg) > 1:
+                    if isinstance(agg, list) and len(agg) > 1 and isinstance(agg[1], dict):
                         field_id = agg[1].get("id")
                         if field_id:
                             agg[1]["id"] = field_mapping.get(field_id, field_id)
@@ -88,7 +98,7 @@ def update_dashboard_and_cards(source_dashboard, table_mapping, field_mapping):
                             print(f"Warning: Unexpected structure in aggregation: {agg}")
 
                 for breakout in query.get("breakout", []):
-                    if isinstance(breakout, list) and len(breakout) > 1:
+                    if isinstance(breakout, list) and len(breakout) > 1 and isinstance(breakout[1], dict):
                         field_id = breakout[1].get("id")
                         if field_id:
                             breakout[1]["id"] = field_mapping.get(field_id, field_id)
