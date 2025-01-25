@@ -11,7 +11,7 @@ SOURCE_DATABASE_ID = 2  # Set the source database ID
 TARGET_DATABASE_ID = 2  # Set the target database ID
 
 # List of dashboards to migrate
-DASHBOARDS = [4, 5, 6]  # Replace with your actual dashboard IDs
+DASHBOARDS = [4]  # Replace with your actual dashboard IDs
 
 HEADERS_SOURCE = {
     "x-api-key": SOURCE_API_KEY,
