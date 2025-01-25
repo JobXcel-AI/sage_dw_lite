@@ -1,6 +1,7 @@
 import requests
 import json
 import logging
+from tabulate import tabulate  # For displaying the mappings as a table
 
 # Metabase API credentials and endpoints
 SOURCE_API_URL = "https://sagexcel.jobxcel.report/api"
@@ -48,6 +49,30 @@ def create_resource(api_url, endpoint, headers, payload):
     except requests.exceptions.RequestException as e:
         logger.error(f"Error creating resource: {e}")
         return None
+
+
+def log_table_mappings(source_tables, target_tables, table_mapping):
+    """
+    Log a table showing the source and target table mappings with field counts.
+    """
+    source_table_lookup = {table["id"]: table for table in source_tables}
+    target_table_lookup = {table["id"]: table for table in target_tables}
+
+    data = []
+    for source_id, target_id in table_mapping.items():
+        source_table = source_table_lookup.get(source_id, {})
+        target_table = target_table_lookup.get(target_id, {})
+        data.append([
+            source_id,
+            source_table.get("name", "Unknown"),
+            len(source_table.get("fields", [])),
+            target_id,
+            target_table.get("name", "Unknown"),
+            len(target_table.get("fields", []))
+        ])
+
+    logger.info("\n" + tabulate(data, headers=["Source ID", "Source Name", "Source Fields",
+                                               "Target ID", "Target Name", "Target Fields"], tablefmt="grid"))
 
 
 def get_table_mapping(source_tables, target_tables):
@@ -141,7 +166,8 @@ def migrate_cards(source_api_url, target_api_url, headers_source, headers_target
         updated_card = source_card.copy()
 
         # Update database ID
-        updated_card["database_id"] = table_mapping.get(source_card.get("database_id"), source_card.get("database_id"))
+        if SOURCE_DATABASE_ID != TARGET_DATABASE_ID:
+            updated_card["database_id"] = TARGET_DATABASE_ID
 
         # Update collection ID
         source_collection_id = source_card.get("collection_id")
@@ -209,6 +235,9 @@ def main():
     target_tables = fetch_resource(TARGET_API_URL, f"database/{TARGET_DATABASE_ID}/metadata", HEADERS_TARGET).get("tables", [])
     table_mapping = get_table_mapping(source_tables, target_tables)
 
+    # Log table mappings for debugging
+    log_table_mappings(source_tables, target_tables, table_mapping)
+
     source_fields = fetch_resource(SOURCE_API_URL, f"database/{SOURCE_DATABASE_ID}/fields", HEADERS_SOURCE)
     target_fields = fetch_resource(TARGET_API_URL, f"database/{TARGET_DATABASE_ID}/fields", HEADERS_TARGET)
     field_mapping = get_field_mapping(source_fields, target_fields)
@@ -227,6 +256,11 @@ def main():
         if not source_dashboard:
             logger.error(f"Failed to fetch dashboard ID {dashboard_id}. Skipping.")
             continue
+
+        # Migrate cards
+        card_mapping = migrate_cards(
+            SOURCE_API_URL, TARGET_API_URL, HEADERS_SOURCE, HEADERS_TARGET, dashboard_id, table_mapping, field_mapping, collection_mapping
+        )
 
         # Update dashboard with new cards
         updated_dashboard = update_dashboard_with_cards(source_dashboard, card_mapping)
