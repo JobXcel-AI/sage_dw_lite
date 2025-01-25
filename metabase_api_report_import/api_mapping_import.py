@@ -1,5 +1,6 @@
 import requests
 import json
+import logging
 
 # Metabase API credentials and endpoints
 SOURCE_API_URL = "https://sagexcel.jobxcel.report/api"
@@ -8,6 +9,7 @@ SOURCE_API_KEY = "mb_blLUnFYZ+diBCC1OY8zBmLXRkKZiRy5f+iFHf1Cj+9E="
 TARGET_API_KEY = "mb_/eIVf6avszWL2YkjlUU21gfD2//Ip2iLgzhuVs+g2rI="
 SOURCE_DATABASE_ID = 2  # Set the source database ID
 TARGET_DATABASE_ID = 2  # Set the target database ID
+
 
 HEADERS_SOURCE = {
     "x-api-key": SOURCE_API_KEY,
@@ -19,6 +21,10 @@ HEADERS_TARGET = {
     "Content-Type": "application/json"
 }
 
+# Configure logger
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
+
 
 def fetch_resource(api_url, endpoint, headers):
     try:
@@ -26,7 +32,7 @@ def fetch_resource(api_url, endpoint, headers):
         response.raise_for_status()
         return response.json()
     except requests.exceptions.RequestException as e:
-        print(f"Error fetching resource from {api_url}/{endpoint}: {e}")
+        logger.error(f"Error fetching resource from {api_url}/{endpoint}: {e}")
         return None
 
 
@@ -38,7 +44,7 @@ def create_resource(api_url, endpoint, headers, payload):
         response.raise_for_status()
         return response.json()
     except requests.exceptions.RequestException as e:
-        print(f"Error creating resource: {e}")
+        logger.error(f"Error creating resource: {e}")
         return None
 
 
@@ -51,7 +57,7 @@ def get_table_mapping(source_tables, target_tables):
         if target_id:
             mapping[source_table["id"]] = target_id
         else:
-            print(f"Source table '{source_table['name']}' not found in target tables.")
+            logger.debug(f"Source table '{source_table['name']}' not found in target tables.")
     return mapping
 
 
@@ -64,14 +70,14 @@ def get_field_mapping(source_fields, target_fields):
         if target_id:
             mapping[source_field["id"]] = target_id
         else:
-            print(f"Source field '{source_field['name']}' not found in target fields.")
+            logger.debug(f"Source field '{source_field['name']}' not found in target fields.")
     return mapping
 
 
 def migrate_collections(source_api_url, target_api_url, headers_source, headers_target):
     source_collections = fetch_resource(source_api_url, "collection", headers_source)
     if not source_collections:
-        print("No collections found in the source.")
+        logger.warning("No collections found in the source.")
         return {}
 
     collection_mapping = {}
@@ -81,14 +87,18 @@ def migrate_collections(source_api_url, target_api_url, headers_source, headers_
         )
         if created_collection:
             collection_mapping[collection["id"]] = created_collection["id"]
+            logger.info(f"Collection '{collection['name']}' migrated successfully.")
         else:
-            print(f"Failed to migrate collection: {collection['name']}")
+            logger.error(f"Failed to migrate collection: {collection['name']}")
     return collection_mapping
 
 
 def fetch_cards(api_url, dashboard_id, headers):
     dashboard = fetch_resource(api_url, f"dashboard/{dashboard_id}", headers)
-    return dashboard.get("dashcards", []) if dashboard else []
+    if not dashboard:
+        logger.error(f"Dashboard with ID {dashboard_id} not found.")
+        return []
+    return dashboard.get("dashcards", [])
 
 
 def migrate_cards(source_api_url, target_api_url, headers_source, headers_target, dashboard_id, table_mapping, field_mapping):
@@ -98,7 +108,7 @@ def migrate_cards(source_api_url, target_api_url, headers_source, headers_target
     for card in source_cards:
         updated_card = card.get("card", {})
         if not updated_card:
-            print("Skipping dashcard without a valid card.")
+            logger.warning("Skipping dashcard without a valid card.")
             continue
 
         dataset_query = updated_card.get("dataset_query", {})
@@ -127,15 +137,16 @@ def migrate_cards(source_api_url, target_api_url, headers_source, headers_target
         created_card = create_resource(target_api_url, "card", headers_target, updated_card)
         if created_card:
             card_mapping[card["id"]] = created_card["id"]
+            logger.info(f"Card '{updated_card.get('name', 'Unnamed')}' migrated successfully.")
         else:
-            print(f"Failed to create card: {updated_card.get('name')}")
+            logger.error(f"Failed to create card: {updated_card.get('name', 'Unnamed')}")
 
     return card_mapping
 
 
 def update_dashboard_with_cards(source_dashboard, card_mapping):
     if not source_dashboard:
-        print("Source dashboard data is empty.")
+        logger.error("Source dashboard data is empty.")
         return None
 
     for dashcard in source_dashboard.get("dashcards", []):
@@ -143,10 +154,13 @@ def update_dashboard_with_cards(source_dashboard, card_mapping):
         if old_card_id in card_mapping:
             dashcard["card_id"] = card_mapping[old_card_id]
 
+    logger.info("Dashboard updated with new card mappings.")
     return source_dashboard
 
 
 def main():
+    logger.info("Starting migration process...")
+
     # Migrate collections
     migrate_collections(SOURCE_API_URL, TARGET_API_URL, HEADERS_SOURCE, HEADERS_TARGET)
 
@@ -168,18 +182,18 @@ def main():
     # Fetch the source dashboard
     source_dashboard = fetch_resource(SOURCE_API_URL, f"dashboard/{dashboard_id}", HEADERS_SOURCE)
     if not source_dashboard:
-        print("Failed to fetch source dashboard. Aborting.")
+        logger.error("Failed to fetch source dashboard. Aborting.")
         return
 
     # Update dashboard with new cards
     updated_dashboard = update_dashboard_with_cards(source_dashboard, card_mapping)
     if not updated_dashboard:
-        print("Failed to update the dashboard. Aborting.")
+        logger.error("Failed to update the dashboard. Aborting.")
         return
 
     # Create the updated dashboard in the target
     create_resource(TARGET_API_URL, "dashboard", HEADERS_TARGET, updated_dashboard)
-    print("Dashboard migration completed successfully.")
+    logger.info("Dashboard migration completed successfully.")
 
 
 if __name__ == "__main__":
