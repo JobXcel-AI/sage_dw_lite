@@ -244,6 +244,12 @@ def migrate_cards(source_api_url, target_api_url, headers_source, headers_target
                         metadata["fk_target_field_id"]
                     )
 
+        # Final pass to check for unmapped fk_target_field_id
+        if "result_metadata" in updated_card:
+            for metadata in updated_card["result_metadata"]:
+                if "fk_target_field_id" in metadata and metadata["fk_target_field_id"] is None:
+                    logger.warning(f"Unmapped fk_target_field_id for field ID {metadata['id']} in card '{updated_card.get('name', 'Unnamed')}'")
+
         # Create the updated card in the target
         created_card = create_resource(target_api_url, "card", headers_target, updated_card)
         if created_card:
