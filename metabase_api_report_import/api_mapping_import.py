@@ -77,21 +77,42 @@ def get_field_mapping(source_fields, target_fields):
 
 
 def migrate_collections(source_api_url, target_api_url, headers_source, headers_target):
+    """
+    Migrate collections from source to target. Check if a collection already exists in the target before creating it.
+    """
     source_collections = fetch_resource(source_api_url, "collection", headers_source)
+    target_collections = fetch_resource(target_api_url, "collection", headers_target)
+
     if not source_collections:
         logger.warning("No collections found in the source.")
         return {}
 
+    if not target_collections:
+        logger.warning("No collections found in the target.")
+        target_collections = []
+
+    # Map target collections by name to avoid duplicates
+    target_collection_lookup = {collection["name"]: collection["id"] for collection in target_collections}
+
     collection_mapping = {}
-    for collection in source_collections:
-        created_collection = create_resource(
-            target_api_url, "collection", headers_target, {"name": collection["name"]}
-        )
-        if created_collection:
-            collection_mapping[collection["id"]] = created_collection["id"]
-            logger.info(f"Collection '{collection['name']}' migrated successfully.")
+    for source_collection in source_collections:
+        source_collection_name = source_collection["name"]
+
+        if source_collection_name in target_collection_lookup:
+            # Collection exists, map its ID
+            collection_mapping[source_collection["id"]] = target_collection_lookup[source_collection_name]
+            logger.info(f"Collection '{source_collection_name}' already exists in the target. Skipping creation.")
         else:
-            logger.error(f"Failed to migrate collection: {collection['name']}")
+            # Collection does not exist, create it
+            created_collection = create_resource(
+                target_api_url, "collection", headers_target, {"name": source_collection_name}
+            )
+            if created_collection:
+                collection_mapping[source_collection["id"]] = created_collection["id"]
+                logger.info(f"Collection '{source_collection_name}' created successfully.")
+            else:
+                logger.error(f"Failed to create collection: {source_collection_name}")
+
     return collection_mapping
 
 
@@ -164,7 +185,7 @@ def main():
     logger.info("Starting migration process...")
 
     # Migrate collections
-    migrate_collections(SOURCE_API_URL, TARGET_API_URL, HEADERS_SOURCE, HEADERS_TARGET)
+    collection_mapping = migrate_collections(SOURCE_API_URL, TARGET_API_URL, HEADERS_SOURCE, HEADERS_TARGET)
 
     # Fetch and map tables and fields
     source_tables = fetch_resource(SOURCE_API_URL, f"database/{SOURCE_DATABASE_ID}/metadata", HEADERS_SOURCE).get("tables", [])
