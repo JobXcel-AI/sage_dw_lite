@@ -245,10 +245,31 @@ def migrate_cards(source_api_url, target_api_url, headers_source, headers_target
         if "result_metadata" in updated_card:
             for metadata in updated_card["result_metadata"]:
                 if "fk_target_field_id" in metadata and metadata["fk_target_field_id"] is not None:
-                    metadata["fk_target_field_id"] = field_mapping.get(
-                        metadata["fk_target_field_id"],
-                        metadata["fk_target_field_id"]
+                    # Attempt to map the fk_target_field_id using field_mapping
+                    field_id = metadata["id"]
+                    source_field_info = next(
+                        (field for field in source_fields if field["id"] == field_id), None
                     )
+
+                    if source_field_info:
+                        field_name = source_field_info.get("name", "Unknown Field Name")
+                        table_id = source_field_info.get("table_id", "Unknown Table ID")
+                        table_name = next(
+                            (table["name"] for table in source_tables if table["id"] == table_id),
+                            "Unknown Table Name"
+                        )
+                        metadata["fk_target_field_id"] = field_mapping.get(
+                            source_field_info["fk_target_field_id"],
+                            None
+                        )
+                        logger.info(
+                            f"Mapped fk_target_field_id for field '{field_name}' (Field ID: {field_id}) "
+                            f"in table '{table_name}' (Table ID: {table_id})."
+                        )
+                    else:
+                        logger.warning(
+                            f"Field ID {field_id} in card '{updated_card.get('name', 'Unnamed')}' could not be mapped."
+                        )
 
         # Final pass to check for unmapped fk_target_field_id
         if "result_metadata" in updated_card:
