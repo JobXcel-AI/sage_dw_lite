@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/sage_dw_lite.iml" filepath="$PROJECT_DIR$/.idea/sage_dw_lite.iml" />
+      <module fileurl="file://$PROJECT_DIR$/sage_dw_lite.iml" filepath="$PROJECT_DIR$/sage_dw_lite.iml" />
     </modules>
   </component>
 </project>

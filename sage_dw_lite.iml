@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<module type="JAVA_MODULE" version="4">
+<module type="PYTHON_MODULE" version="4">
   <component name="NewModuleRootManager" inherit-compiler-output="true">
     <exclude-output />
     <content url="file://$MODULE_DIR$">
       <sourceFolder url="file://$MODULE_DIR$/Export Queries" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Nvision" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Python" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Rivers Electrical Services" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/SQL Tables" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Vertex" isTestSource="false" />
@@ -14,7 +15,7 @@
       <sourceFolder url="file://$MODULE_DIR$/schedule_git_pull" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/venv" />
     </content>
-    <orderEntry type="jdk" jdkName="Python 3.10 (Chargebee API)" jdkType="Python SDK" />
+    <orderEntry type="jdk" jdkName="Python 3.10 (sage_dw_lite) (2)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
 </module>
