@@ -53,28 +53,46 @@ def create_resource(api_url, endpoint, headers, payload):
 
 def log_field_mappings(source_tables, target_tables, source_fields, target_fields, table_mapping, field_mapping):
     """
-    Log a detailed mapping of source and target tables and fields.
+    Log a detailed mapping of source and target tables and fields, ensuring table names are correctly resolved.
     """
+    # Create lookups for table IDs to table names
     source_table_lookup = {table["id"]: table["name"] for table in source_tables}
     target_table_lookup = {table["id"]: table["name"] for table in target_tables}
-    source_field_lookup = {field["id"]: (field["table_id"], field["name"]) for field in source_fields}
-    target_field_lookup = {field["id"]: (field["table_id"], field["name"]) for field in target_fields}
 
+    # Create lookups for field IDs to table ID and field name
+    source_field_lookup = {
+        field["id"]: (field.get("table_id", None), field["name"])
+        for field in source_fields
+    }
+    target_field_lookup = {
+        field["id"]: (field.get("table_id", None), field["name"])
+        for field in target_fields
+    }
+
+    # Build mappings table
     mappings = []
     for source_field_id, target_field_id in field_mapping.items():
-        source_table_id, source_field_name = source_field_lookup.get(source_field_id, ("Unknown", "Unknown"))
-        target_table_id, target_field_name = target_field_lookup.get(target_field_id, ("Unknown", "Unknown"))
+        # Resolve source field details
+        source_table_id, source_field_name = source_field_lookup.get(source_field_id, (None, "Unknown Field"))
+        source_table_name = source_table_lookup.get(source_table_id, "Unknown Table")
+
+        # Resolve target field details
+        target_table_id, target_field_name = target_field_lookup.get(target_field_id, (None, "Unknown Field"))
+        target_table_name = target_table_lookup.get(target_table_id, "Unknown Table")
+
+        # Add to mappings for logging
         mappings.append([
-            source_table_id,
-            source_table_lookup.get(source_table_id, "Unknown"),
+            source_table_id if source_table_id else "N/A",
+            source_table_name,
             source_field_id,
             source_field_name,
-            target_table_id,
-            target_table_lookup.get(target_table_id, "Unknown"),
+            target_table_id if target_table_id else "N/A",
+            target_table_name,
             target_field_id,
             target_field_name
         ])
 
+    # Log the table
     logger.info("\n" + tabulate(mappings, headers=[
         "Source Table ID", "Source Table Name", "Source Field ID", "Source Field Name",
         "Target Table ID", "Target Table Name", "Target Field ID", "Target Field Name"
@@ -335,6 +353,9 @@ def main():
     source_fields = fetch_resource(SOURCE_API_URL, f"database/{SOURCE_DATABASE_ID}/fields", HEADERS_SOURCE)
     target_fields = fetch_resource(TARGET_API_URL, f"database/{TARGET_DATABASE_ID}/fields", HEADERS_TARGET)
     field_mapping = get_field_mapping(source_fields, target_fields)
+
+    # Log the field mappings for review
+    log_field_mappings(source_tables, target_tables, source_fields, target_fields, table_mapping, field_mapping)
 
     # Iterate over dashboards
     for dashboard_id in DASHBOARDS:
