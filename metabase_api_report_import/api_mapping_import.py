@@ -19,35 +19,6 @@ HEADERS_TARGET = {
     "Content-Type": "application/json"
 }
 
-def get_table_mapping(source_tables, target_tables):
-    """
-    Map source table names to target table IDs.
-    """
-    mapping = {}
-    target_table_lookup = {table["name"].lower(): table["id"] for table in target_tables}  # Normalize case
-    for source_table in source_tables:
-        source_table_name = source_table["name"].lower()
-        target_id = target_table_lookup.get(source_table_name)
-        if target_id:
-            mapping[source_table["id"]] = target_id
-        else:
-            print(f"Source table '{source_table['name']}' not found in target tables.")
-    return mapping
-
-def get_field_mapping(source_fields, target_fields):
-    """
-    Map source field names to target field IDs.
-    """
-    mapping = {}
-    target_field_lookup = {field["name"].lower(): field["id"] for field in target_fields}  # Normalize case
-    for source_field in source_fields:
-        source_field_name = source_field["name"].lower()
-        target_id = target_field_lookup.get(source_field_name)
-        if target_id:
-            mapping[source_field["id"]] = target_id
-        else:
-            print(f"Source field '{source_field['name']}' not found in target fields.")
-    return mapping
 
 def fetch_resource(api_url, endpoint, headers):
     try:
@@ -58,111 +29,158 @@ def fetch_resource(api_url, endpoint, headers):
         print(f"Error fetching resource from {api_url}/{endpoint}: {e}")
         return None
 
-def fetch_fields(api_url, database_id, headers):
-    """
-    Fetch all fields for a given database ID.
-    """
-    endpoint = f"database/{database_id}/fields"
-    fields = fetch_resource(api_url, endpoint, headers)
-    return fields if fields else []
 
-def update_dashboard_and_cards(source_dashboard, table_mapping, field_mapping):
-    """
-    Update the dashboard's cards to reflect the new table and field IDs.
-    """
+def create_resource(api_url, endpoint, headers, payload):
+    try:
+        response = requests.post(
+            f"{api_url}/{endpoint}", headers=headers, data=json.dumps(payload), timeout=10
+        )
+        response.raise_for_status()
+        return response.json()
+    except requests.exceptions.RequestException as e:
+        print(f"Error creating resource: {e}")
+        return None
+
+
+def get_table_mapping(source_tables, target_tables):
+    mapping = {}
+    target_table_lookup = {table["name"].lower(): table["id"] for table in target_tables}
+    for source_table in source_tables:
+        source_table_name = source_table["name"].lower()
+        target_id = target_table_lookup.get(source_table_name)
+        if target_id:
+            mapping[source_table["id"]] = target_id
+        else:
+            print(f"Source table '{source_table['name']}' not found in target tables.")
+    return mapping
+
+
+def get_field_mapping(source_fields, target_fields):
+    mapping = {}
+    target_field_lookup = {field["name"].lower(): field["id"] for field in target_fields}
+    for source_field in source_fields:
+        source_field_name = source_field["name"].lower()
+        target_id = target_field_lookup.get(source_field_name)
+        if target_id:
+            mapping[source_field["id"]] = target_id
+        else:
+            print(f"Source field '{source_field['name']}' not found in target fields.")
+    return mapping
+
+
+def migrate_collections(source_api_url, target_api_url, headers_source, headers_target):
+    source_collections = fetch_resource(source_api_url, "collection", headers_source)
+    if not source_collections:
+        print("No collections found in the source.")
+        return {}
+
+    collection_mapping = {}
+    for collection in source_collections:
+        created_collection = create_resource(
+            target_api_url, "collection", headers_target, {"name": collection["name"]}
+        )
+        if created_collection:
+            collection_mapping[collection["id"]] = created_collection["id"]
+        else:
+            print(f"Failed to migrate collection: {collection['name']}")
+    return collection_mapping
+
+
+def fetch_cards(api_url, dashboard_id, headers):
+    dashboard = fetch_resource(api_url, f"dashboard/{dashboard_id}", headers)
+    return dashboard.get("dashcards", []) if dashboard else []
+
+
+def migrate_cards(source_api_url, target_api_url, headers_source, headers_target, dashboard_id, table_mapping, field_mapping):
+    source_cards = fetch_cards(source_api_url, dashboard_id, headers_source)
+    card_mapping = {}
+
+    for card in source_cards:
+        updated_card = card.get("card", {})
+        if not updated_card:
+            print("Skipping dashcard without a valid card.")
+            continue
+
+        dataset_query = updated_card.get("dataset_query", {})
+        query = dataset_query.get("query", {})
+
+        # Update table IDs
+        if "source-query" in query and "table_id" in query["source-query"]:
+            query["source-query"]["table_id"] = table_mapping.get(
+                query["source-query"]["table_id"], query["source-query"]["table_id"]
+            )
+
+        # Update field IDs
+        for agg in query.get("aggregation", []):
+            if isinstance(agg, list) and len(agg) > 1 and isinstance(agg[1], dict):
+                field_id = agg[1].get("id")
+                if field_id:
+                    agg[1]["id"] = field_mapping.get(field_id, field_id)
+
+        for breakout in query.get("breakout", []):
+            if isinstance(breakout, list) and len(breakout) > 1 and isinstance(breakout[1], dict):
+                field_id = breakout[1].get("id")
+                if field_id:
+                    breakout[1]["id"] = field_mapping.get(field_id, field_id)
+
+        # Create the updated card
+        created_card = create_resource(target_api_url, "card", headers_target, updated_card)
+        if created_card:
+            card_mapping[card["id"]] = created_card["id"]
+        else:
+            print(f"Failed to create card: {updated_card.get('name')}")
+
+    return card_mapping
+
+
+def update_dashboard_with_cards(source_dashboard, card_mapping):
     if not source_dashboard:
         print("Source dashboard data is empty.")
         return None
 
     for dashcard in source_dashboard.get("dashcards", []):
-        card = dashcard.get("card")
-        if card:
-            dataset_query = card.get("dataset_query")
-            if dataset_query:
-                query = dataset_query.get("query")
-
-                # Update table IDs
-                if "source-query" in query and "table_id" in query["source-query"]:
-                    query["source-query"]["table_id"] = table_mapping.get(
-                        query["source-query"]["table_id"],
-                        query["source-query"]["table_id"]
-                    )
-
-                # Update field IDs in aggregations and breakout
-                for agg in query.get("aggregation", []):
-                    if isinstance(agg, list) and len(agg) > 1 and isinstance(agg[1], dict):
-                        field_id = agg[1].get("id")
-                        if field_id:
-                            agg[1]["id"] = field_mapping.get(field_id, field_id)
-                        else:
-                            print(f"Warning: Unexpected structure in aggregation: {agg}")
-
-                for breakout in query.get("breakout", []):
-                    if isinstance(breakout, list) and len(breakout) > 1 and isinstance(breakout[1], dict):
-                        field_id = breakout[1].get("id")
-                        if field_id:
-                            breakout[1]["id"] = field_mapping.get(field_id, field_id)
-                        else:
-                            print(f"Warning: Unexpected structure in breakout: {breakout}")
+        old_card_id = dashcard.get("card_id")
+        if old_card_id in card_mapping:
+            dashcard["card_id"] = card_mapping[old_card_id]
 
     return source_dashboard
 
-def validate_dashboard_id(dashboard_id):
-    """
-    Validate and sanitize the dashboard ID to ensure it is an integer.
-    """
-    if not isinstance(dashboard_id, int) or dashboard_id <= 0:
-        raise ValueError("Invalid dashboard ID. It must be a positive integer.")
-    return dashboard_id
 
 def main():
-    # Fetch tables from source and target databases
+    # Migrate collections
+    migrate_collections(SOURCE_API_URL, TARGET_API_URL, HEADERS_SOURCE, HEADERS_TARGET)
+
+    # Fetch and map tables and fields
     source_tables = fetch_resource(SOURCE_API_URL, f"database/{SOURCE_DATABASE_ID}/metadata", HEADERS_SOURCE).get("tables", [])
     target_tables = fetch_resource(TARGET_API_URL, f"database/{TARGET_DATABASE_ID}/metadata", HEADERS_TARGET).get("tables", [])
-
-    if not source_tables or not target_tables:
-        print("Failed to fetch tables. Aborting.")
-        return
-
     table_mapping = get_table_mapping(source_tables, target_tables)
 
-    # Fetch fields from source and target databases
-    source_fields = fetch_fields(SOURCE_API_URL, SOURCE_DATABASE_ID, HEADERS_SOURCE)
-    target_fields = fetch_fields(TARGET_API_URL, TARGET_DATABASE_ID, HEADERS_TARGET)
-
-    if not source_fields or not target_fields:
-        print("Failed to fetch fields. Aborting.")
-        return
-
+    source_fields = fetch_resource(SOURCE_API_URL, f"database/{SOURCE_DATABASE_ID}/fields", HEADERS_SOURCE)
+    target_fields = fetch_resource(TARGET_API_URL, f"database/{TARGET_DATABASE_ID}/fields", HEADERS_TARGET)
     field_mapping = get_field_mapping(source_fields, target_fields)
 
-    # Fetch the source dashboard
+    # Fetch and migrate cards
     dashboard_id = 4  # Replace with your dashboard ID
-    try:
-        dashboard_id = validate_dashboard_id(dashboard_id)
-        source_dashboard = fetch_resource(SOURCE_API_URL, f"dashboard/{dashboard_id}", HEADERS_SOURCE)
-    except ValueError as e:
-        print(e)
+    card_mapping = migrate_cards(
+        SOURCE_API_URL, TARGET_API_URL, HEADERS_SOURCE, HEADERS_TARGET, dashboard_id, table_mapping, field_mapping
+    )
+
+    # Fetch the source dashboard
+    source_dashboard = fetch_resource(SOURCE_API_URL, f"dashboard/{dashboard_id}", HEADERS_SOURCE)
+    if not source_dashboard:
+        print("Failed to fetch source dashboard. Aborting.")
         return
 
-    # Update dashboard with target IDs
-    updated_dashboard = update_dashboard_and_cards(source_dashboard, table_mapping, field_mapping)
+    # Update dashboard with new cards
+    updated_dashboard = update_dashboard_with_cards(source_dashboard, card_mapping)
     if not updated_dashboard:
         print("Failed to update the dashboard. Aborting.")
         return
 
-    # Create the updated dashboard in the target Metabase
-    try:
-        response = requests.post(
-            f"{TARGET_API_URL}/dashboard",
-            headers=HEADERS_TARGET,
-            data=json.dumps(updated_dashboard),
-            timeout=10
-        )
-        response.raise_for_status()
-        print("Dashboard migrated successfully.")
-    except requests.exceptions.RequestException as e:
-        print(f"Failed to migrate dashboard: {e}")
+    # Create the updated dashboard in the target
+    create_resource(TARGET_API_URL, "dashboard", HEADERS_TARGET, updated_dashboard)
+    print("Dashboard migration completed successfully.")
+
 
 if __name__ == "__main__":
     main()
