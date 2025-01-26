@@ -27,6 +27,7 @@ HEADERS_TARGET = {
 logging.basicConfig(level=logging.DEBUG, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
+
 def fetch_resource(api_url, endpoint, headers):
     try:
         response = requests.get(f"{api_url}/{endpoint}", headers=headers, timeout=10)
@@ -38,6 +39,7 @@ def fetch_resource(api_url, endpoint, headers):
     except json.JSONDecodeError as e:
         print(f"Error decoding JSON: {e}")
         return None
+
 
 def create_resource(api_url, endpoint, headers, payload):
     try:
@@ -56,13 +58,14 @@ def create_resource(api_url, endpoint, headers, payload):
             logger.error(f"Error creating resource: {e}")
         return None
 
+
 def build_table_field_mapping(tables):
     """
     Build a mapping of table names and field names from the tables data.
     """
     table_mapping = {table["name"].lower(): table["id"] for table in tables}
     field_mapping = {
-        field["id"]: {"name": field["name"], "table_id": table["id"]}
+        field["id"]: {"name": field["name"], "table_id": table["id"], "table_name": table["name"].lower()}
         for table in tables
         for field in table.get("fields", [])
     }
@@ -129,7 +132,6 @@ def get_table_mapping(source_tables, target_tables):
         else:
             logger.debug(f"Source table '{source_table['name']}' not found in target tables.")
     return mapping
-
 
 
 def migrate_collections(source_api_url, target_api_url, headers_source, headers_target):
@@ -293,23 +295,28 @@ def migrate_cards(
             """
             for aggregation in aggregations:
                 if isinstance(aggregation, list):
-                    # Check for specific structures within aggregation
                     for i, item in enumerate(aggregation):
                         if isinstance(item, list):
                             # Handle nested structures or aggregation-options
                             update_aggregations([item], source_field_mapping, target_field_mapping)
-                        elif item == "field" and i + 1 < len(aggregation) and isinstance(aggregation[i + 1], int):
-                            # Found a field reference, replace the field ID
-                            source_field_id = aggregation[i + 1]
-                            source_field_name = source_field_mapping.get(source_field_id, {}).get("name")
-                            if source_field_name:
-                                target_field_id = next(
-                                    (field_id for field_id, field_data in target_field_mapping.items()
-                                     if field_data["name"] == source_field_name),
-                                    source_field_id  # Default to original if no match
-                                )
-                                aggregation[i + 1] = target_field_id
+                        elif item == "field" and i + 1 < len(aggregation):
+                            # Ensure the next index exists and is an integer (field ID)
+                            if isinstance(aggregation[i + 1], int):
+                                source_field_id = aggregation[i + 1]
+                                source_field_name = source_field_mapping.get(source_field_id, {}).get("name")
+                                source_table_name = source_field_mapping.get(source_field_id, {}).get("table_name")
 
+                                if source_field_name and source_table_name:
+                                    # Ensure the table name exists in the target mapping
+                                    target_field_id = next(
+                                        (
+                                            field_id for field_id, field_data in target_field_mapping.items()
+                                            if field_data["name"] == source_field_name and
+                                               field_data.get("table_name", "").lower() == source_table_name.lower()
+                                        ),
+                                        source_field_id  # Default to original if no match
+                                    )
+                                aggregation[i + 1] = target_field_id
 
         def update_field_ref(field_ref, source_field_mapping, target_field_mapping):
             if isinstance(field_ref, list):
@@ -374,7 +381,8 @@ def migrate_cards(
 
                 # Process "joins"
                 if "joins" in query:
-                    update_joins(query["joins"], source_table_mapping, target_table_mapping, source_field_mapping, target_field_mapping)
+                    update_joins(query["joins"], source_table_mapping, target_table_mapping, source_field_mapping,
+                                 target_field_mapping)
 
                 # Process "breakout"
                 if "breakout" in query:
@@ -395,17 +403,20 @@ def migrate_cards(
 
                 # Process "condition"
                 if "condition" in query:
-                    query["condition"] = update_condition(query["condition"], source_field_mapping, target_field_mapping)
+                    query["condition"] = update_condition(query["condition"], source_field_mapping,
+                                                          target_field_mapping)
 
                 # Process "aggregation"
                 if "aggregation" in query:
                     for aggregation in query["aggregation"]:
                         if isinstance(aggregation, list) and len(aggregation) > 1:
-                            aggregation[1] = update_field_ref(aggregation[1], source_field_mapping, target_field_mapping)
+                            aggregation[1] = update_field_ref(aggregation[1], source_field_mapping,
+                                                              target_field_mapping)
 
                 # If we are at the top level, process `dataset_query` specifically
                 if is_top_level and "dataset_query" in query:
-                    query["dataset_query"] = update_query_recursively(query.get("dataset_query", {}), is_top_level=False)
+                    query["dataset_query"] = update_query_recursively(query.get("dataset_query", {}),
+                                                                      is_top_level=False)
                     return query
 
                 # Process "source-query"
@@ -428,7 +439,8 @@ def migrate_cards(
 
         # Update table_id in the card metadata
         if "table_id" in updated_card:
-            source_table_name = next((table["name"] for table in source_tables if table["id"] == updated_card["table_id"]), None)
+            source_table_name = next(
+                (table["name"] for table in source_tables if table["id"] == updated_card["table_id"]), None)
             if source_table_name:
                 updated_card["table_id"] = next(
                     (table["id"] for table in target_tables if table["name"] == source_table_name),
@@ -507,6 +519,7 @@ def migrate_cards(
 
     return card_mapping
 
+
 def update_dashboard_with_cards(source_dashboard, card_mapping):
     if not source_dashboard:
         logger.error("Source dashboard data is empty.")
@@ -564,6 +577,7 @@ def main():
         logger.info(f"Dashboard ID {dashboard_id} migrated successfully.")
 
     logger.info("Migration process completed.")
+
 
 if __name__ == "__main__":
     main()
