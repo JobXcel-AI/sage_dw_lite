@@ -66,28 +66,45 @@ def build_table_field_mapping(tables):
 
 def log_field_mappings(source_tables, target_tables, field_mapping):
     """
-    Log a detailed mapping of source and target tables and fields, ensuring table names are correctly resolved.
+    Log a detailed mapping of source and target tables and fields, ensuring table names and field names are matched.
     """
     mappings = []
+
     for source_field_id, source_field_data in field_mapping["source"].items():
         source_table_id = source_field_data["table_id"]
         source_field_name = source_field_data["name"]
         source_table_name = next(
             (table["name"] for table in source_tables if table["id"] == source_table_id), "Unknown Table"
         )
-        target_field_data = field_mapping["target"].get(source_field_id)
-        if target_field_data:
-            target_field_id = source_field_id
-            target_table_id = target_field_data["table_id"]
-            target_table_name = next(
-                (table["name"] for table in target_tables if table["id"] == target_table_id), "Unknown Table"
+
+        # Find matching target table and field by name
+        target_table = next(
+            (table for table in target_tables if table["name"].lower() == source_table_name.lower()), None
+        )
+        if target_table:
+            target_table_id = target_table["id"]
+            target_field = next(
+                (field for field in target_table.get("fields", [])
+                 if field["name"].lower() == source_field_name.lower()), None
             )
+            if target_field:
+                target_field_id = target_field["id"]
+                target_table_name = target_table["name"]
+                target_field_name = target_field["name"]
+                mappings.append([
+                    source_table_id, source_table_name, source_field_id, source_field_name,
+                    target_table_id, target_table_name, target_field_id, target_field_name
+                ])
+            else:
+                mappings.append([
+                    source_table_id, source_table_name, source_field_id, source_field_name,
+                    target_table_id, target_table["name"], "N/A", source_field_name
+                ])
+        else:
             mappings.append([
                 source_table_id, source_table_name, source_field_id, source_field_name,
-                target_table_id, target_table_name, target_field_id, source_field_name
+                "N/A", "N/A", "N/A", source_field_name
             ])
-        else:
-            mappings.append([source_table_id, source_table_name, source_field_id, source_field_name, "N/A", "N/A", "N/A", source_field_name])
 
     # Log the table
     logger.info("\n" + tabulate(mappings, headers=[
@@ -137,6 +154,7 @@ def migrate_collections(source_api_url, target_api_url, headers_source, headers_
         logger.warning("No collections found in the target.")
         target_collections = []
 
+    # Map target collections by name to avoid duplicates
     target_collection_lookup = {collection["name"]: collection["id"] for collection in target_collections}
 
     collection_mapping = {}
@@ -144,9 +162,11 @@ def migrate_collections(source_api_url, target_api_url, headers_source, headers_
         source_collection_name = source_collection["name"]
 
         if source_collection_name in target_collection_lookup:
+            # Collection exists, map its ID
             collection_mapping[source_collection["id"]] = target_collection_lookup[source_collection_name]
             logger.info(f"Collection '{source_collection_name}' already exists in the target. Skipping creation.")
         else:
+            # Collection does not exist, create it
             created_collection = create_resource(
                 target_api_url, "collection", headers_target, {"name": source_collection_name}
             )
@@ -183,85 +203,93 @@ def migrate_cards(
             logger.warning("Skipping dashcard without a valid card.")
             continue
 
+        # Transform the source card JSON
         updated_card = source_card.copy()
 
+        # Update database ID
         if SOURCE_DATABASE_ID != TARGET_DATABASE_ID:
             updated_card["database_id"] = TARGET_DATABASE_ID
 
+        # Update collection ID
         source_collection_id = source_card.get("collection_id")
         if source_collection_id and source_collection_id in collection_mapping:
             updated_card["collection_id"] = collection_mapping[source_collection_id]
 
+        # Update dataset_query
         dataset_query = source_card.get("dataset_query", {})
         if dataset_query:
             if "database" in dataset_query:
                 dataset_query["database"] = TARGET_DATABASE_ID
 
+            # Update nested queries, joins, and fk_target_field_id
             def update_query(query):
                 if not isinstance(query, dict):
                     return query
 
+                # Update source-table and table_id
                 if "source-table" in query:
                     query["source-table"] = table_mapping.get(query["source-table"], query["source-table"])
                 if "table_id" in query:
                     query["table_id"] = table_mapping.get(query["table_id"], query["table_id"])
 
+                # Update joins in the query
                 if "joins" in query:
                     for join in query["joins"]:
                         if "source-table" in join:
-                            join["source-table"] = table_mapping.get(join["source-table"], join["source-table"])
+                            join["source-table"] = table_mapping.get(
+                                join["source-table"],
+                                join["source-table"]
+                            )
 
-                # Update fk_target_field_id in aggregation and breakout
-                for key in ["aggregation", "breakout"]:
-                    if key in query:
-                        for item in query[key]:
-                            if isinstance(item, list) and len(item) > 1 and isinstance(item[1], dict):
-                                if "fk_target_field_id" in item[1]:
-                                    original_field_id = item[1]["fk_target_field_id"]
-                                    item[1]["fk_target_field_id"] = field_mapping.get(
-                                        original_field_id, original_field_id
-                                    )
+                # Update fk_target_field_id in fields
+                if "aggregation" in query:
+                    for agg in query["aggregation"]:
+                        if isinstance(agg, list) and len(agg) > 1 and isinstance(agg[1], dict):
+                            if "fk_target_field_id" in agg[1]:
+                                agg[1]["fk_target_field_id"] = field_mapping.get(
+                                    agg[1]["fk_target_field_id"],
+                                    agg[1]["fk_target_field_id"]
+                                )
 
-                # Recursively update nested queries
+                # Update fk_target_field_id in breakout fields
+                if "breakout" in query:
+                    for breakout in query["breakout"]:
+                        if isinstance(breakout, list) and len(breakout) > 1 and isinstance(breakout[1], dict):
+                            if "fk_target_field_id" in breakout[1]:
+                                breakout[1]["fk_target_field_id"] = field_mapping.get(
+                                    breakout[1]["fk_target_field_id"],
+                                    breakout[1]["fk_target_field_id"]
+                                )
+
+                # Update nested source-query
                 if "source-query" in query:
                     query["source-query"] = update_query(query["source-query"])
 
                 return query
 
+            # Apply updates to the top-level query
             dataset_query["query"] = update_query(dataset_query.get("query", {}))
 
         updated_card["dataset_query"] = dataset_query
 
         # Update table_id in the card metadata
         if "table_id" in updated_card:
-            original_table_id = updated_card["table_id"]
-            updated_card["table_id"] = table_mapping.get(original_table_id, original_table_id)
+            updated_card["table_id"] = table_mapping.get(updated_card["table_id"], updated_card["table_id"])
 
-        # Update fk_target_field_id in result_metadata
+        # Update metadata fields such as fk_target_field_id in result_metadata
         if "result_metadata" in updated_card:
             for metadata in updated_card["result_metadata"]:
-                if "fk_target_field_id" in metadata:
-                    metadata["fk_target_field_id"] = field_mapping.get(metadata["fk_target_field_id"], None)
+                if "fk_target_field_id" in metadata and metadata["fk_target_field_id"] is not None:
+                        metadata["fk_target_field_id"] = field_mapping.get(
+                        metadata["fk_target_field_id"],
+                        metadata["fk_target_field_id"]
+                        )
 
-        # Log cases where fk_target_field_id couldn't be mapped
+        # Final pass to check for unmapped fk_target_field_id
         if "result_metadata" in updated_card:
             for metadata in updated_card["result_metadata"]:
                 if "fk_target_field_id" in metadata and metadata["fk_target_field_id"] is None:
-                    field_id = metadata["id"]
-                    source_field_info = next(
-                        (field for field in source_fields if field["id"] == field_id), None
-                    )
-                    if source_field_info:
-                        field_name = source_field_info.get("name", "Unknown Field")
-                        table_id = source_field_info.get("table_id", "Unknown Table")
-                        table_name = next(
-                            (table["name"] for table in source_tables if table["id"] == table_id),
-                            "Unknown Table"
-                        )
-                        logger.warning(
-                            f"Unmapped fk_target_field_id for field '{field_name}' (ID: {field_id}) "
-                            f"in table '{table_name}' (ID: {table_id}) for card '{updated_card.get('name', 'Unnamed')}'."
-                        )
+                    logger.warning(f"Unmapped fk_target_field_id for field ID {metadata['id']} in card '{updated_card.get('name', 'Unnamed')}'")
 
         # Create the updated card in the target
         created_card = create_resource(target_api_url, "card", headers_target, updated_card)
@@ -272,7 +300,6 @@ def migrate_cards(
             logger.error(f"Failed to create card: {updated_card.get('name', 'Unnamed')}")
 
     return card_mapping
-
 
 def update_dashboard_with_cards(source_dashboard, card_mapping):
     if not source_dashboard:
@@ -291,6 +318,7 @@ def update_dashboard_with_cards(source_dashboard, card_mapping):
 def main():
     logger.info("Starting migration process...")
 
+    # Migrate collections
     collection_mapping = migrate_collections(SOURCE_API_URL, TARGET_API_URL, HEADERS_SOURCE, HEADERS_TARGET)
 
     source_metadata = fetch_resource(SOURCE_API_URL, f"database/{SOURCE_DATABASE_ID}/metadata", HEADERS_SOURCE)
@@ -319,11 +347,13 @@ def main():
             source_tables, target_table_mapping
         )
 
+        # Update dashboard with new cards
         updated_dashboard = update_dashboard_with_cards(source_dashboard, card_mapping)
         if not updated_dashboard:
             logger.error(f"Failed to update dashboard ID {dashboard_id}. Skipping.")
             continue
 
+        # Create the updated dashboard in the target
         create_resource(TARGET_API_URL, "dashboard", HEADERS_TARGET, updated_dashboard)
         logger.info(f"Dashboard ID {dashboard_id} migrated successfully.")
 
