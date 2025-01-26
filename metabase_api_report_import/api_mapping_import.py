@@ -74,11 +74,11 @@ def log_field_mappings(source_tables, target_tables, source_fields, target_field
     for source_field_id, target_field_id in field_mapping.items():
         # Resolve source field details
         source_table_id, source_field_name = source_field_lookup.get(source_field_id, (None, "Unknown Field"))
-        source_table_name = source_table_lookup.get(source_table_id, "Unknown Table")
+        source_table_name = source_table_lookup.get(source_table_id, "Unknown Table") if source_table_id else "N/A"
 
         # Resolve target field details
         target_table_id, target_field_name = target_field_lookup.get(target_field_id, (None, "Unknown Field"))
-        target_table_name = target_table_lookup.get(target_table_id, "Unknown Table")
+        target_table_name = target_table_lookup.get(target_table_id, "Unknown Table") if target_table_id else "N/A"
 
         # Add to mappings for logging
         mappings.append([
@@ -348,10 +348,11 @@ def main():
     # Fetch and map tables and fields
     source_tables = fetch_resource(SOURCE_API_URL, f"database/{SOURCE_DATABASE_ID}/metadata", HEADERS_SOURCE).get("tables", [])
     target_tables = fetch_resource(TARGET_API_URL, f"database/{TARGET_DATABASE_ID}/metadata", HEADERS_TARGET).get("tables", [])
-    table_mapping = get_table_mapping(source_tables, target_tables)
-
     source_fields = fetch_resource(SOURCE_API_URL, f"database/{SOURCE_DATABASE_ID}/fields", HEADERS_SOURCE)
     target_fields = fetch_resource(TARGET_API_URL, f"database/{TARGET_DATABASE_ID}/fields", HEADERS_TARGET)
+
+    # Create table and field mappings
+    table_mapping = get_table_mapping(source_tables, target_tables)
     field_mapping = get_field_mapping(source_fields, target_fields)
 
     # Log the field mappings for review
