@@ -277,6 +277,34 @@ def migrate_cards(
                         elif isinstance(item, list):  # Handle nested aggregation-options
                             update_aggregations([item], source_field_mapping, target_field_mapping)
 
+
+        def update_field_ref(field_ref, source_field_mapping, target_field_mapping):
+            if isinstance(field_ref, list):
+                if len(field_ref) > 1 and isinstance(field_ref[1], int):
+                    # Look up the source field name using the field ID
+                    source_field_id = field_ref[1]
+                    source_field_name = source_field_mapping.get(source_field_id, {}).get("name")
+
+                    if source_field_name:
+                        # Find the target field ID using the field name
+                        target_field_id = next(
+                            (field_id for field_id, field_data in target_field_mapping.items()
+                             if field_data["name"] == source_field_name),
+                            None
+                        )
+                        if target_field_id:
+                            field_ref[1] = target_field_id
+            elif isinstance(field_ref, int):
+                # Handle cases where field_ref is a simple integer (field ID)
+                source_field_name = source_field_mapping.get(field_ref, {}).get("name")
+                if source_field_name:
+                    field_ref = next(
+                        (field_id for field_id, field_data in target_field_mapping.items()
+                         if field_data["name"] == source_field_name),
+                        field_ref
+                    )
+            return field_ref
+
         def update_query_recursively(query, is_top_level=True):
             if isinstance(query, dict):
                 # Process "source-table"
@@ -334,7 +362,9 @@ def migrate_cards(
 
                 # Process "aggregation"
                 if "aggregation" in query:
-                    update_aggregations(query["aggregation"], source_field_mapping, target_field_mapping)
+                    for aggregation in query["aggregation"]:
+                        if isinstance(aggregation, list) and len(aggregation) > 1:
+                            aggregation[1] = update_field_ref(aggregation[1], source_field_mapping, target_field_mapping)
 
                 # If we are at the top level, process `dataset_query` specifically
                 if is_top_level and "dataset_query" in query:
@@ -354,24 +384,6 @@ def migrate_cards(
                     query[i] = update_query_recursively(item, is_top_level=False)
 
             return query
-
-
-        def update_field_ref(field_ref, source_field_mapping, target_field_mapping):
-            if len(field_ref) > 1 and isinstance(field_ref[1], str):
-                # Keep the field name as is and avoid converting it to an ID
-                return field_ref
-            elif len(field_ref) > 1 and isinstance(field_ref[1], int):
-                # Only replace the ID if necessary
-                source_field_id = field_ref[1]
-                source_field_name = source_field_mapping.get(source_field_id, {}).get("name")
-                if source_field_name:
-                    target_field_id = next(
-                        (field_id for field_id, field_data in target_field_mapping.items()
-                         if field_data["name"] == source_field_name), None
-                    )
-                    if target_field_id:
-                        field_ref[1] = target_field_id
-            return field_ref
 
         # Begin by updating the top-level source_card
         dataset_query = update_query_recursively(source_card)
