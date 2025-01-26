@@ -225,6 +225,14 @@ def migrate_cards(
         if source_collection_id and source_collection_id in collection_mapping:
             updated_card["collection_id"] = collection_mapping[source_collection_id]
 
+        def update_joins(joins, source_field_mapping, target_field_mapping):
+            """
+            Update the joins array to map source field IDs to target field IDs.
+            """
+            for join in joins:
+                if "condition" in join:
+                    join["condition"] = update_condition(join["condition"], source_field_mapping, target_field_mapping)
+
         def update_condition(condition, source_field_mapping, target_field_mapping):
             """
             Updates field references within a condition array.
@@ -247,6 +255,27 @@ def migrate_cards(
                             update_condition(item, source_field_mapping, target_field_mapping)
 
             return condition
+
+        def update_aggregations(aggregations, source_field_mapping, target_field_mapping):
+            """
+            Update field references within the aggregations array.
+            """
+            for i, aggregation in enumerate(aggregations):
+                if isinstance(aggregation, list):
+                    # Check if this is a field reference in an aggregation
+                    for j, item in enumerate(aggregation):
+                        if isinstance(item, list) and item[0] == "field" and isinstance(item[1], int):
+                            source_field_id = item[1]
+                            source_field_name = source_field_mapping.get(source_field_id, {}).get("name")
+                            if source_field_name:
+                                target_field_id = next(
+                                    (field_id for field_id, field_data in target_field_mapping.items()
+                                     if field_data["name"] == source_field_name),
+                                    source_field_id  # Default to the original ID if no match
+                                )
+                                aggregation[j][1] = target_field_id
+                        elif isinstance(item, list):  # Handle nested aggregation-options
+                            update_aggregations([item], source_field_mapping, target_field_mapping)
 
         def update_query_recursively(query, is_top_level=True):
             if isinstance(query, dict):
@@ -280,17 +309,7 @@ def migrate_cards(
 
                 # Process "joins"
                 if "joins" in query:
-                    for join in query["joins"]:
-                        if "source-table" in join:
-                            source_table_name = next(
-                                (table["name"] for table in source_tables if table["id"] == join["source-table"]),
-                                None
-                            )
-                            if source_table_name:
-                                join["source-table"] = next(
-                                    (table["id"] for table in target_tables if table["name"] == source_table_name),
-                                    join["source-table"]
-                                )
+                    update_joins(query["joins"], source_field_mapping, target_field_mapping)
 
                 # Process "breakout"
                 if "breakout" in query:
@@ -313,6 +332,9 @@ def migrate_cards(
                 if "condition" in query:
                     query["condition"] = update_condition(query["condition"], source_field_mapping, target_field_mapping)
 
+                # Process "aggregation"
+                if "aggregation" in query:
+                    update_aggregations(query["aggregation"], source_field_mapping, target_field_mapping)
 
                 # If we are at the top level, process `dataset_query` specifically
                 if is_top_level and "dataset_query" in query:

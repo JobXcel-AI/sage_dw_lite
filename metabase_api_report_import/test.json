@@ -2,7 +2,7 @@
   "cache_invalidated_at": null,
   "description": null,
   "archived": false,
-  "view_count": 336,
+  "view_count": 341,
   "collection_position": null,
   "table_id": 23,
   "can_run_adhoc_query": true,
@@ -819,14 +819,14 @@
               ],
               [
                 "field",
-                23899,
+                104,
                 {
                   "base-type": "type/BigInteger",
                   "join-alias": "Job Cost - Job Number"
                 }
               ]
             ],
-            "source-table": 28
+            "source-table": 1077
           }
         ],
         "aggregation": [
@@ -868,7 +868,7 @@
                 "sum",
                 [
                   "field",
-                  23893,
+                  217,
                   {
                     "base-type": "type/Decimal",
                     "join-alias": "Job Cost - Job Number"
@@ -905,7 +905,7 @@
             "sum",
             [
               "field",
-              23893,
+              217,
               {
                 "base-type": "type/Decimal",
                 "join-alias": "Job Cost - Job Number"
@@ -940,7 +940,7 @@
                 "sum",
                 [
                   "field",
-                  23893,
+                  217,
                   {
                     "base-type": "type/Decimal",
                     "join-alias": "Job Cost - Job Number"
@@ -973,7 +973,7 @@
                   "sum",
                   [
                     "field",
-                    23893,
+                    217,
                     {
                       "base-type": "type/Decimal",
                       "join-alias": "Job Cost - Job Number"
@@ -1093,7 +1093,7 @@
               "sum",
               [
                 "field",
-                23823,
+                290,
                 {
                   "base-type": "type/Decimal"
                 }
@@ -1103,7 +1103,7 @@
               "sum",
               [
                 "field",
-                23805,
+                272,
                 {
                   "base-type": "type/Decimal"
                 }
@@ -1113,7 +1113,7 @@
               "sum",
               [
                 "field",
-                23796,
+                263,
                 {
                   "base-type": "type/Decimal"
                 }
@@ -1123,7 +1123,7 @@
               "sum",
               [
                 "field",
-                23791,
+                258,
                 {
                   "base-type": "type/Decimal"
                 }
@@ -1133,7 +1133,7 @@
               "sum",
               [
                 "field",
-                23789,
+                256,
                 {
                   "base-type": "type/Decimal"
                 }
@@ -1147,7 +1147,7 @@
                   "sum",
                   [
                     "field",
-                    23823,
+                    290,
                     {
                       "base-type": "type/Decimal"
                     }
@@ -1157,7 +1157,7 @@
                   "sum",
                   [
                     "field",
-                    23791,
+                    258,
                     {
                       "base-type": "type/Decimal"
                     }
