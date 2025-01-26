@@ -107,7 +107,7 @@ def log_field_mappings(source_tables, target_tables, field_mapping):
             ])
 
     # Log the table
-    logger.info("\n" + tabulate(mappings, headers=[
+    logger.debug("\n" + tabulate(mappings, headers=[
         "Source Table ID", "Source Table Name", "Source Field ID", "Source Field Name",
         "Target Table ID", "Target Table Name", "Target Field ID", "Target Field Name"
     ], tablefmt="grid"))
@@ -180,7 +180,7 @@ def migrate_cards(
         dashboard_id, table_mapping, field_mapping, collection_mapping, source_tables, target_tables, source_field_mapping, target_field_mapping
 ):
     """
-    Migrate cards from source to target. Update the database, collection, table, field references, and fk_target_field_id.
+    Migrate cards from source to target. Update the database, collection, table, field references, and field ids.
     """
     source_cards = fetch_cards(source_api_url, dashboard_id, headers_source)
     card_mapping = {}
@@ -233,21 +233,6 @@ def migrate_cards(
                                     join["source-table"]
                                 )
 
-                # Update fk_target_field_id in fields
-                for key in ["aggregation", "breakout"]:
-                    if key in query:
-                        for item in query[key]:
-                            if isinstance(item, list) and len(item) > 1 and isinstance(item[1], dict):
-                                if "fk_target_field_id" in item[1]:
-                                    source_field_id = item[1].get("fk_target_field_id")
-                                    if source_field_id in source_field_mapping:
-                                        source_field_name = source_field_mapping[source_field_id]["name"]
-                                        item[1]["fk_target_field_id"] = next(
-                                            (field_id for field_id, field_data in target_field_mapping.items()
-                                             if field_data["name"] == source_field_name),
-                                            None
-                                        )
-
                 # Recursively update nested source-query
                 if "source-query" in query:
                     query["source-query"] = update_query_recursively(query["source-query"])
@@ -275,24 +260,24 @@ def migrate_cards(
                     updated_card["table_id"]
                 )
 
-        # Update result_metadata fk_target_field_id
+        # Update result_metadata field ids
         if "result_metadata" in updated_card:
             for metadata in updated_card["result_metadata"]:
-                if "fk_target_field_id" in metadata:
-                    source_field_id = metadata.get("id")
-                    if source_field_id in source_field_mapping:
-                        source_field_name = source_field_mapping[source_field_id]["name"]
-                        metadata["fk_target_field_id"] = next(
+                if "id" in metadata:
+                    source_field_id = metadata["id"]
+                    source_field_name = source_field_mapping.get(source_field_id, {}).get("name")
+                    if source_field_name:
+                        metadata["id"] = next(
                             (field_id for field_id, field_data in target_field_mapping.items()
                              if field_data["name"] == source_field_name),
-                            None
+                            metadata["id"]
                         )
 
-        # Final pass to check for unmapped fk_target_field_id
+        # Final pass to check for unmapped field ids
         if "result_metadata" in updated_card:
             for metadata in updated_card["result_metadata"]:
-                if "fk_target_field_id" in metadata and metadata["fk_target_field_id"] is None:
-                    logger.warning(f"Unmapped fk_target_field_id for field ID {metadata['id']} in card '{updated_card.get('name', 'Unnamed')}'")
+                if "id" in metadata and metadata["id"] is None:
+                    logger.warning(f"Unmapped field ID {metadata.get('id')} in card '{updated_card.get('name', 'Unnamed')}'")
 
         # Create the updated card in the target
         created_card = create_resource(target_api_url, "card", headers_target, updated_card)
