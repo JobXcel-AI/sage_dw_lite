@@ -203,8 +203,8 @@ def migrate_cards(
         if source_collection_id and source_collection_id in collection_mapping:
             updated_card["collection_id"] = collection_mapping[source_collection_id]
 
-        # Recursive function to update nested queries
-        def update_query_recursively(query, table_mapping, field_mapping):
+        # Recursive function to update queries
+        def update_query_recursively(query):
             if isinstance(query, dict):
                 # Update 'source-table' and 'table_id' using table_mapping
                 if "source-table" in query:
@@ -233,39 +233,35 @@ def migrate_cards(
                                     join["source-table"]
                                 )
 
-                # Update fk_target_field_id in aggregations and breakout fields
+                # Update fk_target_field_id in fields
                 for key in ["aggregation", "breakout"]:
                     if key in query:
                         for item in query[key]:
                             if isinstance(item, list) and len(item) > 1 and isinstance(item[1], dict):
-                                if "fk_target_field_id" in item[1]:
-                                    source_field_name = next(
-                                        (field_data["name"] for field_id, field_data in source_field_mapping.items()
-                                         if field_id == item[1]["fk_target_field_id"]),
-                                        None
-                                    )
+                                if "fk_target_field_id" in item[1] and item[1]["fk_target_field_id"] is not None:
+                                    source_field_name = source_field_mapping.get(item[1]["fk_target_field_id"], {}).get("name")
                                     if source_field_name:
                                         item[1]["fk_target_field_id"] = next(
                                             (field_id for field_id, field_data in target_field_mapping.items()
                                              if field_data["name"] == source_field_name),
-                                            item[1]["fk_target_field_id"]
+                                            None
                                         )
 
                 # Recursively update nested source-query
                 if "source-query" in query:
-                    query["source-query"] = update_query_recursively(query["source-query"], table_mapping, field_mapping)
+                    query["source-query"] = update_query_recursively(query["source-query"])
 
             elif isinstance(query, list):
                 # Recursively handle lists
                 for i, item in enumerate(query):
-                    query[i] = update_query_recursively(item, table_mapping, field_mapping)
+                    query[i] = update_query_recursively(item)
 
             return query
 
         # Update dataset_query
         dataset_query = source_card.get("dataset_query", {})
         if dataset_query:
-            dataset_query["query"] = update_query_recursively(dataset_query.get("query", {}), table_mapping, field_mapping)
+            dataset_query["query"] = update_query_recursively(dataset_query.get("query", {}))
 
         updated_card["dataset_query"] = dataset_query
 
@@ -281,17 +277,13 @@ def migrate_cards(
         # Update result_metadata fk_target_field_id
         if "result_metadata" in updated_card:
             for metadata in updated_card["result_metadata"]:
-                if "fk_target_field_id" in metadata:
-                    source_field_name = next(
-                        (field_data["name"] for field_id, field_data in source_field_mapping.items()
-                         if field_id == metadata["fk_target_field_id"]),
-                        None
-                    )
+                if "fk_target_field_id" in metadata and metadata["fk_target_field_id"] is not None:
+                    source_field_name = source_field_mapping.get(metadata["fk_target_field_id"], {}).get("name")
                     if source_field_name:
                         metadata["fk_target_field_id"] = next(
                             (field_id for field_id, field_data in target_field_mapping.items()
                              if field_data["name"] == source_field_name),
-                            metadata["fk_target_field_id"]
+                            None
                         )
 
         # Final pass to check for unmapped fk_target_field_id
