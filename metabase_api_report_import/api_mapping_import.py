@@ -192,7 +192,8 @@ def fetch_cards_from_dashboard(api_url, dashboard_id, headers):
 
 def migrate_cards(
         source_api_url, target_api_url, headers_source, headers_target,
-        dashboard_id, collection_mapping, source_tables, target_tables, source_field_mapping, target_field_mapping
+        dashboard_id, collection_mapping, source_tables, target_tables, source_field_mapping, target_field_mapping,
+        source_table_mapping, target_table_mapping
 ):
     """
     Migrate cards from source to target. Update the database, collection, table, field references, and field ids.
@@ -225,11 +226,41 @@ def migrate_cards(
         if source_collection_id and source_collection_id in collection_mapping:
             updated_card["collection_id"] = collection_mapping[source_collection_id]
 
-        def update_joins(joins, source_field_mapping, target_field_mapping):
+        def update_joins(joins, source_table_mapping, target_table_mapping, source_field_mapping, target_field_mapping):
             """
-            Update the joins array to map source field IDs to target field IDs.
+            Update the joins array to map source field IDs to target field IDs and source-table IDs to target-table IDs.
             """
+            # Reverse the source table mapping for lookup by table ID
+            reversed_source_table_mapping = {v: k for k, v in source_table_mapping.items()}
+
             for join in joins:
+                # Update "source-table"
+                if "source-table" in join:
+                    source_table_id = join["source-table"]
+                    logger.debug(f"Original source-table ID: {source_table_id}")
+
+                    # Ensure `source_table_id` is an integer
+                    if not isinstance(source_table_id, int):
+                        logger.error(f"Invalid source-table ID: {source_table_id}")
+                        continue
+
+                    # Get source table name using the reversed mapping
+                    source_table_name = reversed_source_table_mapping.get(source_table_id)
+                    logger.debug(f"Source table name: {source_table_name}")
+
+                    if source_table_name:
+                        # Get target table ID using source table name
+                        target_table_id = target_table_mapping.get(source_table_name.lower())
+                        logger.debug(f"Target table ID: {target_table_id}")
+
+                        if target_table_id:
+                            join["source-table"] = target_table_id
+                        else:
+                            logger.warning(f"Target table ID not found for source table name: {source_table_name}")
+                    else:
+                        logger.warning(f"Source table name not found for source-table ID: {source_table_id}")
+
+                # Update "condition"
                 if "condition" in join:
                     join["condition"] = update_condition(join["condition"], source_field_mapping, target_field_mapping)
 
@@ -252,7 +283,7 @@ def migrate_cards(
                                 )
                                 condition[i][1] = target_field_id  # Replace with target field ID
                         elif isinstance(item, list):  # Recurse into nested conditions
-                            update_condition(item, source_field_mapping, target_field_mapping)
+                            condition[i] = update_condition(item, source_field_mapping, target_field_mapping)
 
             return condition
 
@@ -337,7 +368,7 @@ def migrate_cards(
 
                 # Process "joins"
                 if "joins" in query:
-                    update_joins(query["joins"], source_field_mapping, target_field_mapping)
+                    update_joins(query["joins"], source_table_mapping, target_table_mapping, source_field_mapping, target_field_mapping)
 
                 # Process "breakout"
                 if "breakout" in query:
@@ -512,7 +543,8 @@ def main():
 
         card_mapping = migrate_cards(
             SOURCE_API_URL, TARGET_API_URL, HEADERS_SOURCE, HEADERS_TARGET,
-            dashboard_id, collection_mapping, source_tables, target_tables, source_field_mapping, target_field_mapping
+            dashboard_id, collection_mapping, source_tables, target_tables, source_field_mapping, target_field_mapping,
+            source_table_mapping, target_table_mapping
         )
 
         # Update dashboard with new cards
