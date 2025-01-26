@@ -240,12 +240,14 @@ def migrate_cards(
                             if isinstance(item, list) and len(item) > 1 and isinstance(item[1], dict):
                                 if "fk_target_field_id" in item[1]:
                                     source_field_name = next(
-                                        (field["name"] for field in source_field_mapping if field["id"] == item[1]["fk_target_field_id"]),
+                                        (field_data["name"] for field_id, field_data in source_field_mapping.items()
+                                         if field_id == item[1]["fk_target_field_id"]),
                                         None
                                     )
                                     if source_field_name:
                                         item[1]["fk_target_field_id"] = next(
-                                            (field["id"] for field in target_field_mapping if field["name"] == source_field_name),
+                                            (field_id for field_id, field_data in target_field_mapping.items()
+                                             if field_data["name"] == source_field_name),
                                             item[1]["fk_target_field_id"]
                                         )
 
@@ -281,12 +283,14 @@ def migrate_cards(
             for metadata in updated_card["result_metadata"]:
                 if "fk_target_field_id" in metadata:
                     source_field_name = next(
-                        (field["name"] for field in source_field_mapping if field["id"] == metadata["fk_target_field_id"]),
+                        (field_data["name"] for field_id, field_data in source_field_mapping.items()
+                         if field_id == metadata["fk_target_field_id"]),
                         None
                     )
                     if source_field_name:
                         metadata["fk_target_field_id"] = next(
-                            (field["id"] for field in target_field_mapping if field["name"] == source_field_name),
+                            (field_id for field_id, field_data in target_field_mapping.items()
+                             if field_data["name"] == source_field_name),
                             metadata["fk_target_field_id"]
                         )
 
