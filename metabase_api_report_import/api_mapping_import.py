@@ -269,6 +269,12 @@ def migrate_cards(
                                     join["source-table"]
                                 )
 
+                # Process "breakout"
+                if "breakout" in query:
+                    for breakout in query["breakout"]:
+                        if isinstance(breakout, list) and len(breakout) > 1:
+                            breakout[1] = update_field_ref(breakout[1], source_field_mapping, target_field_mapping)
+
                 # If we are at the top level, process `dataset_query` specifically
                 if is_top_level and "dataset_query" in query:
                     query["dataset_query"] = update_query_recursively(query.get("dataset_query", {}), is_top_level=False)
