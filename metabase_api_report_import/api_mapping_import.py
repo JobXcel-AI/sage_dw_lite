@@ -272,8 +272,13 @@ def migrate_cards(
                 # Process "breakout"
                 if "breakout" in query:
                     for breakout in query["breakout"]:
-                        if isinstance(breakout, list) and len(breakout) > 1:
-                            breakout[1] = update_field_ref(breakout[1], source_field_mapping, target_field_mapping)
+                        # Validate that breakout[1] is a list or another updatable structure
+                        if isinstance(breakout, list) and len(breakout) > 1 and isinstance(breakout[1], (list, int)):
+                            if isinstance(breakout[1], list):
+                                breakout[1] = update_field_ref(breakout[1], source_field_mapping, target_field_mapping)
+                            else:
+                                # Handle cases where breakout[1] is not updatable
+                                logger.debug(f"Skipping update for breakout[1]: {breakout[1]} (not a list)")
 
                 # If we are at the top level, process `dataset_query` specifically
                 if is_top_level and "dataset_query" in query:
