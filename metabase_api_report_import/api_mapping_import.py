@@ -51,46 +51,39 @@ def create_resource(api_url, endpoint, headers, payload):
         return None
 
 
-def log_field_mappings(source_tables, target_tables, source_fields, target_fields, table_mapping, field_mapping):
+def build_table_field_mapping(tables):
+    """
+    Build a mapping of table names and field names from the tables data.
+    """
+    table_mapping = {table["name"].lower(): table["id"] for table in tables}
+    field_mapping = {
+        field["name"].lower(): (field["id"], table["id"])
+        for table in tables
+        for field in table.get("fields", [])
+    }
+    return table_mapping, field_mapping
+
+
+def log_field_mappings(source_tables, target_tables, field_mapping):
     """
     Log a detailed mapping of source and target tables and fields, ensuring table names are correctly resolved.
     """
-    # Create lookups for table IDs to table names
-    source_table_lookup = {table["id"]: table["name"] for table in source_tables}
-    target_table_lookup = {table["id"]: table["name"] for table in target_tables}
-
-    # Create lookups for field IDs to table ID and field name
-    source_field_lookup = {
-        field["id"]: (field.get("table_id", None), field["name"])
-        for field in source_fields
-    }
-    target_field_lookup = {
-        field["id"]: (field.get("table_id", None), field["name"])
-        for field in target_fields
-    }
-
-    # Build mappings table
     mappings = []
-    for source_field_id, target_field_id in field_mapping.items():
-        # Resolve source field details
-        source_table_id, source_field_name = source_field_lookup.get(source_field_id, (None, "Unknown Field"))
-        source_table_name = source_table_lookup.get(source_table_id, "Unknown Table") if source_table_id else "N/A"
-
-        # Resolve target field details
-        target_table_id, target_field_name = target_field_lookup.get(target_field_id, (None, "Unknown Field"))
-        target_table_name = target_table_lookup.get(target_table_id, "Unknown Table") if target_table_id else "N/A"
-
-        # Add to mappings for logging
-        mappings.append([
-            source_table_id if source_table_id else "N/A",
-            source_table_name,
-            source_field_id,
-            source_field_name,
-            target_table_id if target_table_id else "N/A",
-            target_table_name,
-            target_field_id,
-            target_field_name
-        ])
+    for source_field_name, (source_field_id, source_table_id) in field_mapping["source"].items():
+        source_table_name = next(
+            (table["name"] for table in source_tables if table["id"] == source_table_id), "Unknown Table"
+        )
+        if source_field_name in field_mapping["target"]:
+            target_field_id, target_table_id = field_mapping["target"][source_field_name]
+            target_table_name = next(
+                (table["name"] for table in target_tables if table["id"] == target_table_id), "Unknown Table"
+            )
+            mappings.append([
+                source_table_id, source_table_name, source_field_id, source_field_name,
+                target_table_id, target_table_name, target_field_id, source_field_name
+            ])
+        else:
+            mappings.append([source_table_id, source_table_name, source_field_id, source_field_name, "N/A", "N/A", "N/A", source_field_name])
 
     # Log the table
     logger.info("\n" + tabulate(mappings, headers=[
@@ -140,7 +133,6 @@ def migrate_collections(source_api_url, target_api_url, headers_source, headers_
         logger.warning("No collections found in the target.")
         target_collections = []
 
-    # Map target collections by name to avoid duplicates
     target_collection_lookup = {collection["name"]: collection["id"] for collection in target_collections}
 
     collection_mapping = {}
@@ -148,11 +140,9 @@ def migrate_collections(source_api_url, target_api_url, headers_source, headers_
         source_collection_name = source_collection["name"]
 
         if source_collection_name in target_collection_lookup:
-            # Collection exists, map its ID
             collection_mapping[source_collection["id"]] = target_collection_lookup[source_collection_name]
             logger.info(f"Collection '{source_collection_name}' already exists in the target. Skipping creation.")
         else:
-            # Collection does not exist, create it
             created_collection = create_resource(
                 target_api_url, "collection", headers_target, {"name": source_collection_name}
             )
@@ -348,21 +338,25 @@ def main():
     # Fetch and map tables and fields
     source_tables = fetch_resource(SOURCE_API_URL, f"database/{SOURCE_DATABASE_ID}/metadata", HEADERS_SOURCE).get("tables", [])
     target_tables = fetch_resource(TARGET_API_URL, f"database/{TARGET_DATABASE_ID}/metadata", HEADERS_TARGET).get("tables", [])
-    source_fields = fetch_resource(SOURCE_API_URL, f"database/{SOURCE_DATABASE_ID}/fields", HEADERS_SOURCE)
-    target_fields = fetch_resource(TARGET_API_URL, f"database/{TARGET_DATABASE_ID}/fields", HEADERS_TARGET)
 
-    # Create table and field mappings
-    table_mapping = get_table_mapping(source_tables, target_tables)
-    field_mapping = get_field_mapping(source_fields, target_fields)
+    # Build table and field mappings
+    source_table_mapping, source_field_mapping = build_table_field_mapping(source_tables)
+    target_table_mapping, target_field_mapping = build_table_field_mapping(target_tables)
 
-    # Log the field mappings for review
-    log_field_mappings(source_tables, target_tables, source_fields, target_fields, table_mapping, field_mapping)
+    field_mapping = {
+        "source": source_field_mapping,
+        "target": target_field_mapping
+    }
+
+    # Log the mappings
+    log_field_mappings(source_tables, target_tables, field_mapping)
+
+    # Collections migration
+    collection_mapping = migrate_collections(SOURCE_API_URL, TARGET_API_URL, HEADERS_SOURCE, HEADERS_TARGET)
 
     # Iterate over dashboards
     for dashboard_id in DASHBOARDS:
         logger.info(f"Processing dashboard ID: {dashboard_id}")
-
-        # Fetch the source dashboard
         source_dashboard = fetch_resource(SOURCE_API_URL, f"dashboard/{dashboard_id}", HEADERS_SOURCE)
         if not source_dashboard:
             logger.error(f"Failed to fetch dashboard ID {dashboard_id}. Skipping.")
@@ -371,8 +365,8 @@ def main():
         # Fetch and migrate cards
         card_mapping = migrate_cards(
             SOURCE_API_URL, TARGET_API_URL, HEADERS_SOURCE, HEADERS_TARGET,
-            dashboard_id, table_mapping, field_mapping, collection_mapping,
-            source_tables, source_fields
+            dashboard_id, source_table_mapping, field_mapping, collection_mapping,
+            source_tables, target_table_mapping
         )
 
         # Update dashboard with new cards
