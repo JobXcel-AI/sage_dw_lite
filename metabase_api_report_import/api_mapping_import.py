@@ -13,7 +13,8 @@ SOURCE_DATABASE_ID = 2  # Set the source database ID
 TARGET_DATABASE_ID = 2  # Set the target database ID
 
 # List of dashboards to migrate
-DASHBOARDS = [4]
+DASHBOARDS = []
+CARDS = [31]
 
 HEADERS_SOURCE = {
     "x-api-key": SOURCE_API_KEY,
@@ -200,8 +201,12 @@ def migrate_cards(
     """
     Migrate cards from source to target. Update the database, collection, table, field references, and field ids.
     """
-    # Fetch card IDs from the dashboard
-    source_card_ids = fetch_cards_from_dashboard(source_api_url, dashboard_id, headers_source)
+    if (DASHBOARDS):
+        # Fetch card IDs from the dashboard
+        source_card_ids = fetch_cards_from_dashboard(source_api_url, dashboard_id, headers_source)
+    else:
+        source_card_ids = CARDS
+
     source_cards = []
     card_mapping = {}
     # Fetch the card data for each card ID
@@ -317,7 +322,6 @@ def migrate_cards(
                 logger.warning(f"Field or table name missing for source field ID {source_field_id}.")
                 return source_field_id
 
-
         def update_aggregations(aggregations, source_field_mapping, target_field_mapping):
             """
             Update field references within the aggregations array, including in aggregation-options.
@@ -338,6 +342,15 @@ def migrate_cards(
                             else:
                                 # Log a warning if the next index is out of bounds
                                 logger.warning(f"Index {i + 1} is out of bounds for aggregation: {aggregation}")
+                elif isinstance(aggregation, dict):
+                    # Check for "default" in aggregation-options and update it
+                    if "default" in aggregation:
+                        default_field = aggregation["default"]
+                        if isinstance(default_field, list) and len(default_field) > 1 and default_field[0] == "field":
+                            if isinstance(default_field[1], int):
+                                default_field[1] = map_field_id(default_field[1], source_field_mapping, target_field_mapping)
+                            else:
+                                logger.warning(f"Unexpected type for 'default' field ID: {type(default_field[1])}")
 
         def update_field_ref(field_ref, source_field_mapping, target_field_mapping):
             if isinstance(field_ref, list):
@@ -535,7 +548,6 @@ def main():
 
     # Migrate collections
     collection_mapping = migrate_collections(SOURCE_API_URL, TARGET_API_URL, HEADERS_SOURCE, HEADERS_TARGET)
-
     source_metadata = fetch_resource(SOURCE_API_URL, f"database/{SOURCE_DATABASE_ID}/metadata", HEADERS_SOURCE)
     target_metadata = fetch_resource(TARGET_API_URL, f"database/{TARGET_DATABASE_ID}/metadata", HEADERS_TARGET)
 
@@ -549,28 +561,36 @@ def main():
 
     log_field_mappings(source_tables, target_tables, field_mapping)
 
-    for dashboard_id in DASHBOARDS:
-        logger.info(f"Processing dashboard ID: {dashboard_id}")
-        source_dashboard = fetch_resource(SOURCE_API_URL, f"dashboard/{dashboard_id}", HEADERS_SOURCE)
-        if not source_dashboard:
-            logger.error(f"Failed to fetch dashboard ID {dashboard_id}. Skipping.")
-            continue
+    if (DASHBOARDS):
+        for dashboard_id in DASHBOARDS:
+            logger.info(f"Processing dashboard ID: {dashboard_id}")
+            source_dashboard = fetch_resource(SOURCE_API_URL, f"dashboard/{dashboard_id}", HEADERS_SOURCE)
+            if not source_dashboard:
+                logger.error(f"Failed to fetch dashboard ID {dashboard_id}. Skipping.")
+                continue
 
+            card_mapping = migrate_cards(
+                SOURCE_API_URL, TARGET_API_URL, HEADERS_SOURCE, HEADERS_TARGET,
+                dashboard_id, collection_mapping, source_tables, target_tables, source_field_mapping, target_field_mapping,
+                source_table_mapping, target_table_mapping
+            )
+
+            # Update dashboard with new cards
+            updated_dashboard = update_dashboard_with_cards(source_dashboard, card_mapping)
+            if not updated_dashboard:
+                logger.error(f"Failed to update dashboard ID {dashboard_id}. Skipping.")
+                continue
+
+            # Create the updated dashboard in the target
+            create_resource(TARGET_API_URL, "dashboard", HEADERS_TARGET, updated_dashboard)
+            logger.info(f"Dashboard ID {dashboard_id} migrated successfully.")
+    else:
         card_mapping = migrate_cards(
             SOURCE_API_URL, TARGET_API_URL, HEADERS_SOURCE, HEADERS_TARGET,
-            dashboard_id, collection_mapping, source_tables, target_tables, source_field_mapping, target_field_mapping,
+            [], collection_mapping, source_tables, target_tables, source_field_mapping, target_field_mapping,
             source_table_mapping, target_table_mapping
         )
-
-        # Update dashboard with new cards
-        updated_dashboard = update_dashboard_with_cards(source_dashboard, card_mapping)
-        if not updated_dashboard:
-            logger.error(f"Failed to update dashboard ID {dashboard_id}. Skipping.")
-            continue
-
-        # Create the updated dashboard in the target
-        create_resource(TARGET_API_URL, "dashboard", HEADERS_TARGET, updated_dashboard)
-        logger.info(f"Dashboard ID {dashboard_id} migrated successfully.")
+        logger.info(f"New card mappings. {card_mapping}")
 
     logger.info("Migration process completed.")
 
