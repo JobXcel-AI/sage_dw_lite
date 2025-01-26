@@ -289,23 +289,26 @@ def migrate_cards(
 
         def update_aggregations(aggregations, source_field_mapping, target_field_mapping):
             """
-            Update field references within the aggregations array.
+            Update field references within the aggregations array, including in aggregation-options.
             """
             for i, aggregation in enumerate(aggregations):
                 if isinstance(aggregation, list):
-                    # Check if this is a field reference in an aggregation
+                    # Recursively process nested structures in aggregation-options
                     for j, item in enumerate(aggregation):
                         if isinstance(item, list) and item[0] == "field" and isinstance(item[1], int):
+                            # This is a field reference
                             source_field_id = item[1]
                             source_field_name = source_field_mapping.get(source_field_id, {}).get("name")
                             if source_field_name:
+                                # Look up target field ID by field name
                                 target_field_id = next(
                                     (field_id for field_id, field_data in target_field_mapping.items()
                                      if field_data["name"] == source_field_name),
-                                    source_field_id  # Default to the original ID if no match
+                                    source_field_id  # Default to original if not found
                                 )
                                 aggregation[j][1] = target_field_id
-                        elif isinstance(item, list):  # Handle nested aggregation-options
+                        elif isinstance(item, list):
+                            # Recurse into nested aggregations
                             update_aggregations([item], source_field_mapping, target_field_mapping)
 
 
