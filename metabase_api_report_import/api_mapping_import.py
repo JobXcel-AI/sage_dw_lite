@@ -322,6 +322,27 @@ def migrate_cards(
                 logger.warning(f"Field or table name missing for source field ID {source_field_id}.")
                 return source_field_id
 
+        def update_aggregation_options(aggregation_options, source_field_mapping, target_field_mapping):
+            """
+            Update field references within aggregation-options, including "default" fields.
+            """
+            if isinstance(aggregation_options, list):
+                for i, option in enumerate(aggregation_options):
+                    if isinstance(option, list):
+                        # Recursively handle nested structures
+                        update_aggregation_options(option, source_field_mapping, target_field_mapping)
+                    elif option == "field" and i + 1 < len(aggregation_options):
+                        # Map the field ID
+                        if isinstance(aggregation_options[i + 1], int):
+                            source_field_id = aggregation_options[i + 1]
+                            aggregation_options[i + 1] = map_field_id(source_field_id, source_field_mapping, target_field_mapping)
+                    elif isinstance(option, dict) and "default" in option:
+                        # Handle "default" field
+                        default_value = option["default"]
+                        if isinstance(default_value, list) and default_value[0] == "field" and isinstance(default_value[1], int):
+                            source_field_id = default_value[1]
+                            option["default"][1] = map_field_id(source_field_id, source_field_mapping, target_field_mapping)
+
         def update_aggregations(aggregations, source_field_mapping, target_field_mapping):
             """
             Update field references within the aggregations array, including in aggregation-options.
@@ -332,25 +353,14 @@ def migrate_cards(
                         if isinstance(item, list):
                             # Handle nested structures or aggregation-options
                             update_aggregations([item], source_field_mapping, target_field_mapping)
-                        elif item == "field":
-                            # Ensure there is a next index and it's valid
-                            if i + 1 < len(aggregation):
-                                if isinstance(aggregation[i + 1], int):
-                                    aggregation[i + 1] = map_field_id(aggregation[i + 1], source_field_mapping, target_field_mapping)
-                                else:
-                                    logger.warning(f"Unexpected type at aggregation[{i + 1}]: {type(aggregation[i + 1])}")
-                            else:
-                                # Log a warning if the next index is out of bounds
-                                logger.warning(f"Index {i + 1} is out of bounds for aggregation: {aggregation}")
-                elif isinstance(aggregation, dict):
-                    # Check for "default" in aggregation-options and update it
-                    if "default" in aggregation:
-                        default_field = aggregation["default"]
-                        if isinstance(default_field, list) and len(default_field) > 1 and default_field[0] == "field":
-                            if isinstance(default_field[1], int):
-                                default_field[1] = map_field_id(default_field[1], source_field_mapping, target_field_mapping)
-                            else:
-                                logger.warning(f"Unexpected type for 'default' field ID: {type(default_field[1])}")
+                        elif item == "field" and i + 1 < len(aggregation):
+                            # Map the field ID
+                            if isinstance(aggregation[i + 1], int):
+                                source_field_id = aggregation[i + 1]
+                                aggregation[i + 1] = map_field_id(source_field_id, source_field_mapping, target_field_mapping)
+                        elif isinstance(item, dict) and "default" in item:
+                            # Handle "default" field in aggregation-options
+                            update_aggregation_options([item], source_field_mapping, target_field_mapping)
 
         def update_field_ref(field_ref, source_field_mapping, target_field_mapping):
             if isinstance(field_ref, list):

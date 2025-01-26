@@ -2,7 +2,7 @@
   "cache_invalidated_at": null,
   "description": null,
   "archived": false,
-  "view_count": 206,
+  "view_count": 207,
   "collection_position": null,
   "table_id": 23,
   "can_run_adhoc_query": true,
@@ -682,7 +682,7 @@
                 {
                   "default": [
                     "field",
-                    23821,
+                    288,
                     {
                       "base-type": "type/Decimal"
                     }
@@ -712,7 +712,7 @@
                 {
                   "default": [
                     "field",
-                    23817,
+                    284,
                     {
                       "base-type": "type/Decimal"
                     }
