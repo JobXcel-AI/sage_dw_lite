@@ -2,7 +2,7 @@
   "cache_invalidated_at": null,
   "description": null,
   "archived": false,
-  "view_count": 335,
+  "view_count": 336,
   "collection_position": null,
   "table_id": 23,
   "can_run_adhoc_query": true,
@@ -1052,28 +1052,28 @@
           "breakout": [
             [
               "field",
-              23838,
+              305,
               {
                 "base-type": "type/Text"
               }
             ],
             [
               "field",
-              23834,
+              103,
               {
                 "base-type": "type/Text"
               }
             ],
             [
               "field",
-              23779,
+              104,
               {
                 "base-type": "type/BigInteger"
               }
             ],
             [
               "field",
-              23797,
+              264,
               {
                 "base-type": "type/Date",
                 "temporal-unit": "day"
@@ -1081,7 +1081,7 @@
             ],
             [
               "field",
-              23825,
+              292,
               {
                 "base-type": "type/Date",
                 "temporal-unit": "day"

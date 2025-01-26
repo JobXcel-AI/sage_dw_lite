@@ -225,6 +225,29 @@ def migrate_cards(
         if source_collection_id and source_collection_id in collection_mapping:
             updated_card["collection_id"] = collection_mapping[source_collection_id]
 
+        def update_condition(condition, source_field_mapping, target_field_mapping):
+            """
+            Updates field references within a condition array.
+            """
+            if isinstance(condition, list):
+                for i, item in enumerate(condition):
+                    if isinstance(item, list) and len(item) > 1:
+                        # Check if this is a field reference
+                        if item[0] == "field" and isinstance(item[1], int):  # If the second item is a field ID
+                            source_field_id = item[1]
+                            source_field_name = source_field_mapping.get(source_field_id, {}).get("name")
+                            if source_field_name:
+                                target_field_id = next(
+                                    (field_id for field_id, field_data in target_field_mapping.items()
+                                     if field_data["name"] == source_field_name),
+                                    source_field_id  # Default to the original ID if no match
+                                )
+                                condition[i][1] = target_field_id  # Replace with target field ID
+                        elif isinstance(item, list):  # Recurse into nested conditions
+                            update_condition(item, source_field_mapping, target_field_mapping)
+
+            return condition
+
         def update_query_recursively(query, is_top_level=True):
             if isinstance(query, dict):
                 # Process "source-table"
@@ -272,13 +295,24 @@ def migrate_cards(
                 # Process "breakout"
                 if "breakout" in query:
                     for breakout in query["breakout"]:
-                        # Validate that breakout[1] is a list or another updatable structure
-                        if isinstance(breakout, list) and len(breakout) > 1 and isinstance(breakout[1], (list, int)):
-                            if isinstance(breakout[1], list):
+                        if isinstance(breakout, list) and len(breakout) > 1:
+                            if isinstance(breakout[1], int):  # Process field ID in breakout
+                                source_field_id = breakout[1]
+                                source_field_name = source_field_mapping.get(source_field_id, {}).get("name")
+                                if source_field_name:
+                                    target_field_id = next(
+                                        (field_id for field_id, field_data in target_field_mapping.items()
+                                         if field_data["name"] == source_field_name),
+                                        source_field_id  # Default to the original ID if no match
+                                    )
+                                    breakout[1] = target_field_id
+                            elif isinstance(breakout[1], list):  # Handle nested field refs
                                 breakout[1] = update_field_ref(breakout[1], source_field_mapping, target_field_mapping)
-                            else:
-                                # Handle cases where breakout[1] is not updatable
-                                logger.debug(f"Skipping update for breakout[1]: {breakout[1]} (not a list)")
+
+                # Process "condition"
+                if "condition" in query:
+                    query["condition"] = update_condition(query["condition"], source_field_mapping, target_field_mapping)
+
 
                 # If we are at the top level, process `dataset_query` specifically
                 if is_top_level and "dataset_query" in query:
