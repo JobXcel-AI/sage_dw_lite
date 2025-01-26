@@ -2,7 +2,7 @@
   "cache_invalidated_at": null,
   "description": null,
   "archived": false,
-  "view_count": 351,
+  "view_count": 354,
   "collection_position": null,
   "table_id": 23,
   "can_run_adhoc_query": true,
@@ -868,7 +868,7 @@
                 "sum",
                 [
                   "field",
-                  23893,
+                  217,
                   {
                     "base-type": "type/Decimal",
                     "join-alias": "Job Cost - Job Number"
@@ -940,7 +940,7 @@
                 "sum",
                 [
                   "field",
-                  23893,
+                  217,
                   {
                     "base-type": "type/Decimal",
                     "join-alias": "Job Cost - Job Number"
@@ -973,7 +973,7 @@
                   "sum",
                   [
                     "field",
-                    23893,
+                    217,
                     {
                       "base-type": "type/Decimal",
                       "join-alias": "Job Cost - Job Number"
@@ -1147,7 +1147,7 @@
                   "sum",
                   [
                     "field",
-                    23823,
+                    290,
                     {
                       "base-type": "type/Decimal"
                     }
@@ -1157,7 +1157,7 @@
                   "sum",
                   [
                     "field",
-                    23791,
+                    258,
                     {
                       "base-type": "type/Decimal"
                     }
