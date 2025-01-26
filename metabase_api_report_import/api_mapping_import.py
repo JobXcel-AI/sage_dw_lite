@@ -289,6 +289,35 @@ def migrate_cards(
 
             return condition
 
+        def map_field_id(source_field_id, source_field_mapping, target_field_mapping):
+            """
+            Map a source field ID to a target field ID using source and target field mappings.
+
+            :param source_field_id: The source field ID to map.
+            :param source_field_mapping: Dictionary of source field mappings.
+            :param target_field_mapping: Dictionary of target field mappings.
+            :return: Mapped target field ID or the original source field ID if no match is found.
+            """
+            source_field_name = source_field_mapping.get(source_field_id, {}).get("name")
+            source_table_name = source_field_mapping.get(source_field_id, {}).get("table_name")
+
+            if source_field_name and source_table_name:
+                # Map source field and table names to target field ID
+                target_field_id = next(
+                    (
+                        field_id for field_id, field_data in target_field_mapping.items()
+                        if field_data["name"] == source_field_name and
+                           field_data.get("table_name", "").lower() == source_table_name.lower()
+                    ),
+                    source_field_id  # Default to original if no match
+                )
+                return target_field_id
+            else:
+                # Log a warning if the source field name or table name is missing
+                logger.warning(f"Field or table name missing for source field ID {source_field_id}.")
+                return source_field_id
+
+
         def update_aggregations(aggregations, source_field_mapping, target_field_mapping):
             """
             Update field references within the aggregations array, including in aggregation-options.
@@ -299,50 +328,25 @@ def migrate_cards(
                         if isinstance(item, list):
                             # Handle nested structures or aggregation-options
                             update_aggregations([item], source_field_mapping, target_field_mapping)
-                        elif item == "field" and i + 1 < len(aggregation):
-                            # Ensure the next index exists and is an integer (field ID)
-                            if isinstance(aggregation[i + 1], int):
-                                source_field_id = aggregation[i + 1]
-                                source_field_name = source_field_mapping.get(source_field_id, {}).get("name")
-                                source_table_name = source_field_mapping.get(source_field_id, {}).get("table_name")
-
-                                if source_field_name and source_table_name:
-                                    # Ensure the table name exists in the target mapping
-                                    target_field_id = next(
-                                        (
-                                            field_id for field_id, field_data in target_field_mapping.items()
-                                            if field_data["name"] == source_field_name and
-                                               field_data.get("table_name", "").lower() == source_table_name.lower()
-                                        ),
-                                        source_field_id  # Default to original if no match
-                                    )
-                                aggregation[i + 1] = target_field_id
+                        elif item == "field":
+                            # Ensure there is a next index and it's valid
+                            if i + 1 < len(aggregation):
+                                if isinstance(aggregation[i + 1], int):
+                                    aggregation[i + 1] = map_field_id(aggregation[i + 1], source_field_mapping, target_field_mapping)
+                                else:
+                                    logger.warning(f"Unexpected type at aggregation[{i + 1}]: {type(aggregation[i + 1])}")
+                            else:
+                                # Log a warning if the next index is out of bounds
+                                logger.warning(f"Index {i + 1} is out of bounds for aggregation: {aggregation}")
 
         def update_field_ref(field_ref, source_field_mapping, target_field_mapping):
             if isinstance(field_ref, list):
                 if len(field_ref) > 1 and isinstance(field_ref[1], int):
                     # Look up the source field name using the field ID
-                    source_field_id = field_ref[1]
-                    source_field_name = source_field_mapping.get(source_field_id, {}).get("name")
-
-                    if source_field_name:
-                        # Find the target field ID using the field name
-                        target_field_id = next(
-                            (field_id for field_id, field_data in target_field_mapping.items()
-                             if field_data["name"] == source_field_name),
-                            None
-                        )
-                        if target_field_id:
-                            field_ref[1] = target_field_id
+                    field_ref[1]  = map_field_id(field_ref[1], source_field_mapping, target_field_mapping)
             elif isinstance(field_ref, int):
                 # Handle cases where field_ref is a simple integer (field ID)
-                source_field_name = source_field_mapping.get(field_ref, {}).get("name")
-                if source_field_name:
-                    field_ref = next(
-                        (field_id for field_id, field_data in target_field_mapping.items()
-                         if field_data["name"] == source_field_name),
-                        field_ref
-                    )
+                field_ref = map_field_id(field_ref, source_field_mapping, target_field_mapping)
             return field_ref
 
         def update_query_recursively(query, is_top_level=True):
@@ -389,15 +393,7 @@ def migrate_cards(
                     for breakout in query["breakout"]:
                         if isinstance(breakout, list) and len(breakout) > 1:
                             if isinstance(breakout[1], int):  # Process field ID in breakout
-                                source_field_id = breakout[1]
-                                source_field_name = source_field_mapping.get(source_field_id, {}).get("name")
-                                if source_field_name:
-                                    target_field_id = next(
-                                        (field_id for field_id, field_data in target_field_mapping.items()
-                                         if field_data["name"] == source_field_name),
-                                        source_field_id  # Default to the original ID if no match
-                                    )
-                                    breakout[1] = target_field_id
+                                breakout[1] = map_field_id(breakout[1], source_field_mapping, target_field_mapping)
                             elif isinstance(breakout[1], list):  # Handle nested field refs
                                 breakout[1] = update_field_ref(breakout[1], source_field_mapping, target_field_mapping)
 

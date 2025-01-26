@@ -1,3334 +1,1373 @@
 {
-  23587: {
-    'name': 'created_date',
-    'table_id': 1064
-  },
-  23588: {
-    'name': 'is_deleted',
-    'table_id': 1064
-  },
-  23589: {
-    'name': 'quantity_available',
-    'table_id': 1064
-  },
-  23590: {
-    'name': 'unit',
-    'table_id': 1064
-  },
-  23591: {
-    'name': 'msds_number',
-    'table_id': 1064
-  },
-  23592: {
-    'name': 'alpha_part_number',
-    'table_id': 1064
-  },
-  23593: {
-    'name': 'location',
-    'table_id': 1064
-  },
-  23594: {
-    'name': 'default_location',
-    'table_id': 1064
-  },
-  23595: {
-    'name': 'bin_number',
-    'table_id': 1064
-  },
-  23596: {
-    'name': 'last_updated_date',
-    'table_id': 1064
-  },
-  23597: {
-    'name': 'part_number',
-    'table_id': 1064
-  },
-  23598: {
-    'name': 'quantity_on_hand',
-    'table_id': 1064
-  },
-  23599: {
-    'name': 'part_notes',
-    'table_id': 1064
-  },
-  23600: {
-    'name': 'cost_type',
-    'table_id': 1064
-  },
-  23601: {
-    'name': 'description',
-    'table_id': 1064
-  },
-  23602: {
-    'name': 'last_updated',
-    'table_id': 1064
-  },
-  23603: {
-    'name': 'manufacturer',
-    'table_id': 1064
-  },
-  23604: {
-    'name': 'deleted_date',
-    'table_id': 1064
-  },
-  23605: {
-    'name': 'cost_code',
-    'table_id': 1064
-  },
-  23606: {
-    'name': 'manufacturer_part_number',
-    'table_id': 1064
-  },
-  23607: {
-    'name': 'gross_pay',
-    'table_id': 1065
-  },
-  23608: {
-    'name': 'created_date',
-    'table_id': 1065
-  },
-  23609: {
-    'name': 'period_end',
-    'table_id': 1065
-  },
-  23610: {
-    'name': 'comp_code',
-    'table_id': 1065
-  },
-  23611: {
-    'name': 'deducts',
-    'table_id': 1065
-  },
-  23612: {
-    'name': 'premium_pay',
-    'table_id': 1065
-  },
-  23613: {
-    'name': 'payroll_type',
-    'table_id': 1065
-  },
-  23614: {
-    'name': 'premium_hours',
-    'table_id': 1065
-  },
-  23615: {
-    'name': 'is_deleted',
-    'table_id': 1065
-  },
-  23616: {
-    'name': 'sick_pay',
-    'table_id': 1065
-  },
-  23617: {
-    'name': 'check_date',
-    'table_id': 1065
-  },
-  23618: {
-    'name': 'timecard_regular_hours',
-    'table_id': 1065
-  },
-  23619: {
-    'name': 'payroll_record_id',
-    'table_id': 1065
-  },
-  23620: {
-    'name': 'netpay',
-    'table_id': 1065
-  },
-  23621: {
-    'name': 'holiday_hours',
-    'table_id': 1065
-  },
-  23622: {
-    'name': 'regular_pay',
-    'table_id': 1065
-  },
-  23623: {
-    'name': 'comp_gross',
-    'table_id': 1065
-  },
-  23624: {
-    'name': 'total_hours',
-    'table_id': 1065
-  },
-  23625: {
-    'name': 'vacation_hours',
-    'table_id': 1065
-  },
-  23626: {
-    'name': 'additions',
-    'table_id': 1065
-  },
-  23627: {
-    'name': 'per_diem',
-    'table_id': 1065
-  },
-  23628: {
-    'name': 'timecard_overtime_hours',
-    'table_id': 1065
-  },
-  23629: {
-    'name': 'comp_wage',
-    'table_id': 1065
-  },
-  23630: {
-    'name': 'sick_hours',
-    'table_id': 1065
-  },
-  23631: {
-    'name': 'deleted_date',
-    'table_id': 1065
-  },
-  23632: {
-    'name': 'employee_status',
-    'table_id': 1065
-  },
-  23633: {
-    'name': 'piece_pay',
-    'table_id': 1065
-  },
-  23634: {
-    'name': 'payroll_status',
-    'table_id': 1065
-  },
-  23635: {
-    'name': 'overtime_hours',
-    'table_id': 1065
-  },
-  23636: {
-    'name': 'holiday_pay',
-    'table_id': 1065
-  },
-  23637: {
-    'name': 'comp_type',
-    'table_id': 1065
-  },
-  23638: {
-    'name': 'timecard_premium_hours',
-    'table_id': 1065
-  },
-  23639: {
-    'name': 'regular_hours',
-    'table_id': 1065
-  },
-  23640: {
-    'name': 'overtime_pay',
-    'table_id': 1065
-  },
-  23641: {
-    'name': 'vacation_pay',
-    'table_id': 1065
-  },
-  23642: {
-    'name': 'period_start',
-    'table_id': 1065
-  },
-  23643: {
-    'name': 'check_number',
-    'table_id': 1065
-  },
-  23644: {
-    'name': 'last_updated_date',
-    'table_id': 1065
-  },
-  23645: {
-    'name': 'employee_id',
-    'table_id': 1065
-  },
-  23646: {
-    'name': 'employee_full_name',
-    'table_id': 1065
-  },
-  23647: {
-    'name': 'misc_pay',
-    'table_id': 1065
-  },
-  23648: {
-    'name': 'change_order_open_date',
-    'table_id': 1066
-  },
-  23649: {
-    'name': 'job_number',
-    'table_id': 1066
-  },
-  23650: {
-    'name': 'record_number',
-    'table_id': 1066
-  },
-  23651: {
-    'name': 'job_type',
-    'table_id': 1067
-  },
-  23652: {
-    'name': 'cost_code_name',
-    'table_id': 1067
-  },
-  23653: {
-    'name': 'equipment_name_repaired',
-    'table_id': 1067
-  },
-  23654: {
-    'name': 'job_phase_name',
-    'table_id': 1067
-  },
-  23655: {
-    'name': 'job_status_number',
-    'table_id': 1067
-  },
-  23656: {
-    'name': 'comp_code',
-    'table_id': 1067
-  },
-  23657: {
-    'name': 'client_name',
-    'table_id': 1067
-  },
-  23658: {
-    'name': 'pay_type_number',
-    'table_id': 1067
-  },
-  23659: {
-    'name': 'pay_rate',
-    'table_id': 1067
-  },
-  23660: {
-    'name': 'service_order_invoice_number',
-    'table_id': 1067
-  },
-  23661: {
-    'name': 'payroll_record_id',
-    'table_id': 1067
-  },
-  23662: {
-    'name': 'employee_status',
-    'table_id': 1067
-  },
-  23663: {
-    'name': 'check_date',
-    'table_id': 1067
-  },
-  23664: {
-    'name': 'job_number',
-    'table_id': 1067
-  },
-  23665: {
-    'name': 'timecard_line_number',
-    'table_id': 1067
-  },
-  23666: {
-    'name': 'pay_type_name',
-    'table_id': 1067
-  },
-  23667: {
-    'name': 'job_phase_number',
-    'table_id': 1067
-  },
-  23668: {
-    'name': 'pay_group_name',
-    'table_id': 1067
-  },
-  23669: {
-    'name': 'cost_code_number',
-    'table_id': 1067
-  },
-  23670: {
-    'name': 'job_status',
-    'table_id': 1067
-  },
-  23671: {
-    'name': 'description',
-    'table_id': 1067
-  },
-  23672: {
-    'name': 'equipment_number_repaired',
-    'table_id': 1067
-  },
-  23673: {
-    'name': 'employee_full_name',
-    'table_id': 1067
-  },
-  23674: {
-    'name': 'pay_group_number',
-    'table_id': 1067
-  },
-  23675: {
-    'name': 'service_order_number',
-    'table_id': 1067
-  },
-  23676: {
-    'name': 'period_end',
-    'table_id': 1067
-  },
-  23677: {
-    'name': 'client_id',
-    'table_id': 1067
-  },
-  23678: {
-    'name': 'check_number',
-    'table_id': 1067
-  },
-  23679: {
-    'name': 'is_deleted',
-    'table_id': 1067
-  },
-  23680: {
-    'name': 'deleted_date',
-    'table_id': 1067
-  },
-  23681: {
-    'name': 'hours_worked',
-    'table_id': 1067
-  },
-  23682: {
-    'name': 'period_start',
-    'table_id': 1067
-  },
-  23683: {
-    'name': 'job_name',
-    'table_id': 1067
-  },
-  23684: {
-    'name': 'date_worked',
-    'table_id': 1067
-  },
-  23685: {
-    'name': 'department_name',
-    'table_id': 1067
-  },
-  23686: {
-    'name': 'day_worked',
-    'table_id': 1067
-  },
-  23687: {
-    'name': 'employee_id',
-    'table_id': 1067
-  },
-  23688: {
-    'name': 'workers_compensation_name',
-    'table_id': 1067
-  },
-  23689: {
-    'name': 'department_id',
-    'table_id': 1067
-  },
-  23690: {
-    'name': 'purchase_order_type',
-    'table_id': 1068
-  },
-  23691: {
-    'name': 'equipment',
-    'table_id': 1068
-  },
-  23692: {
-    'name': 'job_number',
-    'table_id': 1068
-  },
-  23693: {
-    'name': 'vendor_name',
-    'table_id': 1068
-  },
-  23694: {
-    'name': 'vendor_id',
-    'table_id': 1068
-  },
-  23695: {
-    'name': 'vendor_account_number',
-    'table_id': 1068
-  },
-  23696: {
-    'name': 'purchase_order_description',
-    'table_id': 1068
-  },
-  23697: {
-    'name': 'last_updated_date',
-    'table_id': 1068
-  },
-  23698: {
-    'name': 'hot_list',
-    'table_id': 1068
-  },
-  23699: {
-    'name': 'total',
-    'table_id': 1068
-  },
-  23700: {
-    'name': 'sales_tax',
-    'table_id': 1068
-  },
-  23701: {
-    'name': 'is_deleted',
-    'table_id': 1068
-  },
-  23702: {
-    'name': 'created_date',
-    'table_id': 1068
-  },
-  23703: {
-    'name': 'subtotal',
-    'table_id': 1068
-  },
-  23704: {
-    'name': 'balance',
-    'table_id': 1068
-  },
-  23705: {
-    'name': 'purchase_order_id',
-    'table_id': 1068
-  },
-  23706: {
-    'name': 'vendor_type',
-    'table_id': 1068
-  },
-  23707: {
-    'name': 'delivery_via',
-    'table_id': 1068
-  },
-  23708: {
-    'name': 'canceled',
-    'table_id': 1068
-  },
-  23709: {
-    'name': 'purchase_order_number',
-    'table_id': 1068
-  },
-  23710: {
-    'name': 'vendor_phone_number',
-    'table_id': 1068
-  },
-  23711: {
-    'name': 'vendor_email',
-    'table_id': 1068
-  },
-  23712: {
-    'name': 'received',
-    'table_id': 1068
-  },
-  23713: {
-    'name': 'deleted_date',
-    'table_id': 1068
-  },
-  23714: {
-    'name': 'purchase_order_status',
-    'table_id': 1068
-  },
-  23715: {
-    'name': 'delivery_date',
-    'table_id': 1068
-  },
-  23716: {
-    'name': 'current_value',
-    'table_id': 1068
-  },
-  23717: {
-    'name': 'purchase_order_date',
-    'table_id': 1068
-  },
-  23718: {
-    'name': 'created_date',
-    'table_id': 1069
-  },
-  23719: {
-    'name': 'entered_date',
-    'table_id': 1069
-  },
-  23720: {
-    'name': 'work_in_progress_variance',
-    'table_id': 1069
-  },
-  23721: {
-    'name': 'ledger_account_id',
-    'table_id': 1069
-  },
-  23722: {
-    'name': 'ledger_transaction_description',
-    'table_id': 1069
-  },
-  23723: {
-    'name': 'transaction_number',
-    'table_id': 1069
-  },
-  23724: {
-    'name': 'ledger_account_name',
-    'table_id': 1069
-  },
-  23725: {
-    'name': 'vendor_name',
-    'table_id': 1069
-  },
-  23726: {
-    'name': 'is_deleted',
-    'table_id': 1069
-  },
-  23727: {
-    'name': 'ledger_transaction_id',
-    'table_id': 1069
-  },
-  23728: {
-    'name': 'job_cost',
-    'table_id': 1069
-  },
-  23729: {
-    'name': 'deleted_date',
-    'table_id': 1069
-  },
-  23730: {
-    'name': 'debit_amount',
-    'table_id': 1069
-  },
-  23731: {
-    'name': 'equip_cost',
-    'table_id': 1069
-  },
-  23732: {
-    'name': 'purchase_order_number',
-    'table_id': 1069
-  },
-  23733: {
-    'name': 'credit_amount',
-    'table_id': 1069
-  },
-  23734: {
-    'name': 'posting_year',
-    'table_id': 1069
-  },
-  23735: {
-    'name': 'equipment_variance',
-    'table_id': 1069
-  },
-  23736: {
-    'name': 'check_amount',
-    'table_id': 1069
-  },
-  23737: {
-    'name': 'last_updated_date',
-    'table_id': 1069
-  },
-  23738: {
-    'name': 'month_id',
-    'table_id': 1069
-  },
-  23739: {
-    'name': 'transaction_date',
-    'table_id': 1069
-  },
-  23740: {
-    'name': 'job_variance',
-    'table_id': 1069
-  },
-  23741: {
-    'name': 'source_name',
-    'table_id': 1069
-  },
-  23742: {
-    'name': 'change_order_number',
-    'table_id': 1070
-  },
-  23743: {
-    'name': 'created_date',
-    'table_id': 1070
-  },
-  23744: {
-    'name': 'approved_amount',
-    'table_id': 1070
-  },
-  23745: {
-    'name': 'invoice_date',
-    'table_id': 1070
-  },
-  23746: {
-    'name': 'approved_date',
-    'table_id': 1070
-  },
-  23747: {
-    'name': 'last_updated_date',
-    'table_id': 1070
-  },
-  23748: {
-    'name': 'status_number',
-    'table_id': 1070
-  },
-  23749: {
-    'name': 'deleted_date',
-    'table_id': 1070
-  },
-  23750: {
-    'name': 'is_deleted',
-    'table_id': 1070
-  },
-  23751: {
-    'name': 'overhead_amount',
-    'table_id': 1070
-  },
-  23752: {
-    'name': 'requested_amount',
-    'table_id': 1070
-  },
-  23753: {
-    'name': 'job_phase_number',
-    'table_id': 1070
-  },
-  23754: {
-    'name': 'change_type',
-    'table_id': 1070
-  },
-  23755: {
-    'name': 'purchase_order_number',
-    'table_id': 1070
-  },
-  23756: {
-    'name': 'change_order_date',
-    'table_id': 1070
-  },
-  23757: {
-    'name': 'submitted_date',
-    'table_id': 1070
-  },
-  23758: {
-    'name': 'change_order_description',
-    'table_id': 1070
-  },
-  23759: {
-    'name': 'reason',
-    'table_id': 1070
-  },
-  23760: {
-    'name': 'change_order_id',
-    'table_id': 1070
-  },
-  23761: {
-    'name': 'job_name',
-    'table_id': 1070
-  },
-  23762: {
-    'name': 'status',
-    'table_id': 1070
-  },
-  23763: {
-    'name': 'job_number',
-    'table_id': 1070
-  },
-  23764: {
-    'name': 'valid_from_date',
-    'table_id': 1071
-  },
-  23765: {
-    'name': 'valid_to_date',
-    'table_id': 1071
-  },
-  23766: {
-    'name': 'job_status',
-    'table_id': 1071
-  },
-  23767: {
-    'name': 'job_number',
-    'table_id': 1071
-  },
-  23768: {
-    'name': 'job_status_number',
-    'table_id': 1071
-  },
-  23769: {
-    'name': 'waterfall_category',
-    'table_id': 1072
-  },
-  23770: {
-    'name': 'waterfall_value',
-    'table_id': 1072
-  },
-  23771: {
-    'name': 'job_number',
-    'table_id': 1072
-  },
-  23772: {
-    'name': 'cost_code',
-    'table_id': 1073
-  },
-  23773: {
-    'name': 'cost_code_name',
-    'table_id': 1073
-  },
-  23774: {
-    'name': 'cost_type',
-    'table_id': 1073
-  },
-  23775: {
-    'name': 'budget',
-    'table_id': 1073
-  },
-  23776: {
-    'name': 'job_number',
-    'table_id': 1073
-  },
-  23777: {
-    'name': 'last_date_worked',
-    'table_id': 1074
-  },
-  23778: {
-    'name': 'plans_received_date',
-    'table_id': 1074
-  },
-  23779: {
-    'name': 'job_number',
-    'table_id': 1074
-  },
-  23780: {
-    'name': 'retention',
-    'table_id': 1074
-  },
-  23781: {
-    'name': 'supervisor',
-    'table_id': 1074
-  },
-  23782: {
-    'name': 'salesperson_id',
-    'table_id': 1074
-  },
-  23783: {
-    'name': 'estimator_id',
-    'table_id': 1074
-  },
-  23784: {
-    'name': 'address2',
-    'table_id': 1074
-  },
-  23785: {
-    'name': 'takeoff_profit_amount_excl_labor',
-    'table_id': 1074
-  },
-  23786: {
-    'name': 'bid_completed_date',
-    'table_id': 1074
-  },
-  23787: {
-    'name': 'created_date',
-    'table_id': 1074
-  },
-  23788: {
-    'name': 'invoice_balance',
-    'table_id': 1074
-  },
-  23789: {
-    'name': 'estimated_gross_profit',
-    'table_id': 1074
-  },
-  23790: {
-    'name': 'contract_signed_date',
-    'table_id': 1074
-  },
-  23791: {
-    'name': 'total_budget_amount',
-    'table_id': 1074
-  },
-  23792: {
-    'name': 'contact',
-    'table_id': 1074
-  },
-  23793: {
-    'name': 'takeoff_ext_cost',
-    'table_id': 1074
-  },
-  23794: {
-    'name': 'last_payment_received_date',
-    'table_id': 1074
-  },
-  23795: {
-    'name': 'takeoff_sales_tax',
-    'table_id': 1074
-  },
-  23796: {
-    'name': 'original_budget_amount',
-    'table_id': 1074
-  },
-  23797: {
-    'name': 'project_complete_date',
-    'table_id': 1074
-  },
-  23798: {
-    'name': 'job_contact_phone_number',
-    'table_id': 1074
-  },
-  23799: {
-    'name': 'invoice_amount_paid',
-    'table_id': 1074
-  },
-  23800: {
-    'name': 'last_updated_date',
-    'table_id': 1074
-  },
-  23801: {
-    'name': 'estimator',
-    'table_id': 1074
-  },
-  23802: {
-    'name': 'job_status_number',
-    'table_id': 1074
-  },
-  23803: {
-    'name': 'takeoff_sales_tax_excl_labor',
-    'table_id': 1074
-  },
-  23804: {
-    'name': 'pre_lien_filed_date',
-    'table_id': 1074
-  },
-  23805: {
-    'name': 'invoice_billed',
-    'table_id': 1074
-  },
-  23806: {
-    'name': 'material_cost',
-    'table_id': 1074
-  },
-  23807: {
-    'name': 'other_cost',
-    'table_id': 1074
-  },
-  23808: {
-    'name': 'takeoff_profit_amount',
-    'table_id': 1074
-  },
-  23809: {
-    'name': 'deleted_date',
-    'table_id': 1074
-  },
-  23810: {
-    'name': 'phone_number',
-    'table_id': 1074
-  },
-  23811: {
-    'name': 'labor_cost',
-    'table_id': 1074
-  },
-  23812: {
-    'name': 'lien_release_date',
-    'table_id': 1074
-  },
-  23813: {
-    'name': 'takeoff_overhead_amount',
-    'table_id': 1074
-  },
-  23814: {
-    'name': 'address1',
-    'table_id': 1074
-  },
-  23815: {
-    'name': 'takeoff_overhead_amount_excl_labor',
-    'table_id': 1074
-  },
-  23816: {
-    'name': 'client_name',
-    'table_id': 1074
-  },
-  23817: {
-    'name': 'invoice_sales_tax',
-    'table_id': 1074
-  },
-  23818: {
-    'name': 'invoice_net_due',
-    'table_id': 1074
-  },
-  23819: {
-    'name': 'takeoff_ext_cost_excl_labor',
-    'table_id': 1074
-  },
-  23820: {
-    'name': 'bid_opening_date',
-    'table_id': 1074
-  },
-  23821: {
-    'name': 'invoice_total',
-    'table_id': 1074
-  },
-  23822: {
-    'name': 'client_id',
-    'table_id': 1074
-  },
-  23823: {
-    'name': 'total_contract_amount',
-    'table_id': 1074
-  },
-  23824: {
-    'name': 'is_deleted',
-    'table_id': 1074
-  },
-  23825: {
-    'name': 'project_start_date',
-    'table_id': 1074
-  },
-  23826: {
-    'name': 'job_name',
-    'table_id': 1074
-  },
-  23827: {
-    'name': 'supervisor_id',
-    'table_id': 1074
-  },
-  23828: {
-    'name': 'takeoff_ext_price_excl_labor',
-    'table_id': 1074
-  },
-  23829: {
-    'name': 'city',
-    'table_id': 1074
-  },
-  23830: {
-    'name': 'job_type',
-    'table_id': 1074
-  },
-  23831: {
-    'name': 'job_cost_overhead',
-    'table_id': 1074
-  },
-  23832: {
-    'name': 'change_order_approved_amount',
-    'table_id': 1074
-  },
-  23833: {
-    'name': 'salesperson',
-    'table_id': 1074
-  },
-  23834: {
-    'name': 'job_status',
-    'table_id': 1074
-  },
-  23835: {
-    'name': 'equipment_cost',
-    'table_id': 1074
-  },
-  23836: {
-    'name': 'takeoff_ext_price',
-    'table_id': 1074
-  },
-  23837: {
-    'name': 'zip_code',
-    'table_id': 1074
-  },
-  23838: {
-    'name': 'job_number_job_name',
-    'table_id': 1074
-  },
-  23839: {
-    'name': 'first_date_worked',
-    'table_id': 1074
-  },
-  23840: {
-    'name': 'state',
-    'table_id': 1074
-  },
-  23841: {
-    'name': 'contract_amount',
-    'table_id': 1074
-  },
-  23842: {
-    'name': 'valid_to_date',
-    'table_id': 1075
-  },
-  23843: {
-    'name': 'change_order_status_number',
-    'table_id': 1075
-  },
-  23844: {
-    'name': 'job_number',
-    'table_id': 1075
-  },
-  23845: {
-    'name': 'change_order_status',
-    'table_id': 1075
-  },
-  23846: {
-    'name': 'valid_from_date',
-    'table_id': 1075
-  },
-  23847: {
-    'name': 'record_number',
-    'table_id': 1075
-  },
-  23848: {
-    'name': 'is_deleted',
-    'table_id': 1076
-  },
-  23849: {
-    'name': 'ar_invoice_tax_district',
-    'table_id': 1076
-  },
-  23850: {
-    'name': 'tax_entity2',
-    'table_id': 1076
-  },
-  23851: {
-    'name': 'ar_invoice_amount_paid',
-    'table_id': 1076
-  },
-  23852: {
-    'name': 'job_phone_number',
-    'table_id': 1076
-  },
-  23853: {
-    'name': 'job_name',
-    'table_id': 1076
-  },
-  23854: {
-    'name': 'ar_invoice_number',
-    'table_id': 1076
-  },
-  23855: {
-    'name': 'created_date',
-    'table_id': 1076
-  },
-  23856: {
-    'name': 'ar_invoice_payments_credit_taken',
-    'table_id': 1076
-  },
-  23857: {
-    'name': 'client_name',
-    'table_id': 1076
-  },
-  23858: {
-    'name': 'ar_invoice_balance',
-    'table_id': 1076
-  },
-  23859: {
-    'name': 'job_supervisor',
-    'table_id': 1076
-  },
-  23860: {
-    'name': 'job_type',
-    'table_id': 1076
-  },
-  23861: {
-    'name': 'job_notes',
-    'table_id': 1076
-  },
-  23862: {
-    'name': 'ar_invoice_due_date',
-    'table_id': 1076
-  },
-  23863: {
-    'name': 'last_payment_received_date',
-    'table_id': 1076
-  },
-  23864: {
-    'name': 'deleted_date',
-    'table_id': 1076
-  },
-  23865: {
-    'name': 'job_tax_district',
-    'table_id': 1076
-  },
-  23866: {
-    'name': 'job_zip_code',
-    'table_id': 1076
-  },
-  23867: {
-    'name': 'ar_invoice_payments_payment_amount',
-    'table_id': 1076
-  },
-  23868: {
-    'name': 'ar_invoice_sales_tax',
-    'table_id': 1076
-  },
-  23869: {
-    'name': 'tax_entity2_rate',
-    'table_id': 1076
-  },
-  23870: {
-    'name': 'last_updated_date',
-    'table_id': 1076
-  },
-  23871: {
-    'name': 'ar_invoice_id',
-    'table_id': 1076
-  },
-  23872: {
-    'name': 'job_city',
-    'table_id': 1076
-  },
-  23873: {
-    'name': 'last_date_worked',
-    'table_id': 1076
-  },
-  23874: {
-    'name': 'job_salesperson',
-    'table_id': 1076
-  },
-  23875: {
-    'name': 'ar_invoice_payments_discount_taken',
-    'table_id': 1076
-  },
-  23876: {
-    'name': 'job_state',
-    'table_id': 1076
-  },
-  23877: {
-    'name': 'tax_entity1',
-    'table_id': 1076
-  },
-  23878: {
-    'name': 'ar_invoice_date',
-    'table_id': 1076
-  },
-  23879: {
-    'name': 'job_status',
-    'table_id': 1076
-  },
-  23880: {
-    'name': 'job_number',
-    'table_id': 1076
-  },
-  23881: {
-    'name': 'tax_entity1_rate',
-    'table_id': 1076
-  },
-  23882: {
-    'name': 'job_address2',
-    'table_id': 1076
-  },
-  23883: {
-    'name': 'ar_invoice_description',
-    'table_id': 1076
-  },
-  23884: {
-    'name': 'ar_invoice_retention',
-    'table_id': 1076
-  },
-  23885: {
-    'name': 'ar_invoice_total',
-    'table_id': 1076
-  },
-  23886: {
-    'name': 'job_address1',
-    'table_id': 1076
-  },
-  23887: {
-    'name': 'ar_invoice_type',
-    'table_id': 1076
-  },
-  23888: {
-    'name': 'ar_invoice_status',
-    'table_id': 1076
-  },
-  23889: {
-    'name': 'work_order_number',
-    'table_id': 1077
-  },
-  23890: {
-    'name': 'job_cost_code_name',
-    'table_id': 1077
-  },
-  23891: {
-    'name': 'subcontract_cost',
-    'table_id': 1077
-  },
-  23892: {
-    'name': 'overhead_amount',
-    'table_id': 1077
-  },
-  23893: {
-    'name': 'cost_amount',
-    'table_id': 1077
-  },
-  23894: {
-    'name': 'cost_type',
-    'table_id': 1077
-  },
-  23895: {
-    'name': 'job_cost_code',
-    'table_id': 1077
-  },
-  23896: {
-    'name': 'material_cost',
-    'table_id': 1077
-  },
-  23897: {
-    'name': 'is_deleted',
-    'table_id': 1077
-  },
-  23898: {
-    'name': 'job_cost_description',
-    'table_id': 1077
-  },
-  23899: {
-    'name': 'job_number',
-    'table_id': 1077
-  },
-  23900: {
-    'name': 'labor_cost',
-    'table_id': 1077
-  },
-  23901: {
-    'name': 'created_date',
-    'table_id': 1077
-  },
-  23902: {
-    'name': 'equipment_cost',
-    'table_id': 1077
-  },
-  23903: {
-    'name': 'job_status',
-    'table_id': 1077
-  },
-  23904: {
-    'name': 'last_updated_date',
-    'table_id': 1077
-  },
-  23905: {
-    'name': 'job_cost_id',
-    'table_id': 1077
-  },
-  23906: {
-    'name': 'transaction_number',
-    'table_id': 1077
-  },
-  23907: {
-    'name': 'billing_amount',
-    'table_id': 1077
-  },
-  23908: {
-    'name': 'vendor_id',
-    'table_id': 1077
-  },
-  23909: {
-    'name': 'other_cost',
-    'table_id': 1077
-  },
-  23910: {
-    'name': 'job_name',
-    'table_id': 1077
-  },
-  23911: {
-    'name': 'vendor',
-    'table_id': 1077
-  },
-  23912: {
-    'name': 'job_cost_status',
-    'table_id': 1077
-  },
-  23913: {
-    'name': 'billing_quantity',
-    'table_id': 1077
-  },
-  23914: {
-    'name': 'job_cost_source',
-    'table_id': 1077
-  },
-  23915: {
-    'name': 'cost_in_hours',
-    'table_id': 1077
-  },
-  23916: {
-    'name': 'deleted_date',
-    'table_id': 1077
-  },
-  23917: {
-    'name': 'last_name',
-    'table_id': 1078
-  },
-  23918: {
-    'name': 'is_deleted',
-    'table_id': 1078
-  },
-  23919: {
-    'name': 'first_name',
-    'table_id': 1078
-  },
-  23920: {
-    'name': 'employee_status',
-    'table_id': 1078
-  },
-  23921: {
-    'name': 'zip_code',
-    'table_id': 1078
-  },
-  23922: {
-    'name': 'deleted_date',
-    'table_id': 1078
-  },
-  23923: {
-    'name': 'employee_id',
-    'table_id': 1078
-  },
-  23924: {
-    'name': 'last_updated_date',
-    'table_id': 1078
-  },
-  23925: {
-    'name': 'email',
-    'table_id': 1078
-  },
-  23926: {
-    'name': 'position',
-    'table_id': 1078
-  },
-  23927: {
-    'name': 'department',
-    'table_id': 1078
-  },
-  23928: {
-    'name': 'hire_date',
-    'table_id': 1078
-  },
-  23929: {
-    'name': 'city',
-    'table_id': 1078
-  },
-  23930: {
-    'name': 'phone_number',
-    'table_id': 1078
-  },
-  23931: {
-    'name': 'created_date',
-    'table_id': 1078
-  },
-  23932: {
-    'name': 'address1',
-    'table_id': 1078
-  },
-  23933: {
-    'name': 'date_inactive',
-    'table_id': 1078
-  },
-  23934: {
-    'name': 'state',
-    'table_id': 1078
-  },
-  23935: {
-    'name': 'full_name',
-    'table_id': 1078
-  },
-  23936: {
-    'name': 'address2',
-    'table_id': 1078
-  },
-  23937: {
-    'name': 'created_date',
-    'table_id': 1079
-  },
-  23938: {
-    'name': 'job_name',
-    'table_id': 1079
-  },
-  23939: {
-    'name': 'submitted_date',
-    'table_id': 1079
-  },
-  23940: {
-    'name': 'job_phase_number',
-    'table_id': 1079
-  },
-  23941: {
-    'name': 'change_order_description',
-    'table_id': 1079
-  },
-  23942: {
-    'name': 'change_order_id',
-    'table_id': 1079
-  },
-  23943: {
-    'name': 'change_amount',
-    'table_id': 1079
-  },
-  23944: {
-    'name': 'approved_date',
-    'table_id': 1079
-  },
-  23945: {
-    'name': 'change_order_number',
-    'table_id': 1079
-  },
-  23946: {
-    'name': 'change_order_date',
-    'table_id': 1079
-  },
-  23947: {
-    'name': 'cost_code',
-    'table_id': 1079
-  },
-  23948: {
-    'name': 'cost_code_name',
-    'table_id': 1079
-  },
-  23949: {
-    'name': 'reason',
-    'table_id': 1079
-  },
-  23950: {
-    'name': 'cost_type',
-    'table_id': 1079
-  },
-  23951: {
-    'name': 'status_number',
-    'table_id': 1079
-  },
-  23952: {
-    'name': 'invoice_date',
-    'table_id': 1079
-  },
-  23953: {
-    'name': 'status',
-    'table_id': 1079
-  },
-  23954: {
-    'name': 'is_deleted',
-    'table_id': 1079
-  },
-  23955: {
-    'name': 'approved_change_amount',
-    'table_id': 1079
-  },
-  23956: {
-    'name': 'deleted_date',
-    'table_id': 1079
-  },
-  23957: {
-    'name': 'last_updated_date',
-    'table_id': 1079
-  },
-  23958: {
-    'name': 'job_number',
-    'table_id': 1079
-  },
-  23959: {
-    'name': 'purchase_order_number',
-    'table_id': 1079
-  },
-  23960: {
-    'name': 'change_type',
-    'table_id': 1079
-  },
-  23961: {
-    'name': 'created_date',
-    'table_id': 1080
-  },
-  23962: {
-    'name': 'vendor_email',
-    'table_id': 1080
-  },
-  23963: {
-    'name': 'subcontract_id',
-    'table_id': 1080
-  },
-  23964: {
-    'name': 'scheduled_start_date',
-    'table_id': 1080
-  },
-  23965: {
-    'name': 'vendor_id',
-    'table_id': 1080
-  },
-  23966: {
-    'name': 'committed_amount',
-    'table_id': 1080
-  },
-  23967: {
-    'name': 'cost_code',
-    'table_id': 1080
-  },
-  23968: {
-    'name': 'actual_start_date',
-    'table_id': 1080
-  },
-  23969: {
-    'name': 'job_number',
-    'table_id': 1080
-  },
-  23970: {
-    'name': 'actual_finish_date',
-    'table_id': 1080
-  },
-  23971: {
-    'name': 'remaining_amount',
-    'table_id': 1080
-  },
-  23972: {
-    'name': 'is_deleted',
-    'table_id': 1080
-  },
-  23973: {
-    'name': 'deleted_date',
-    'table_id': 1080
-  },
-  23974: {
-    'name': 'vendor_name',
-    'table_id': 1080
-  },
-  23975: {
-    'name': 'subcontract_date',
-    'table_id': 1080
-  },
-  23976: {
-    'name': 'cost_type',
-    'table_id': 1080
-  },
-  23977: {
-    'name': 'vendor_account_number',
-    'table_id': 1080
-  },
-  23978: {
-    'name': 'last_updated_date',
-    'table_id': 1080
-  },
-  23979: {
-    'name': 'subcontract_number',
-    'table_id': 1080
-  },
-  23980: {
-    'name': 'subcontract_status',
-    'table_id': 1080
-  },
-  23981: {
-    'name': 'hot_list',
-    'table_id': 1080
-  },
-  23982: {
-    'name': 'vendor_type',
-    'table_id': 1080
-  },
-  23983: {
-    'name': 'vendor_phone_number',
-    'table_id': 1080
-  },
-  23984: {
-    'name': 'scheduled_finish_date',
-    'table_id': 1080
-  },
-  23985: {
-    'name': 'job_number',
-    'table_id': 1081
-  },
-  23986: {
-    'name': 'job_active_date',
-    'table_id': 1081
-  },
-  23987: {
-    'name': 'cost_type',
-    'table_id': 1082
-  },
-  23988: {
-    'name': 'PY_PD3_Balance',
-    'table_id': 1082
-  },
-  23989: {
-    'name': 'ledger_account',
-    'table_id': 1082
-  },
-  23990: {
-    'name': 'CY_PD9_Budget',
-    'table_id': 1082
-  },
-  23991: {
-    'name': 'CY_PD10_Budget',
-    'table_id': 1082
-  },
-  23992: {
-    'name': 'CY_PD7_Balance',
-    'table_id': 1082
-  },
-  23993: {
-    'name': 'CY_PD10_Balance',
-    'table_id': 1082
-  },
-  23994: {
-    'name': 'PY_PD6_Budget',
-    'table_id': 1082
-  },
-  23995: {
-    'name': 'CY_PD9_Balance',
-    'table_id': 1082
-  },
-  23996: {
-    'name': 'CY_PD2_Budget',
-    'table_id': 1082
-  },
-  23997: {
-    'name': 'PY_PD2_Balance',
-    'table_id': 1082
-  },
-  23998: {
-    'name': 'CY_PD1_Budget',
-    'table_id': 1082
-  },
-  23999: {
-    'name': 'PY_PD12_Balance',
-    'table_id': 1082
-  },
-  24000: {
-    'name': 'account_type',
-    'table_id': 1082
-  },
-  24001: {
-    'name': 'debit_or_credit',
-    'table_id': 1082
-  },
-  24002: {
-    'name': 'PY_PD1_Budget',
-    'table_id': 1082
-  },
-  24003: {
-    'name': 'PY_PD5_Budget',
-    'table_id': 1082
-  },
-  24004: {
-    'name': 'created_date',
-    'table_id': 1082
-  },
-  24005: {
-    'name': 'PY_PD5_Balance',
-    'table_id': 1082
-  },
-  24006: {
-    'name': 'CY_PD12_Budget',
-    'table_id': 1082
-  },
-  24007: {
-    'name': 'is_deleted',
-    'table_id': 1082
-  },
-  24008: {
-    'name': 'PY_PD3_Budget',
-    'table_id': 1082
-  },
-  24009: {
-    'name': 'CY_PD3_Balance',
-    'table_id': 1082
-  },
-  24010: {
-    'name': 'subsidiary_type',
-    'table_id': 1082
-  },
-  24011: {
-    'name': 'PY_PD9_Balance',
-    'table_id': 1082
-  },
-  24012: {
-    'name': 'CY_PD6_Budget',
-    'table_id': 1082
-  },
-  24013: {
-    'name': 'PY_PD12_Budget',
-    'table_id': 1082
-  },
-  24014: {
-    'name': 'deleted_date',
-    'table_id': 1082
-  },
-  24015: {
-    'name': 'CY_PD3_Budget',
-    'table_id': 1082
-  },
-  24016: {
-    'name': 'CY_PD11_Budget',
-    'table_id': 1082
-  },
-  24017: {
-    'name': 'PY_PD10_Balance',
-    'table_id': 1082
-  },
-  24018: {
-    'name': 'last_updated_date',
-    'table_id': 1082
-  },
-  24019: {
-    'name': 'CY_PD8_Balance',
-    'table_id': 1082
-  },
-  24020: {
-    'name': 'PY_PD1_Balance',
-    'table_id': 1082
-  },
-  24021: {
-    'name': 'PY_PD6_Balance',
-    'table_id': 1082
-  },
-  24022: {
-    'name': 'CY_PD7_Budget',
-    'table_id': 1082
-  },
-  24023: {
-    'name': 'PY_PD2_Budget',
-    'table_id': 1082
-  },
-  24024: {
-    'name': 'PY_PD7_Balance',
-    'table_id': 1082
-  },
-  24025: {
-    'name': 'CY_PD4_Budget',
-    'table_id': 1082
-  },
-  24026: {
-    'name': 'CY_PD8_Budget',
-    'table_id': 1082
-  },
-  24027: {
-    'name': 'CY_PD6_Balance',
-    'table_id': 1082
-  },
-  24028: {
-    'name': 'ledger_account_id',
-    'table_id': 1082
-  },
-  24029: {
-    'name': 'PY_PD11_Balance',
-    'table_id': 1082
-  },
-  24030: {
-    'name': 'PY_PD9_Budget',
-    'table_id': 1082
-  },
-  24031: {
-    'name': 'PY_PD4_Balance',
-    'table_id': 1082
-  },
-  24032: {
-    'name': 'PY_PD8_Budget',
-    'table_id': 1082
-  },
-  24033: {
-    'name': 'CY_PD4_Balance',
-    'table_id': 1082
-  },
-  24034: {
-    'name': 'CY_PD2_Balance',
-    'table_id': 1082
-  },
-  24035: {
-    'name': 'PY_PD8_Balance',
-    'table_id': 1082
-  },
-  24036: {
-    'name': 'PY_PD7_Budget',
-    'table_id': 1082
-  },
-  24037: {
-    'name': 'summary_account',
-    'table_id': 1082
-  },
-  24038: {
-    'name': 'CY_PD12_Balance',
-    'table_id': 1082
-  },
-  24039: {
-    'name': 'CY_PD1_Balance',
-    'table_id': 1082
-  },
-  24040: {
-    'name': 'PY_PD4_Budget',
-    'table_id': 1082
-  },
-  24041: {
-    'name': 'CY_PD5_Budget',
-    'table_id': 1082
-  },
-  24042: {
-    'name': 'CY_PD5_Balance',
-    'table_id': 1082
-  },
-  24043: {
-    'name': 'ending_balance',
-    'table_id': 1082
-  },
-  24044: {
-    'name': 'CY_PD11_Balance',
-    'table_id': 1082
-  },
-  24045: {
-    'name': 'notes',
-    'table_id': 1082
-  },
-  24046: {
-    'name': 'PY_PD11_Budget',
-    'table_id': 1082
-  },
-  24047: {
-    'name': 'PY_PD10_Budget',
-    'table_id': 1082
-  },
-  24048: {
-    'name': 'contact_email',
-    'table_id': 1083
-  },
-  24049: {
-    'name': 'state',
-    'table_id': 1083
-  },
-  24050: {
-    'name': 'contact_phone',
-    'table_id': 1083
-  },
-  24051: {
-    'name': 'vendor_type',
-    'table_id': 1083
-  },
-  24052: {
-    'name': 'vendor_contact_id',
-    'table_id': 1083
-  },
-  24053: {
-    'name': 'address1',
-    'table_id': 1083
-  },
-  24054: {
-    'name': 'contact_name',
-    'table_id': 1083
-  },
-  24055: {
-    'name': 'deleted_date',
-    'table_id': 1083
-  },
-  24056: {
-    'name': 'vendor_name',
-    'table_id': 1083
-  },
-  24057: {
-    'name': 'cost_code',
-    'table_id': 1083
-  },
-  24058: {
-    'name': 'vendor_resale_number',
-    'table_id': 1083
-  },
-  24059: {
-    'name': 'created_date',
-    'table_id': 1083
-  },
-  24060: {
-    'name': 'vendor_id',
-    'table_id': 1083
-  },
-  24061: {
-    'name': 'vendor_account_number',
-    'table_id': 1083
-  },
-  24062: {
-    'name': 'vendor_license_number',
-    'table_id': 1083
-  },
-  24063: {
-    'name': 'is_deleted',
-    'table_id': 1083
-  },
-  24064: {
-    'name': 'city',
-    'table_id': 1083
-  },
-  24065: {
-    'name': 'address2',
-    'table_id': 1083
-  },
-  24066: {
-    'name': 'cost_type',
-    'table_id': 1083
-  },
-  24067: {
-    'name': 'last_updated_date',
-    'table_id': 1083
-  },
-  24068: {
-    'name': 'job_title',
-    'table_id': 1083
-  },
-  24069: {
-    'name': 'zip',
-    'table_id': 1083
-  },
-  24070: {
-    'name': 'purchase_order_id',
-    'table_id': 1084
-  },
-  24071: {
-    'name': 'purchase_order_description',
-    'table_id': 1084
-  },
-  24072: {
-    'name': 'job_number',
-    'table_id': 1084
-  },
-  24073: {
-    'name': 'vendor_phone_number',
-    'table_id': 1084
-  },
-  24074: {
-    'name': 'purchase_order_type',
-    'table_id': 1084
-  },
-  24075: {
-    'name': 'vendor_id',
-    'table_id': 1084
-  },
-  24076: {
-    'name': 'delivery_via',
-    'table_id': 1084
-  },
-  24077: {
-    'name': 'vendor_email',
-    'table_id': 1084
-  },
-  24078: {
-    'name': 'hot_list',
-    'table_id': 1084
-  },
-  24079: {
-    'name': 'last_updated_date',
-    'table_id': 1084
-  },
-  24080: {
-    'name': 'received_to_date',
-    'table_id': 1084
-  },
-  24081: {
-    'name': 'quantity',
-    'table_id': 1084
-  },
-  24082: {
-    'name': 'purchase_order_number',
-    'table_id': 1084
-  },
-  24083: {
-    'name': 'committed_total',
-    'table_id': 1084
-  },
-  24084: {
-    'name': 'is_deleted',
-    'table_id': 1084
-  },
-  24085: {
-    'name': 'vendor_name',
-    'table_id': 1084
-  },
-  24086: {
-    'name': 'vendor_account_number',
-    'table_id': 1084
-  },
-  24087: {
-    'name': 'deleted_date',
-    'table_id': 1084
-  },
-  24088: {
-    'name': 'delivery_date',
-    'table_id': 1084
-  },
-  24089: {
-    'name': 'canceled',
-    'table_id': 1084
-  },
-  24090: {
-    'name': 'equipment',
-    'table_id': 1084
-  },
-  24091: {
-    'name': 'vendor_type',
-    'table_id': 1084
-  },
-  24092: {
-    'name': 'cost_code',
-    'table_id': 1084
-  },
-  24093: {
-    'name': 'purchase_order_status',
-    'table_id': 1084
-  },
-  24094: {
-    'name': 'total',
-    'table_id': 1084
-  },
-  24095: {
-    'name': 'purchase_order_line_number',
-    'table_id': 1084
-  },
-  24096: {
-    'name': 'created_date',
-    'table_id': 1084
-  },
-  24097: {
-    'name': 'purchase_order_date',
-    'table_id': 1084
-  },
-  24098: {
-    'name': 'price',
-    'table_id': 1084
-  },
-  24099: {
-    'name': 'cost_type',
-    'table_id': 1084
-  },
-  24188: {
-    'name': 'change_order_number',
-    'table_id': 1089
-  },
-  24189: {
-    'name': 'job_number',
-    'table_id': 1089
-  },
-  24190: {
-    'name': 'approved_amount',
-    'table_id': 1089
-  },
-  24191: {
-    'name': 'change_order_id',
-    'table_id': 1089
-  },
-  24192: {
-    'name': 'last_updated_date',
-    'table_id': 1089
-  },
-  24193: {
-    'name': 'job_name',
-    'table_id': 1089
-  },
-  24194: {
-    'name': 'reason',
-    'table_id': 1089
-  },
-  24195: {
-    'name': 'job_phase_number',
-    'table_id': 1089
-  },
-  24196: {
-    'name': 'change_order_date',
-    'table_id': 1089
-  },
-  24197: {
-    'name': 'is_deleted',
-    'table_id': 1089
-  },
-  24198: {
-    'name': 'requested_amount',
-    'table_id': 1089
-  },
-  24199: {
-    'name': 'status',
-    'table_id': 1089
-  },
-  24200: {
-    'name': 'purchase_order_number',
-    'table_id': 1089
-  },
-  24201: {
-    'name': 'submitted_date',
-    'table_id': 1089
-  },
-  24202: {
-    'name': 'deleted_date',
-    'table_id': 1089
-  },
-  24203: {
-    'name': 'status_number',
-    'table_id': 1089
-  },
-  24204: {
-    'name': 'invoice_date',
-    'table_id': 1089
-  },
-  24205: {
-    'name': 'change_type',
-    'table_id': 1089
-  },
-  24206: {
-    'name': 'approved_date',
-    'table_id': 1089
-  },
-  24207: {
-    'name': 'created_date',
-    'table_id': 1089
-  },
-  24208: {
-    'name': 'snapshot_date',
-    'table_id': 1089
-  },
-  24209: {
-    'name': 'change_order_description',
-    'table_id': 1089
-  },
-  24210: {
-    'name': 'overhead_amount',
-    'table_id': 1089
-  },
-  24211: {
-    'name': 'job_cost_code_name',
-    'table_id': 1090
-  },
-  24212: {
-    'name': 'billing_quantity',
-    'table_id': 1090
-  },
-  24213: {
-    'name': 'cost_in_hours',
-    'table_id': 1090
-  },
-  24214: {
-    'name': 'transaction_number',
-    'table_id': 1090
-  },
-  24215: {
-    'name': 'job_cost_description',
-    'table_id': 1090
-  },
-  24216: {
-    'name': 'vendor_id',
-    'table_id': 1090
-  },
-  24217: {
-    'name': 'is_deleted',
-    'table_id': 1090
-  },
-  24218: {
-    'name': 'cost_amount',
-    'table_id': 1090
-  },
-  24219: {
-    'name': 'material_cost',
-    'table_id': 1090
-  },
-  24220: {
-    'name': 'equipment_cost',
-    'table_id': 1090
-  },
-  24221: {
-    'name': 'billing_amount',
-    'table_id': 1090
-  },
-  24222: {
-    'name': 'job_cost_status',
-    'table_id': 1090
-  },
-  24223: {
-    'name': 'work_order_number',
-    'table_id': 1090
-  },
-  24224: {
-    'name': 'labor_cost',
-    'table_id': 1090
-  },
-  24225: {
-    'name': 'job_cost_source',
-    'table_id': 1090
-  },
-  24226: {
-    'name': 'cost_type',
-    'table_id': 1090
-  },
-  24227: {
-    'name': 'job_cost_id',
-    'table_id': 1090
-  },
-  24228: {
-    'name': 'overhead_amount',
-    'table_id': 1090
-  },
-  24229: {
-    'name': 'job_status',
-    'table_id': 1090
-  },
-  24230: {
-    'name': 'created_date',
-    'table_id': 1090
-  },
-  24231: {
-    'name': 'subcontract_cost',
-    'table_id': 1090
-  },
-  24232: {
-    'name': 'deleted_date',
-    'table_id': 1090
-  },
-  24233: {
-    'name': 'last_updated_date',
-    'table_id': 1090
-  },
-  24234: {
-    'name': 'job_number',
-    'table_id': 1090
-  },
-  24235: {
-    'name': 'vendor',
-    'table_id': 1090
-  },
-  24236: {
-    'name': 'other_cost',
-    'table_id': 1090
-  },
-  24237: {
-    'name': 'job_name',
-    'table_id': 1090
-  },
-  24238: {
-    'name': 'job_cost_code',
-    'table_id': 1090
-  },
-  24239: {
-    'name': 'snapshot_date',
-    'table_id': 1090
-  },
-  24240: {
-    'name': 'billing_amount',
-    'table_id': 1091
-  },
-  24241: {
-    'name': 'last_updated_date',
-    'table_id': 1091
-  },
-  24242: {
-    'name': 'other_cost',
-    'table_id': 1091
-  },
-  24243: {
-    'name': 'material_cost',
-    'table_id': 1091
-  },
-  24244: {
-    'name': 'snapshot_date',
-    'table_id': 1091
-  },
-  24245: {
-    'name': 'is_deleted',
-    'table_id': 1091
-  },
-  24246: {
-    'name': 'billing_quantity',
-    'table_id': 1091
-  },
-  24247: {
-    'name': 'transaction_number',
-    'table_id': 1091
-  },
-  24248: {
-    'name': 'cost_amount',
-    'table_id': 1091
-  },
-  24249: {
-    'name': 'job_cost_description',
-    'table_id': 1091
-  },
-  24250: {
-    'name': 'cost_type',
-    'table_id': 1091
-  },
-  24251: {
-    'name': 'job_number',
-    'table_id': 1091
-  },
-  24252: {
-    'name': 'labor_cost',
-    'table_id': 1091
-  },
-  24253: {
-    'name': 'work_order_number',
-    'table_id': 1091
-  },
-  24254: {
-    'name': 'job_name',
-    'table_id': 1091
-  },
-  24255: {
-    'name': 'equipment_cost',
-    'table_id': 1091
-  },
-  24256: {
-    'name': 'job_cost_id',
-    'table_id': 1091
-  },
-  24257: {
-    'name': 'overhead_amount',
-    'table_id': 1091
-  },
-  24258: {
-    'name': 'vendor_id',
-    'table_id': 1091
-  },
-  24259: {
-    'name': 'vendor',
-    'table_id': 1091
-  },
-  24260: {
-    'name': 'subcontract_cost',
-    'table_id': 1091
-  },
-  24261: {
-    'name': 'job_status',
-    'table_id': 1091
-  },
-  24262: {
-    'name': 'job_cost_code',
-    'table_id': 1091
-  },
-  24263: {
-    'name': 'job_cost_source',
-    'table_id': 1091
-  },
-  24264: {
-    'name': 'cost_in_hours',
-    'table_id': 1091
-  },
-  24265: {
-    'name': 'job_cost_code_name',
-    'table_id': 1091
-  },
-  24266: {
-    'name': 'job_cost_status',
-    'table_id': 1091
-  },
-  24267: {
-    'name': 'deleted_date',
-    'table_id': 1091
-  },
-  24268: {
-    'name': 'created_date',
-    'table_id': 1091
-  },
-  24269: {
-    'name': 'last_updated_date',
-    'table_id': 1092
-  },
-  24270: {
-    'name': 'change_order_id',
-    'table_id': 1092
-  },
-  24271: {
-    'name': 'created_date',
-    'table_id': 1092
-  },
-  24272: {
-    'name': 'status_number',
-    'table_id': 1092
-  },
-  24273: {
-    'name': 'purchase_order_number',
-    'table_id': 1092
-  },
-  24274: {
-    'name': 'is_deleted',
-    'table_id': 1092
-  },
-  24275: {
-    'name': 'job_phase_number',
-    'table_id': 1092
-  },
-  24276: {
-    'name': 'status',
-    'table_id': 1092
-  },
-  24277: {
-    'name': 'deleted_date',
-    'table_id': 1092
-  },
-  24278: {
-    'name': 'reason',
-    'table_id': 1092
-  },
-  24279: {
-    'name': 'change_type',
-    'table_id': 1092
-  },
-  24280: {
-    'name': 'requested_amount',
-    'table_id': 1092
-  },
-  24281: {
-    'name': 'change_order_number',
-    'table_id': 1092
-  },
-  24282: {
-    'name': 'approved_amount',
-    'table_id': 1092
-  },
-  24283: {
-    'name': 'job_name',
-    'table_id': 1092
-  },
-  24284: {
-    'name': 'approved_date',
-    'table_id': 1092
-  },
-  24285: {
-    'name': 'invoice_date',
-    'table_id': 1092
-  },
-  24286: {
-    'name': 'change_order_description',
-    'table_id': 1092
-  },
-  24287: {
-    'name': 'job_number',
-    'table_id': 1092
-  },
-  24288: {
-    'name': 'overhead_amount',
-    'table_id': 1092
-  },
-  24289: {
-    'name': 'submitted_date',
-    'table_id': 1092
-  },
-  24290: {
-    'name': 'change_order_date',
-    'table_id': 1092
-  },
-  24291: {
-    'name': 'snapshot_date',
-    'table_id': 1092
-  },
-  24292: {
-    'name': 'contract_signed_date',
-    'table_id': 1093
-  },
-  24293: {
-    'name': 'is_deleted',
-    'table_id': 1093
-  },
-  24294: {
-    'name': 'material_cost',
-    'table_id': 1093
-  },
-  24295: {
-    'name': 'address1',
-    'table_id': 1093
-  },
-  24296: {
-    'name': 'retention',
-    'table_id': 1093
-  },
-  24297: {
-    'name': 'equipment_cost',
-    'table_id': 1093
-  },
-  24298: {
-    'name': 'last_payment_received_date',
-    'table_id': 1093
-  },
-  24299: {
-    'name': 'snapshot_date',
-    'table_id': 1093
-  },
-  24300: {
-    'name': 'deleted_date',
-    'table_id': 1093
-  },
-  24301: {
-    'name': 'contact',
-    'table_id': 1093
-  },
-  24302: {
-    'name': 'salesperson_id',
-    'table_id': 1093
-  },
-  24303: {
-    'name': 'original_budget_amount',
-    'table_id': 1093
-  },
-  24304: {
-    'name': 'last_date_worked',
-    'table_id': 1093
-  },
-  24305: {
-    'name': 'total_contract_amount',
-    'table_id': 1093
-  },
-  24306: {
-    'name': 'takeoff_ext_price_excl_labor',
-    'table_id': 1093
-  },
-  24307: {
-    'name': 'takeoff_overhead_amount_excl_labor',
-    'table_id': 1093
-  },
-  24308: {
-    'name': 'total_budget_amount',
-    'table_id': 1093
-  },
-  24309: {
-    'name': 'estimator_id',
-    'table_id': 1093
-  },
-  24310: {
-    'name': 'contract_amount',
-    'table_id': 1093
-  },
-  24311: {
-    'name': 'bid_completed_date',
-    'table_id': 1093
-  },
-  24312: {
-    'name': 'job_number',
-    'table_id': 1093
-  },
-  24313: {
-    'name': 'job_name',
-    'table_id': 1093
-  },
-  24314: {
-    'name': 'bid_opening_date',
-    'table_id': 1093
-  },
-  24315: {
-    'name': 'job_type',
-    'table_id': 1093
-  },
-  24316: {
-    'name': 'last_updated_date',
-    'table_id': 1093
-  },
-  24317: {
-    'name': 'supervisor_id',
-    'table_id': 1093
-  },
-  24318: {
-    'name': 'lien_release_date',
-    'table_id': 1093
-  },
-  24319: {
-    'name': 'zip_code',
-    'table_id': 1093
-  },
-  24320: {
-    'name': 'client_name',
-    'table_id': 1093
-  },
-  24321: {
-    'name': 'plans_received_date',
-    'table_id': 1093
-  },
-  24322: {
-    'name': 'client_id',
-    'table_id': 1093
-  },
-  24323: {
-    'name': 'job_status',
-    'table_id': 1093
-  },
-  24324: {
-    'name': 'estimated_gross_profit',
-    'table_id': 1093
-  },
-  24325: {
-    'name': 'first_date_worked',
-    'table_id': 1093
-  },
-  24326: {
-    'name': 'other_cost',
-    'table_id': 1093
-  },
-  24327: {
-    'name': 'estimator',
-    'table_id': 1093
-  },
-  24328: {
-    'name': 'invoice_balance',
-    'table_id': 1093
-  },
-  24329: {
-    'name': 'invoice_sales_tax',
-    'table_id': 1093
-  },
-  24330: {
-    'name': 'takeoff_ext_cost_excl_labor',
-    'table_id': 1093
-  },
-  24331: {
-    'name': 'created_date',
-    'table_id': 1093
-  },
-  24332: {
-    'name': 'invoice_net_due',
-    'table_id': 1093
-  },
-  24333: {
-    'name': 'salesperson',
-    'table_id': 1093
-  },
-  24334: {
-    'name': 'job_contact_phone_number',
-    'table_id': 1093
-  },
-  24335: {
-    'name': 'takeoff_sales_tax_excl_labor',
-    'table_id': 1093
-  },
-  24336: {
-    'name': 'city',
-    'table_id': 1093
-  },
-  24337: {
-    'name': 'invoice_billed',
-    'table_id': 1093
-  },
-  24338: {
-    'name': 'address2',
-    'table_id': 1093
-  },
-  24339: {
-    'name': 'job_cost_overhead',
-    'table_id': 1093
-  },
-  24340: {
-    'name': 'state',
-    'table_id': 1093
-  },
-  24341: {
-    'name': 'takeoff_profit_amount',
-    'table_id': 1093
-  },
-  24342: {
-    'name': 'job_status_number',
-    'table_id': 1093
-  },
-  24343: {
-    'name': 'takeoff_ext_price',
-    'table_id': 1093
-  },
-  24344: {
-    'name': 'phone_number',
-    'table_id': 1093
-  },
-  24345: {
-    'name': 'pre_lien_filed_date',
-    'table_id': 1093
-  },
-  24346: {
-    'name': 'project_complete_date',
-    'table_id': 1093
-  },
-  24347: {
-    'name': 'job_number_job_name',
-    'table_id': 1093
-  },
-  24348: {
-    'name': 'invoice_amount_paid',
-    'table_id': 1093
-  },
-  24349: {
-    'name': 'takeoff_profit_amount_excl_labor',
-    'table_id': 1093
-  },
-  24350: {
-    'name': 'supervisor',
-    'table_id': 1093
-  },
-  24351: {
-    'name': 'takeoff_overhead_amount',
-    'table_id': 1093
-  },
-  24352: {
-    'name': 'takeoff_ext_cost',
-    'table_id': 1093
-  },
-  24353: {
-    'name': 'change_order_approved_amount',
-    'table_id': 1093
-  },
-  24354: {
-    'name': 'invoice_total',
-    'table_id': 1093
-  },
-  24355: {
-    'name': 'project_start_date',
-    'table_id': 1093
-  },
-  24356: {
-    'name': 'labor_cost',
-    'table_id': 1093
-  },
-  24357: {
-    'name': 'takeoff_sales_tax',
-    'table_id': 1093
-  },
-  24358: {
-    'name': 'is_deleted',
-    'table_id': 1094
-  },
-  24359: {
-    'name': 'job_salesperson',
-    'table_id': 1094
-  },
-  24360: {
-    'name': 'ar_invoice_sales_tax',
-    'table_id': 1094
-  },
-  24361: {
-    'name': 'last_updated_date',
-    'table_id': 1094
-  },
-  24362: {
-    'name': 'created_date',
-    'table_id': 1094
-  },
-  24363: {
-    'name': 'ar_invoice_status',
-    'table_id': 1094
-  },
-  24364: {
-    'name': 'last_payment_received_date',
-    'table_id': 1094
-  },
-  24365: {
-    'name': 'ar_invoice_payments_payment_amount',
-    'table_id': 1094
-  },
-  24366: {
-    'name': 'job_state',
-    'table_id': 1094
-  },
-  24367: {
-    'name': 'job_supervisor',
-    'table_id': 1094
-  },
-  24368: {
-    'name': 'job_name',
-    'table_id': 1094
-  },
-  24369: {
-    'name': 'job_number',
-    'table_id': 1094
-  },
-  24370: {
-    'name': 'ar_invoice_type',
-    'table_id': 1094
-  },
-  24371: {
-    'name': 'job_city',
-    'table_id': 1094
-  },
-  24372: {
-    'name': 'job_address1',
-    'table_id': 1094
-  },
-  24373: {
-    'name': 'tax_entity2_rate',
-    'table_id': 1094
-  },
-  24374: {
-    'name': 'ar_invoice_payments_discount_taken',
-    'table_id': 1094
-  },
-  24375: {
-    'name': 'job_address2',
-    'table_id': 1094
-  },
-  24376: {
-    'name': 'ar_invoice_balance',
-    'table_id': 1094
-  },
-  24377: {
-    'name': 'ar_invoice_total',
-    'table_id': 1094
-  },
-  24378: {
-    'name': 'tax_entity1_rate',
-    'table_id': 1094
-  },
-  24379: {
-    'name': 'ar_invoice_payments_credit_taken',
-    'table_id': 1094
-  },
-  24380: {
-    'name': 'ar_invoice_id',
-    'table_id': 1094
-  },
-  24381: {
-    'name': 'ar_invoice_retention',
-    'table_id': 1094
-  },
-  24382: {
-    'name': 'client_name',
-    'table_id': 1094
-  },
-  24383: {
-    'name': 'job_notes',
-    'table_id': 1094
-  },
-  24384: {
-    'name': 'ar_invoice_date',
-    'table_id': 1094
-  },
-  24385: {
-    'name': 'ar_invoice_number',
-    'table_id': 1094
-  },
-  24386: {
-    'name': 'ar_invoice_due_date',
-    'table_id': 1094
-  },
-  24387: {
-    'name': 'job_tax_district',
-    'table_id': 1094
-  },
-  24388: {
-    'name': 'ar_invoice_amount_paid',
-    'table_id': 1094
-  },
-  24389: {
-    'name': 'deleted_date',
-    'table_id': 1094
-  },
-  24390: {
-    'name': 'job_status',
-    'table_id': 1094
-  },
-  24391: {
-    'name': 'ar_invoice_description',
-    'table_id': 1094
-  },
-  24392: {
-    'name': 'job_phone_number',
-    'table_id': 1094
-  },
-  24393: {
-    'name': 'ar_invoice_tax_district',
-    'table_id': 1094
-  },
-  24394: {
-    'name': 'job_type',
-    'table_id': 1094
-  },
-  24395: {
-    'name': 'tax_entity1',
-    'table_id': 1094
-  },
-  24396: {
-    'name': 'last_date_worked',
-    'table_id': 1094
-  },
-  24397: {
-    'name': 'tax_entity2',
-    'table_id': 1094
-  },
-  24398: {
-    'name': 'snapshot_date',
-    'table_id': 1094
-  },
-  24399: {
-    'name': 'job_zip_code',
-    'table_id': 1094
-  },
-  24400: {
-    'name': 'tax_entity2_rate',
-    'table_id': 1095
-  },
-  24401: {
-    'name': 'job_supervisor',
-    'table_id': 1095
-  },
-  24402: {
-    'name': 'client_name',
-    'table_id': 1095
-  },
-  24403: {
-    'name': 'is_deleted',
-    'table_id': 1095
-  },
-  24404: {
-    'name': 'job_address1',
-    'table_id': 1095
-  },
-  24405: {
-    'name': 'job_zip_code',
-    'table_id': 1095
-  },
-  24406: {
-    'name': 'ar_invoice_payments_discount_taken',
-    'table_id': 1095
-  },
-  24407: {
-    'name': 'job_notes',
-    'table_id': 1095
-  },
-  24408: {
-    'name': 'ar_invoice_balance',
-    'table_id': 1095
-  },
-  24409: {
-    'name': 'job_status',
-    'table_id': 1095
-  },
-  24410: {
-    'name': 'ar_invoice_number',
-    'table_id': 1095
-  },
-  24411: {
-    'name': 'ar_invoice_sales_tax',
-    'table_id': 1095
-  },
-  24412: {
-    'name': 'ar_invoice_description',
-    'table_id': 1095
-  },
-  24413: {
-    'name': 'ar_invoice_date',
-    'table_id': 1095
-  },
-  24414: {
-    'name': 'job_city',
-    'table_id': 1095
-  },
-  24415: {
-    'name': 'ar_invoice_total',
-    'table_id': 1095
-  },
-  24416: {
-    'name': 'last_updated_date',
-    'table_id': 1095
-  },
-  24417: {
-    'name': 'tax_entity2',
-    'table_id': 1095
-  },
-  24418: {
-    'name': 'job_phone_number',
-    'table_id': 1095
-  },
-  24419: {
-    'name': 'ar_invoice_due_date',
-    'table_id': 1095
-  },
-  24420: {
-    'name': 'ar_invoice_payments_credit_taken',
-    'table_id': 1095
-  },
-  24421: {
-    'name': 'job_tax_district',
-    'table_id': 1095
-  },
-  24422: {
-    'name': 'ar_invoice_amount_paid',
-    'table_id': 1095
-  },
-  24423: {
-    'name': 'last_payment_received_date',
-    'table_id': 1095
-  },
-  24424: {
-    'name': 'last_date_worked',
-    'table_id': 1095
-  },
-  24425: {
-    'name': 'ar_invoice_status',
-    'table_id': 1095
-  },
-  24426: {
-    'name': 'ar_invoice_type',
-    'table_id': 1095
-  },
-  24427: {
-    'name': 'created_date',
-    'table_id': 1095
-  },
-  24428: {
-    'name': 'snapshot_date',
-    'table_id': 1095
-  },
-  24429: {
-    'name': 'ar_invoice_retention',
-    'table_id': 1095
-  },
-  24430: {
-    'name': 'job_address2',
-    'table_id': 1095
-  },
-  24431: {
-    'name': 'tax_entity1_rate',
-    'table_id': 1095
-  },
-  24432: {
-    'name': 'ar_invoice_payments_payment_amount',
-    'table_id': 1095
-  },
-  24433: {
-    'name': 'ar_invoice_id',
-    'table_id': 1095
-  },
-  24434: {
-    'name': 'tax_entity1',
-    'table_id': 1095
-  },
-  24435: {
-    'name': 'deleted_date',
-    'table_id': 1095
-  },
-  24436: {
-    'name': 'job_salesperson',
-    'table_id': 1095
-  },
-  24437: {
-    'name': 'job_number',
-    'table_id': 1095
-  },
-  24438: {
-    'name': 'job_type',
-    'table_id': 1095
-  },
-  24439: {
-    'name': 'job_name',
-    'table_id': 1095
-  },
-  24440: {
-    'name': 'job_state',
-    'table_id': 1095
-  },
-  24441: {
-    'name': 'ar_invoice_tax_district',
-    'table_id': 1095
-  },
-  24442: {
-    'name': 'bid_opening_date',
-    'table_id': 1096
-  },
-  24443: {
-    'name': 'last_updated_date',
-    'table_id': 1096
-  },
-  24444: {
-    'name': 'labor_cost',
-    'table_id': 1096
-  },
-  24445: {
-    'name': 'job_name',
-    'table_id': 1096
-  },
-  24446: {
-    'name': 'contract_signed_date',
-    'table_id': 1096
-  },
-  24447: {
-    'name': 'takeoff_sales_tax',
-    'table_id': 1096
-  },
-  24448: {
-    'name': 'takeoff_profit_amount',
-    'table_id': 1096
-  },
-  24449: {
-    'name': 'address1',
-    'table_id': 1096
-  },
-  24450: {
-    'name': 'snapshot_date',
-    'table_id': 1096
-  },
-  24451: {
-    'name': 'last_payment_received_date',
-    'table_id': 1096
-  },
-  24452: {
-    'name': 'estimator_id',
-    'table_id': 1096
-  },
-  24453: {
-    'name': 'pre_lien_filed_date',
-    'table_id': 1096
-  },
-  24454: {
-    'name': 'project_complete_date',
-    'table_id': 1096
-  },
-  24455: {
-    'name': 'job_contact_phone_number',
-    'table_id': 1096
-  },
-  24456: {
-    'name': 'material_cost',
-    'table_id': 1096
-  },
-  24457: {
-    'name': 'invoice_sales_tax',
-    'table_id': 1096
-  },
-  24458: {
-    'name': 'invoice_total',
-    'table_id': 1096
-  },
-  24459: {
-    'name': 'contract_amount',
-    'table_id': 1096
-  },
-  24460: {
-    'name': 'original_budget_amount',
-    'table_id': 1096
-  },
-  24461: {
-    'name': 'salesperson',
-    'table_id': 1096
-  },
-  24462: {
-    'name': 'supervisor',
-    'table_id': 1096
-  },
-  24463: {
-    'name': 'takeoff_ext_price',
-    'table_id': 1096
-  },
-  24464: {
-    'name': 'deleted_date',
-    'table_id': 1096
-  },
-  24465: {
-    'name': 'invoice_balance',
-    'table_id': 1096
-  },
-  24466: {
-    'name': 'takeoff_sales_tax_excl_labor',
-    'table_id': 1096
-  },
-  24467: {
-    'name': 'total_contract_amount',
-    'table_id': 1096
-  },
-  24468: {
-    'name': 'takeoff_ext_price_excl_labor',
-    'table_id': 1096
-  },
-  24469: {
-    'name': 'created_date',
-    'table_id': 1096
-  },
-  24470: {
-    'name': 'estimator',
-    'table_id': 1096
-  },
-  24471: {
-    'name': 'change_order_approved_amount',
-    'table_id': 1096
-  },
-  24472: {
-    'name': 'client_id',
-    'table_id': 1096
-  },
-  24473: {
-    'name': 'project_start_date',
-    'table_id': 1096
-  },
-  24474: {
-    'name': 'first_date_worked',
-    'table_id': 1096
-  },
-  24475: {
-    'name': 'job_cost_overhead',
-    'table_id': 1096
-  },
-  24476: {
-    'name': 'takeoff_ext_cost_excl_labor',
-    'table_id': 1096
-  },
-  24477: {
-    'name': 'supervisor_id',
-    'table_id': 1096
-  },
-  24478: {
-    'name': 'address2',
-    'table_id': 1096
-  },
-  24479: {
-    'name': 'phone_number',
-    'table_id': 1096
-  },
-  24480: {
-    'name': 'other_cost',
-    'table_id': 1096
-  },
-  24481: {
-    'name': 'job_status_number',
-    'table_id': 1096
-  },
-  24482: {
-    'name': 'job_status',
-    'table_id': 1096
-  },
-  24483: {
-    'name': 'equipment_cost',
-    'table_id': 1096
-  },
-  24484: {
-    'name': 'job_number_job_name',
-    'table_id': 1096
-  },
-  24485: {
-    'name': 'is_deleted',
-    'table_id': 1096
-  },
-  24486: {
-    'name': 'takeoff_profit_amount_excl_labor',
-    'table_id': 1096
-  },
-  24487: {
-    'name': 'plans_received_date',
-    'table_id': 1096
-  },
-  24488: {
-    'name': 'takeoff_overhead_amount',
-    'table_id': 1096
-  },
-  24489: {
-    'name': 'retention',
-    'table_id': 1096
-  },
-  24490: {
-    'name': 'job_type',
-    'table_id': 1096
-  },
-  24491: {
-    'name': 'job_number',
-    'table_id': 1096
-  },
-  24492: {
-    'name': 'estimated_gross_profit',
-    'table_id': 1096
-  },
-  24493: {
-    'name': 'takeoff_ext_cost',
-    'table_id': 1096
-  },
-  24494: {
-    'name': 'bid_completed_date',
-    'table_id': 1096
-  },
-  24495: {
-    'name': 'zip_code',
-    'table_id': 1096
-  },
-  24496: {
-    'name': 'last_date_worked',
-    'table_id': 1096
-  },
-  24497: {
-    'name': 'total_budget_amount',
-    'table_id': 1096
-  },
-  24498: {
-    'name': 'invoice_amount_paid',
-    'table_id': 1096
-  },
-  24499: {
-    'name': 'city',
-    'table_id': 1096
-  },
-  24500: {
-    'name': 'salesperson_id',
-    'table_id': 1096
-  },
-  24501: {
-    'name': 'invoice_billed',
-    'table_id': 1096
-  },
-  24502: {
-    'name': 'invoice_net_due',
-    'table_id': 1096
-  },
-  24503: {
-    'name': 'state',
-    'table_id': 1096
-  },
-  24504: {
-    'name': 'takeoff_overhead_amount_excl_labor',
-    'table_id': 1096
-  },
-  24505: {
-    'name': 'lien_release_date',
-    'table_id': 1096
-  },
-  24506: {
-    'name': 'contact',
-    'table_id': 1096
-  },
-  24507: {
-    'name': 'client_name',
-    'table_id': 1096
-  }
+  "cache_invalidated_at": null,
+  "description": null,
+  "archived": false,
+  "view_count": 376,
+  "collection_position": null,
+  "table_id": 23,
+  "can_run_adhoc_query": true,
+  "result_metadata": [
+    {
+      "description": null,
+      "semantic_type": "type/Category",
+      "coercion_strategy": null,
+      "name": "job_number_job_name",
+      "settings": null,
+      "fk_target_field_id": null,
+      "field_ref": [
+        "field",
+        "job_number_job_name",
+        {
+          "base-type": "type/Text"
+        }
+      ],
+      "effective_type": "type/Text",
+      "id": 305,
+      "visibility_type": "normal",
+      "display_name": "Job Number Job Name",
+      "fingerprint": {
+        "global": {
+          "distinct-count": 11,
+          "nil%": 0.0
+        },
+        "type": {
+          "type/Text": {
+            "percent-json": 0.0,
+            "percent-url": 0.0,
+            "percent-email": 0.0,
+            "percent-state": 0.0,
+            "average-length": 24.454545454545453
+          }
+        }
+      },
+      "base_type": "type/Text"
+    },
+    {
+      "description": null,
+      "semantic_type": "type/Category",
+      "coercion_strategy": null,
+      "name": "job_status",
+      "settings": null,
+      "fk_target_field_id": null,
+      "field_ref": [
+        "field",
+        "job_status",
+        {
+          "base-type": "type/Text"
+        }
+      ],
+      "effective_type": "type/Text",
+      "id": 103,
+      "visibility_type": "normal",
+      "display_name": "Job Status",
+      "fingerprint": {
+        "global": {
+          "distinct-count": 2,
+          "nil%": 0.0
+        },
+        "type": {
+          "type/Text": {
+            "percent-json": 0.0,
+            "percent-url": 0.0,
+            "percent-email": 0.0,
+            "percent-state": 0.0,
+            "average-length": 7.090909090909091
+          }
+        }
+      },
+      "base_type": "type/Text"
+    },
+    {
+      "description": null,
+      "semantic_type": null,
+      "coercion_strategy": null,
+      "unit": "day",
+      "name": "project_complete_date",
+      "settings": null,
+      "fk_target_field_id": null,
+      "field_ref": [
+        "field",
+        "project_complete_date",
+        {
+          "base-type": "type/Date",
+          "temporal-unit": "day"
+        }
+      ],
+      "effective_type": "type/Date",
+      "id": 264,
+      "visibility_type": "normal",
+      "display_name": "Project Complete Date",
+      "fingerprint": {
+        "global": {
+          "distinct-count": 6,
+          "nil%": 0.5454545454545455
+        },
+        "type": {
+          "type/DateTime": {
+            "earliest": "2023-06-15",
+            "latest": "2023-12-20"
+          }
+        }
+      },
+      "base_type": "type/Date"
+    },
+    {
+      "description": null,
+      "semantic_type": "type/Quantity",
+      "coercion_strategy": null,
+      "name": "job_number",
+      "settings": null,
+      "fk_target_field_id": null,
+      "field_ref": [
+        "field",
+        "job_number",
+        {
+          "base-type": "type/BigInteger"
+        }
+      ],
+      "effective_type": "type/BigInteger",
+      "id": 104,
+      "visibility_type": "normal",
+      "display_name": "Job Number",
+      "fingerprint": {
+        "global": {
+          "distinct-count": 11,
+          "nil%": 0.0
+        },
+        "type": {
+          "type/Number": {
+            "min": 1.0,
+            "q1": 202.5,
+            "q3": 221.75,
+            "max": 224.0,
+            "sd": 65.10425206055007,
+            "avg": 194.1818181818182
+          }
+        }
+      },
+      "base_type": "type/BigInteger"
+    },
+    {
+      "description": null,
+      "semantic_type": "type/CreationDate",
+      "coercion_strategy": null,
+      "unit": "day",
+      "name": "project_start_date",
+      "settings": null,
+      "fk_target_field_id": null,
+      "field_ref": [
+        "field",
+        "project_start_date",
+        {
+          "base-type": "type/Date",
+          "temporal-unit": "day"
+        }
+      ],
+      "effective_type": "type/Date",
+      "id": 292,
+      "visibility_type": "normal",
+      "display_name": "Project Start Date",
+      "fingerprint": {
+        "global": {
+          "distinct-count": 7,
+          "nil%": 0.3636363636363636
+        },
+        "type": {
+          "type/DateTime": {
+            "earliest": "2023-01-01",
+            "latest": "2023-07-01"
+          }
+        }
+      },
+      "base_type": "type/Date"
+    },
+    {
+      "display_name": "Sum of Max of Sum of Total Contract Amount",
+      "field_ref": [
+        "aggregation",
+        0
+      ],
+      "base_type": "type/Decimal",
+      "effective_type": "type/Decimal",
+      "name": "sum",
+      "semantic_type": null,
+      "fingerprint": {
+        "global": {
+          "distinct-count": 356,
+          "nil%": 0.0
+        },
+        "type": {
+          "type/Number": {
+            "min": 0.0,
+            "q1": 1401866.3408346092,
+            "q3": 3867512.297723551,
+            "max": 4975449.41,
+            "sd": 1430704.353476612,
+            "avg": 2610110.5615686276
+          }
+        }
+      }
+    },
+    {
+      "display_name": "Sum of Max of Sum of Original Budget Amount",
+      "field_ref": [
+        "aggregation",
+        1
+      ],
+      "base_type": "type/Decimal",
+      "effective_type": "type/Decimal",
+      "name": "sum_2",
+      "semantic_type": null,
+      "fingerprint": {
+        "global": {
+          "distinct-count": 357,
+          "nil%": 0.0
+        },
+        "type": {
+          "type/Number": {
+            "min": 0.0,
+            "q1": 1201522.7682775764,
+            "q3": 3261960.8730000006,
+            "max": 4584438.29,
+            "sd": 1254895.5072387254,
+            "avg": 2280384.8771988796
+          }
+        }
+      }
+    },
+    {
+      "display_name": "Sum of Max of Sum of Estimated Gross Profit",
+      "field_ref": [
+        "aggregation",
+        2
+      ],
+      "base_type": "type/Decimal",
+      "effective_type": "type/Decimal",
+      "name": "sum_3",
+      "semantic_type": null,
+      "fingerprint": {
+        "global": {
+          "distinct-count": 357,
+          "nil%": 0.0
+        },
+        "type": {
+          "type/Number": {
+            "min": -379155.62,
+            "q1": 148548.51749999996,
+            "q3": 456590.38750347315,
+            "max": 954675.96,
+            "sd": 224624.14088956363,
+            "avg": 326746.5823809523
+          }
+        }
+      }
+    },
+    {
+      "display_name": "Sum of Percent Complete",
+      "field_ref": [
+        "aggregation",
+        3
+      ],
+      "base_type": "type/Float",
+      "effective_type": "type/Float",
+      "name": "sum_4",
+      "semantic_type": null,
+      "fingerprint": {
+        "global": {
+          "distinct-count": 357,
+          "nil%": 0.002801120448179272
+        },
+        "type": {
+          "type/Number": {
+            "min": 0.03693316720172409,
+            "q1": 1.1621947358511897,
+            "q3": 1.2758850246797575,
+            "max": 1.329405609528941,
+            "sd": 0.13863965888764085,
+            "avg": 1.2025576915553637
+          }
+        }
+      }
+    },
+    {
+      "display_name": "Sum of Max of Sum of Invoice Billed",
+      "field_ref": [
+        "aggregation",
+        4
+      ],
+      "base_type": "type/Decimal",
+      "effective_type": "type/Decimal",
+      "name": "sum_5",
+      "semantic_type": null,
+      "fingerprint": {
+        "global": {
+          "distinct-count": 354,
+          "nil%": 0.0
+        },
+        "type": {
+          "type/Number": {
+            "min": 0.0,
+            "q1": 1114003.342685521,
+            "q3": 3358757.416018518,
+            "max": 6465473.0,
+            "sd": 1411475.0993258778,
+            "avg": 2307820.233165266
+          }
+        }
+      }
+    },
+    {
+      "display_name": "Sum of Sum of Job Cost - Job Number \u2192 Cost Amount",
+      "semantic_type": "type/Cost",
+      "field_ref": [
+        "aggregation",
+        5
+      ],
+      "base_type": "type/Decimal",
+      "effective_type": "type/Decimal",
+      "name": "sum_6",
+      "fingerprint": {
+        "global": {
+          "distinct-count": 357,
+          "nil%": 0.0
+        },
+        "type": {
+          "type/Number": {
+            "min": 293.19,
+            "q1": 1443571.9101493715,
+            "q3": 4093071.8329454893,
+            "max": 5341718.35,
+            "sd": 1534734.0876289506,
+            "avg": 2754834.404565826
+          }
+        }
+      }
+    },
+    {
+      "display_name": "Sum of Income",
+      "field_ref": [
+        "aggregation",
+        6
+      ],
+      "base_type": "type/Decimal",
+      "effective_type": "type/Decimal",
+      "name": "sum_7",
+      "semantic_type": null,
+      "fingerprint": {
+        "global": {
+          "distinct-count": 357,
+          "nil%": 0.0
+        },
+        "type": {
+          "type/Number": {
+            "min": -2101899.68,
+            "q1": -823488.4020432212,
+            "q3": -50106.485314311474,
+            "max": 1384875.17,
+            "sd": 615675.5805272193,
+            "avg": -447014.17140056024
+          }
+        }
+      }
+    },
+    {
+      "display_name": "Sum of Overbilled",
+      "field_ref": [
+        "aggregation",
+        7
+      ],
+      "base_type": "type/Float",
+      "effective_type": "type/Float",
+      "name": "sum_8",
+      "semantic_type": null,
+      "fingerprint": {
+        "global": {
+          "distinct-count": 334,
+          "nil%": 0.0
+        },
+        "type": {
+          "type/Number": {
+            "min": 0.0,
+            "q1": 274863.7134327834,
+            "q3": 1338884.475469635,
+            "max": 2897381.432598487,
+            "sd": 719879.5127297183,
+            "avg": 863042.7395122421
+          }
+        }
+      }
+    },
+    {
+      "display_name": "Sum of Underbilled",
+      "field_ref": [
+        "aggregation",
+        8
+      ],
+      "base_type": "type/Float",
+      "effective_type": "type/Float",
+      "name": "sum_9",
+      "semantic_type": null,
+      "fingerprint": {
+        "global": {
+          "distinct-count": 24,
+          "nil%": 0.0
+        },
+        "type": {
+          "type/Number": {
+            "min": -577704.5063669244,
+            "q1": -1592.8107783038267,
+            "q3": 0.0,
+            "max": 0.0,
+            "sd": 56037.65928889941,
+            "avg": -10295.499291427283
+          }
+        }
+      }
+    },
+    {
+      "display_name": "Sum of Earned Revenue",
+      "field_ref": [
+        "aggregation",
+        9
+      ],
+      "base_type": "type/Float",
+      "effective_type": "type/Float",
+      "name": "sum_10",
+      "semantic_type": null,
+      "fingerprint": {
+        "global": {
+          "distinct-count": 357,
+          "nil%": 0.002801120448179272
+        },
+        "type": {
+          "type/Number": {
+            "min": 0.0,
+            "q1": 1645038.2549542151,
+            "q3": 4693672.409208836,
+            "max": 6613849.359204726,
+            "sd": 1766018.9948687607,
+            "avg": 3169445.471906828
+          }
+        }
+      }
+    },
+    {
+      "display_name": "Sum of Cost of Revenue",
+      "field_ref": [
+        "aggregation",
+        10
+      ],
+      "base_type": "type/Float",
+      "effective_type": "type/Float",
+      "name": "sum_11",
+      "semantic_type": null,
+      "fingerprint": {
+        "global": {
+          "distinct-count": 357,
+          "nil%": 0.002801120448179272
+        },
+        "type": {
+          "type/Number": {
+            "min": -262812.2419909225,
+            "q1": 1499727.8903967645,
+            "q3": 4229746.032817744,
+            "max": 5659173.399204726,
+            "sd": 1578803.0395066754,
+            "avg": 2841781.062047278
+          }
+        }
+      }
+    },
+    {
+      "display_name": "Sum of Max of Gross Profit",
+      "field_ref": [
+        "aggregation",
+        11
+      ],
+      "base_type": "type/Decimal",
+      "effective_type": "type/Decimal",
+      "name": "sum_12",
+      "semantic_type": null,
+      "fingerprint": {
+        "global": {
+          "distinct-count": 357,
+          "nil%": 0.0
+        },
+        "type": {
+          "type/Number": {
+            "min": -379155.62,
+            "q1": 148548.51749999996,
+            "q3": 456590.38750347315,
+            "max": 954675.96,
+            "sd": 224624.14088956363,
+            "avg": 326746.5823809523
+          }
+        }
+      }
+    }
+  ],
+  "creator": {
+    "email": "rfullmer@jobxcel.ai",
+    "first_name": "Randy",
+    "last_login": "2025-01-16T20:18:23.995076Z",
+    "is_qbnewb": false,
+    "is_superuser": true,
+    "id": 3,
+    "last_name": "Fullmer",
+    "date_joined": "2024-12-11T20:51:12.035536Z",
+    "common_name": "Randy Fullmer"
+  },
+  "database_id": 2,
+  "enable_embedding": false,
+  "collection_id": null,
+  "query_type": "query",
+  "name": "Over / Under Billings",
+  "type": "question",
+  "dataset_query": {
+    "database": 2,
+    "type": "query",
+    "query": {
+      "expressions": {
+        "Overbilled": [
+          "case",
+          [
+            [
+              [
+                ">",
+                [
+                  "-",
+                  [
+                    "field",
+                    "Earned Revenue",
+                    {
+                      "base-type": "type/Float"
+                    }
+                  ],
+                  [
+                    "field",
+                    "max_4",
+                    {
+                      "base-type": "type/Decimal"
+                    }
+                  ]
+                ],
+                0
+              ],
+              [
+                "-",
+                [
+                  "field",
+                  "Earned Revenue",
+                  {
+                    "base-type": "type/Float"
+                  }
+                ],
+                [
+                  "field",
+                  "max_4",
+                  {
+                    "base-type": "type/Decimal"
+                  }
+                ]
+              ]
+            ]
+          ],
+          {
+            "default": 0
+          }
+        ],
+        "Underbilled": [
+          "case",
+          [
+            [
+              [
+                "<",
+                [
+                  "-",
+                  [
+                    "field",
+                    "Earned Revenue",
+                    {
+                      "base-type": "type/Float"
+                    }
+                  ],
+                  [
+                    "field",
+                    "max_4",
+                    {
+                      "base-type": "type/Decimal"
+                    }
+                  ]
+                ],
+                0
+              ],
+              [
+                "-",
+                [
+                  "field",
+                  "Earned Revenue",
+                  {
+                    "base-type": "type/Float"
+                  }
+                ],
+                [
+                  "field",
+                  "max_4",
+                  {
+                    "base-type": "type/Decimal"
+                  }
+                ]
+              ]
+            ]
+          ],
+          {
+            "default": 0
+          }
+        ],
+        "Cost of Revenue": [
+          "-",
+          [
+            "field",
+            "Earned Revenue",
+            {
+              "base-type": "type/Float"
+            }
+          ],
+          [
+            "field",
+            "max_6",
+            {
+              "base-type": "type/Decimal"
+            }
+          ]
+        ]
+      },
+      "breakout": [
+        [
+          "field",
+          "job_number_job_name",
+          {
+            "base-type": "type/Text"
+          }
+        ],
+        [
+          "field",
+          "job_status",
+          {
+            "base-type": "type/Text"
+          }
+        ],
+        [
+          "field",
+          "project_complete_date",
+          {
+            "base-type": "type/Date",
+            "temporal-unit": "day"
+          }
+        ],
+        [
+          "field",
+          "job_number",
+          {
+            "base-type": "type/BigInteger"
+          }
+        ],
+        [
+          "field",
+          "project_start_date",
+          {
+            "base-type": "type/Date",
+            "temporal-unit": "day"
+          }
+        ]
+      ],
+      "aggregation": [
+        [
+          "sum",
+          [
+            "field",
+            "max",
+            {
+              "base-type": "type/Decimal"
+            }
+          ]
+        ],
+        [
+          "sum",
+          [
+            "field",
+            "max_2",
+            {
+              "base-type": "type/Decimal"
+            }
+          ]
+        ],
+        [
+          "sum",
+          [
+            "field",
+            "max_3",
+            {
+              "base-type": "type/Decimal"
+            }
+          ]
+        ],
+        [
+          "sum",
+          [
+            "field",
+            "Percent Complete",
+            {
+              "base-type": "type/Float"
+            }
+          ]
+        ],
+        [
+          "sum",
+          [
+            "field",
+            "max_4",
+            {
+              "base-type": "type/Decimal"
+            }
+          ]
+        ],
+        [
+          "sum",
+          [
+            "field",
+            "sum",
+            {
+              "base-type": "type/Decimal"
+            }
+          ]
+        ],
+        [
+          "sum",
+          [
+            "field",
+            "Income",
+            {
+              "base-type": "type/Decimal"
+            }
+          ]
+        ],
+        [
+          "sum",
+          [
+            "expression",
+            "Overbilled",
+            {
+              "base-type": "type/Float"
+            }
+          ]
+        ],
+        [
+          "sum",
+          [
+            "expression",
+            "Underbilled",
+            {
+              "base-type": "type/Float"
+            }
+          ]
+        ],
+        [
+          "sum",
+          [
+            "field",
+            "Earned Revenue",
+            {
+              "base-type": "type/Float"
+            }
+          ]
+        ],
+        [
+          "sum",
+          [
+            "expression",
+            "Cost of Revenue",
+            {
+              "base-type": "type/Float"
+            }
+          ]
+        ],
+        [
+          "sum",
+          [
+            "field",
+            "max_6",
+            {
+              "base-type": "type/Decimal"
+            }
+          ]
+        ]
+      ],
+      "source-query": {
+        "joins": [
+          {
+            "strategy": "inner-join",
+            "alias": "Job Cost - Job Number",
+            "condition": [
+              "=",
+              [
+                "field",
+                "job_number",
+                {
+                  "base-type": "type/BigInteger"
+                }
+              ],
+              [
+                "field",
+                104,
+                {
+                  "base-type": "type/BigInteger",
+                  "join-alias": "Job Cost - Job Number"
+                }
+              ]
+            ],
+            "source-table": 28
+          }
+        ],
+        "aggregation": [
+          [
+            "max",
+            [
+              "field",
+              "sum",
+              {
+                "base-type": "type/Decimal"
+              }
+            ]
+          ],
+          [
+            "max",
+            [
+              "field",
+              "sum_3",
+              {
+                "base-type": "type/Decimal"
+              }
+            ]
+          ],
+          [
+            "max",
+            [
+              "field",
+              "sum_5",
+              {
+                "base-type": "type/Decimal"
+              }
+            ]
+          ],
+          [
+            "aggregation-options",
+            [
+              "/",
+              [
+                "sum",
+                [
+                  "field",
+                  217,
+                  {
+                    "base-type": "type/Decimal",
+                    "join-alias": "Job Cost - Job Number"
+                  }
+                ]
+              ],
+              [
+                "max",
+                [
+                  "field",
+                  "sum_3",
+                  {
+                    "base-type": "type/Decimal"
+                  }
+                ]
+              ]
+            ],
+            {
+              "name": "Percent Complete",
+              "display-name": "Percent Complete"
+            }
+          ],
+          [
+            "max",
+            [
+              "field",
+              "sum_2",
+              {
+                "base-type": "type/Decimal"
+              }
+            ]
+          ],
+          [
+            "sum",
+            [
+              "field",
+              217,
+              {
+                "base-type": "type/Decimal",
+                "join-alias": "Job Cost - Job Number"
+              }
+            ]
+          ],
+          [
+            "max",
+            [
+              "field",
+              "sum_4",
+              {
+                "base-type": "type/Decimal"
+              }
+            ]
+          ],
+          [
+            "aggregation-options",
+            [
+              "-",
+              [
+                "max",
+                [
+                  "field",
+                  "sum_2",
+                  {
+                    "base-type": "type/Decimal"
+                  }
+                ]
+              ],
+              [
+                "sum",
+                [
+                  "field",
+                  217,
+                  {
+                    "base-type": "type/Decimal",
+                    "join-alias": "Job Cost - Job Number"
+                  }
+                ]
+              ]
+            ],
+            {
+              "name": "Income",
+              "display-name": "Income"
+            }
+          ],
+          [
+            "aggregation-options",
+            [
+              "*",
+              [
+                "max",
+                [
+                  "field",
+                  "sum",
+                  {
+                    "base-type": "type/Decimal"
+                  }
+                ]
+              ],
+              [
+                "/",
+                [
+                  "sum",
+                  [
+                    "field",
+                    217,
+                    {
+                      "base-type": "type/Decimal",
+                      "join-alias": "Job Cost - Job Number"
+                    }
+                  ]
+                ],
+                [
+                  "max",
+                  [
+                    "field",
+                    "sum_3",
+                    {
+                      "base-type": "type/Decimal"
+                    }
+                  ]
+                ]
+              ]
+            ],
+            {
+              "name": "Earned Revenue",
+              "display-name": "Earned Revenue"
+            }
+          ],
+          [
+            "max",
+            [
+              "field",
+              "Gross Profit",
+              {
+                "base-type": "type/Decimal"
+              }
+            ]
+          ]
+        ],
+        "breakout": [
+          [
+            "field",
+            "job_number_job_name",
+            {
+              "base-type": "type/Text"
+            }
+          ],
+          [
+            "field",
+            "job_number",
+            {
+              "base-type": "type/BigInteger"
+            }
+          ],
+          [
+            "field",
+            "job_status",
+            {
+              "base-type": "type/Text"
+            }
+          ],
+          [
+            "field",
+            "project_complete_date",
+            {
+              "base-type": "type/Date",
+              "temporal-unit": "day"
+            }
+          ],
+          [
+            "field",
+            "project_start_date",
+            {
+              "base-type": "type/Date",
+              "temporal-unit": "day"
+            }
+          ]
+        ],
+        "source-query": {
+          "source-table": 23,
+          "breakout": [
+            [
+              "field",
+              305,
+              {
+                "base-type": "type/Text"
+              }
+            ],
+            [
+              "field",
+              301,
+              {
+                "base-type": "type/Text"
+              }
+            ],
+            [
+              "field",
+              246,
+              {
+                "base-type": "type/BigInteger"
+              }
+            ],
+            [
+              "field",
+              264,
+              {
+                "base-type": "type/Date",
+                "temporal-unit": "day"
+              }
+            ],
+            [
+              "field",
+              292,
+              {
+                "base-type": "type/Date",
+                "temporal-unit": "day"
+              }
+            ]
+          ],
+          "aggregation": [
+            [
+              "sum",
+              [
+                "field",
+                290,
+                {
+                  "base-type": "type/Decimal"
+                }
+              ]
+            ],
+            [
+              "sum",
+              [
+                "field",
+                272,
+                {
+                  "base-type": "type/Decimal"
+                }
+              ]
+            ],
+            [
+              "sum",
+              [
+                "field",
+                263,
+                {
+                  "base-type": "type/Decimal"
+                }
+              ]
+            ],
+            [
+              "sum",
+              [
+                "field",
+                258,
+                {
+                  "base-type": "type/Decimal"
+                }
+              ]
+            ],
+            [
+              "sum",
+              [
+                "field",
+                256,
+                {
+                  "base-type": "type/Decimal"
+                }
+              ]
+            ],
+            [
+              "aggregation-options",
+              [
+                "-",
+                [
+                  "sum",
+                  [
+                    "field",
+                    290,
+                    {
+                      "base-type": "type/Decimal"
+                    }
+                  ]
+                ],
+                [
+                  "sum",
+                  [
+                    "field",
+                    258,
+                    {
+                      "base-type": "type/Decimal"
+                    }
+                  ]
+                ]
+              ],
+              {
+                "name": "Gross Profit",
+                "display-name": "Gross Profit"
+              }
+            ]
+          ]
+        }
+      }
+    }
+  },
+  "visualization_settings": {
+    "table.column_formatting": [
+      {
+        "columns": [
+          "sum_9"
+        ],
+        "type": "single",
+        "operator": "<",
+        "value": 0,
+        "color": "#F7C4C4",
+        "highlight_row": true,
+        "id": 0
+      }
+    ],
+    "table.pivot_column": "job_number_job_name",
+    "table.cell_column": "sum",
+    "table.columns": [
+      {
+        "name": "job_number_job_name",
+        "enabled": true
+      },
+      {
+        "name": "job_status",
+        "enabled": false
+      },
+      {
+        "name": "project_complete_date",
+        "enabled": false
+      },
+      {
+        "name": "sum",
+        "enabled": true
+      },
+      {
+        "name": "sum_2",
+        "enabled": true
+      },
+      {
+        "name": "sum_3",
+        "enabled": true
+      },
+      {
+        "name": "sum_4",
+        "enabled": true
+      },
+      {
+        "name": "sum_5",
+        "enabled": true
+      },
+      {
+        "name": "sum_6",
+        "enabled": true
+      },
+      {
+        "name": "sum_7",
+        "enabled": true
+      },
+      {
+        "name": "sum_8",
+        "enabled": true
+      },
+      {
+        "name": "sum_9",
+        "enabled": true
+      },
+      {
+        "name": "sum_10",
+        "enabled": true
+      },
+      {
+        "name": "sum_11",
+        "enabled": true
+      },
+      {
+        "name": "sum_12",
+        "enabled": true
+      },
+      {
+        "name": "job_number",
+        "enabled": false
+      },
+      {
+        "name": "project_start_date",
+        "enabled": false
+      }
+    ],
+    "column_settings": {
+      "[\"name\",\"sum_11\"]": {
+        "column_title": "Cost of Revenue",
+        "number_style": "currency",
+        "currency_in_header": false,
+        "decimals": 0
+      },
+      "[\"name\",\"sum\"]": {
+        "column_title": "Total Contract",
+        "number_style": "currency",
+        "currency_in_header": false,
+        "decimals": 0
+      },
+      "[\"name\",\"sum_9\"]": {
+        "column_title": "Underbilled",
+        "number_style": "currency",
+        "currency_in_header": false,
+        "decimals": 0
+      },
+      "[\"name\",\"sum_5\"]": {
+        "column_title": "Billed",
+        "number_style": "currency",
+        "currency_in_header": false,
+        "decimals": 0
+      },
+      "[\"name\",\"sum_4\"]": {
+        "column_title": "Percent Complete",
+        "number_style": "percent",
+        "decimals": 0
+      },
+      "[\"name\",\"sum_3\"]": {
+        "column_title": "Estimated Gross Profit",
+        "number_style": "currency",
+        "currency_in_header": false,
+        "decimals": 0
+      },
+      "[\"name\",\"sum_12\"]": {
+        "column_title": "Gross Profit",
+        "number_style": "currency",
+        "currency_in_header": false,
+        "decimals": 0
+      },
+      "[\"name\",\"sum_7\"]": {
+        "column_title": "Income",
+        "number_style": "currency",
+        "currency_in_header": false,
+        "decimals": 0
+      },
+      "[\"name\",\"sum_8\"]": {
+        "column_title": "Overbilled",
+        "number_style": "currency",
+        "currency_in_header": false,
+        "decimals": 0
+      },
+      "[\"name\",\"sum_6\"]": {
+        "column_title": "Costs",
+        "decimals": 0,
+        "currency_in_header": false
+      },
+      "[\"name\",\"sum_2\"]": {
+        "column_title": "Est. Cost at Completion",
+        "number_style": "currency",
+        "currency_in_header": false,
+        "decimals": 0
+      },
+      "[\"name\",\"sum_10\"]": {
+        "column_title": "Earned Revenue",
+        "number_style": "currency",
+        "currency_in_header": false,
+        "decimals": 0
+      }
+    }
+  },
+  "last_query_start": "2025-01-26T02:46:24.899215Z",
+  "last_used_at": "2025-01-26T02:46:25.154306Z",
+  "created_at": "2025-01-02T00:47:41.562649Z",
+  "updated_at": "2025-01-02T14:48:44.138545Z",
+  "id": 40,
+  "initially_published_at": null,
+  "can_write": true,
+  "dashboard_count": 4,
+  "average_query_time": 1359.7937062937062,
+  "creator_id": 3,
+  "moderation_reviews": [],
+  "made_public_by_id": null,
+  "embedding_params": null,
+  "cache_ttl": null,
+  "parameter_mappings": [],
+  "display": "table",
+  "entity_id": "kqpJurAbRQLnbkC31SZB3",
+  "collection_preview": true,
+  "last-edit-info": {
+    "id": 3,
+    "email": "rfullmer@jobxcel.ai",
+    "first_name": "Randy",
+    "last_name": "Fullmer",
+    "timestamp": "2025-01-02T14:48:44.15565Z"
+  },
+  "collection": {
+    "metabase.models.collection.root/is-root?": true,
+    "authority_level": null,
+    "name": "Our analytics",
+    "is_personal": false,
+    "id": "root",
+    "can_write": true
+  },
+  "metabase_version": "v0.50.26 (5a65f46)",
+  "parameters": [],
+  "parameter_usage_count": 0,
+  "public_uuid": null
 }
