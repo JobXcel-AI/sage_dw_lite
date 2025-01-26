@@ -2,6 +2,7 @@ import requests
 import json
 import logging
 from tabulate import tabulate  # For displaying the mappings as a table
+from collections import OrderedDict
 
 # Metabase API credentials and endpoints
 SOURCE_API_URL = "https://sagexcel.jobxcel.report/api"
@@ -23,19 +24,28 @@ HEADERS_TARGET = {
 }
 
 # Configure logger
-logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+logging.basicConfig(level=logging.DEBUG, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
-
 
 def fetch_resource(api_url, endpoint, headers):
     try:
         response = requests.get(f"{api_url}/{endpoint}", headers=headers, timeout=10)
         response.raise_for_status()
+        # Convert response.text to JSON and return it
         return response.json()
     except requests.exceptions.RequestException as e:
-        logger.error(f"Error fetching resource from {api_url}/{endpoint}: {e}")
+        print(f"Error fetching resource from {api_url}/{endpoint}: {e}")
+        return None
+    except json.JSONDecodeError as e:
+        print(f"Error decoding JSON: {e}")
         return None
 
+
+import json
+import requests
+import logging
+
+logger = logging.getLogger(__name__)
 
 def create_resource(api_url, endpoint, headers, payload):
     try:
@@ -43,9 +53,13 @@ def create_resource(api_url, endpoint, headers, payload):
             f"{api_url}/{endpoint}", headers=headers, data=json.dumps(payload), timeout=10
         )
         response.raise_for_status()
-        return response.json()
+        return response.json()  # Return the JSON response
     except requests.exceptions.RequestException as e:
-        logger.error(f"Error creating resource: {e}")
+        # Log the error and the response text if available
+        if e.response is not None:  # Check if response is present
+            logger.error(f"Error creating resource: {e}, Response: {e.response.text}")
+        else:
+            logger.error(f"Error creating resource: {e}")
         return None
 
 
@@ -203,8 +217,7 @@ def migrate_cards(
         else:
             logger.warning(f"Card with ID {card_id} not found or could not be retrieved.")
 
-    for card in source_cards:
-        source_card = card.get("card", {})
+    for source_card in source_cards:
         if not source_card:
             logger.warning("Skipping dashcard without a valid card.")
             continue
@@ -224,7 +237,6 @@ def migrate_cards(
         # Recursive function to update queries
         def update_query_recursively(query):
             if isinstance(query, dict):
-                # Update 'source-table' and 'table_id' using table_mapping
                 if "source-table" in query:
                     source_table_name = next((table["name"] for table in source_tables if table["id"] == query["source-table"]), None)
                     if source_table_name:
@@ -239,14 +251,10 @@ def migrate_cards(
                             (table["id"] for table in target_tables if table["name"] == source_table_name),
                             query["table_id"]
                         )
-
-                # Update field_ref
                 if "field_ref" in query:
                     query["field_ref"] = update_field_ref(
                         query["field_ref"], source_field_mapping, target_field_mapping
                     )
-
-                # Update joins
                 if "joins" in query:
                     for join in query["joins"]:
                         if "source-table" in join:
@@ -256,29 +264,21 @@ def migrate_cards(
                                     (table["id"] for table in target_tables if table["name"] == source_table_name),
                                     join["source-table"]
                                 )
-
-                # Recursively update nested source-query
                 if "source-query" in query:
                     query["source-query"] = update_query_recursively(query["source-query"])
-
             elif isinstance(query, list):
-                # Recursively handle lists
                 for i, item in enumerate(query):
                     query[i] = update_query_recursively(item)
-
             return query
 
-        # Function to update field_ref
         def update_field_ref(field_ref, source_field_mapping, target_field_mapping):
-            if len(field_ref) > 1 and isinstance(field_ref[1], str):  # Check if field_ref has a name to map
+            if len(field_ref) > 1 and isinstance(field_ref[1], str):
                 source_field_name = field_ref[1]
-                # Find the source field ID for the name
                 source_field_id = next(
                     (field_id for field_id, field_data in source_field_mapping.items() if field_data["name"] == source_field_name),
                     None
                 )
                 if source_field_id:
-                    # Find the target field ID for the source field ID
                     target_field_id = next(
                         (field_id for field_id, field_data in target_field_mapping.items() if field_data["name"] == source_field_name),
                         None
@@ -306,7 +306,7 @@ def migrate_cards(
         # Update result_metadata field ids and field_ref
         if "result_metadata" in updated_card:
             for metadata in updated_card["result_metadata"]:
-                # Update id
+                # Update id directly (next to fingerprint)
                 if "id" in metadata:
                     source_field_id = metadata["id"]
                     source_field_name = source_field_mapping.get(source_field_id, {}).get("name")
@@ -323,16 +323,10 @@ def migrate_cards(
                         metadata["field_ref"], source_field_mapping, target_field_mapping
                     )
 
-        # Final pass to check for unmapped field ids
-        if "result_metadata" in updated_card:
-            for metadata in updated_card["result_metadata"]:
-                if "id" in metadata and metadata["id"] is None:
-                    logger.warning(f"Unmapped field ID {metadata.get('id')} in card '{updated_card.get('name', 'Unnamed')}'")
-
         # Create the updated card in the target
         created_card = create_resource(target_api_url, "card", headers_target, updated_card)
         if created_card:
-            card_mapping[card["id"]] = created_card["id"]
+            card_mapping[source_card["id"]] = created_card["id"]
             logger.info(f"Card '{updated_card.get('name', 'Unnamed')}' migrated successfully.")
         else:
             logger.error(f"Failed to create card: {updated_card.get('name', 'Unnamed')}")
