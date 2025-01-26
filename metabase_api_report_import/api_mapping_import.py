@@ -1,7 +1,7 @@
-import requests
 import json
+import requests
 import logging
-from tabulate import tabulate  # For displaying the mappings as a table
+from tabulate import tabulate
 from collections import OrderedDict
 
 # Metabase API credentials and endpoints
@@ -13,7 +13,7 @@ SOURCE_DATABASE_ID = 2  # Set the source database ID
 TARGET_DATABASE_ID = 2  # Set the target database ID
 
 # List of dashboards to migrate
-DASHBOARDS = [4]  # Replace with your actual dashboard IDs
+DASHBOARDS = [4]
 
 HEADERS_SOURCE = {
     "x-api-key": SOURCE_API_KEY,
@@ -31,7 +31,6 @@ def fetch_resource(api_url, endpoint, headers):
     try:
         response = requests.get(f"{api_url}/{endpoint}", headers=headers, timeout=10)
         response.raise_for_status()
-        # Convert response.text to JSON and return it
         return response.json()
     except requests.exceptions.RequestException as e:
         print(f"Error fetching resource from {api_url}/{endpoint}: {e}")
@@ -40,28 +39,22 @@ def fetch_resource(api_url, endpoint, headers):
         print(f"Error decoding JSON: {e}")
         return None
 
-
-import json
-import requests
-import logging
-
-logger = logging.getLogger(__name__)
-
 def create_resource(api_url, endpoint, headers, payload):
     try:
+        # Ensure Content-Type is set to application/json
+        headers["Content-Type"] = "application/json"
+        json_payload = json.dumps(payload, indent=4)
         response = requests.post(
-            f"{api_url}/{endpoint}", headers=headers, data=json.dumps(payload), timeout=10
+            f"{api_url}/{endpoint}", headers=headers, data=json_payload, timeout=10
         )
         response.raise_for_status()
-        return response.json()  # Return the JSON response
+        return response.json()
     except requests.exceptions.RequestException as e:
-        # Log the error and the response text if available
-        if e.response is not None:  # Check if response is present
+        if e.response is not None:
             logger.error(f"Error creating resource: {e}, Response: {e.response.text}")
         else:
             logger.error(f"Error creating resource: {e}")
         return None
-
 
 def build_table_field_mapping(tables):
     """
@@ -207,7 +200,6 @@ def migrate_cards(
     # Fetch card IDs from the dashboard
     source_card_ids = fetch_cards_from_dashboard(source_api_url, dashboard_id, headers_source)
     source_cards = []
-
     card_mapping = {}
     # Fetch the card data for each card ID
     for card_id in source_card_ids:
@@ -221,7 +213,6 @@ def migrate_cards(
         if not source_card:
             logger.warning("Skipping dashcard without a valid card.")
             continue
-
         # Transform the source card JSON
         updated_card = source_card.copy()
 
@@ -234,64 +225,89 @@ def migrate_cards(
         if source_collection_id and source_collection_id in collection_mapping:
             updated_card["collection_id"] = collection_mapping[source_collection_id]
 
-        # Recursive function to update queries
-        def update_query_recursively(query):
+        def update_query_recursively(query, is_top_level=True):
             if isinstance(query, dict):
+                # Process "source-table"
                 if "source-table" in query:
-                    source_table_name = next((table["name"] for table in source_tables if table["id"] == query["source-table"]), None)
+                    source_table_name = next(
+                        (table["name"] for table in source_tables if table["id"] == query["source-table"]), None
+                    )
                     if source_table_name:
                         query["source-table"] = next(
                             (table["id"] for table in target_tables if table["name"] == source_table_name),
                             query["source-table"]
                         )
+
+                # Process "table_id"
                 if "table_id" in query:
-                    source_table_name = next((table["name"] for table in source_tables if table["id"] == query["table_id"]), None)
+                    source_table_name = next(
+                        (table["name"] for table in source_tables if table["id"] == query["table_id"]), None
+                    )
                     if source_table_name:
                         query["table_id"] = next(
                             (table["id"] for table in target_tables if table["name"] == source_table_name),
                             query["table_id"]
                         )
+
+                # Process "field_ref"
                 if "field_ref" in query:
                     query["field_ref"] = update_field_ref(
                         query["field_ref"], source_field_mapping, target_field_mapping
                     )
+
+                # Process "joins"
                 if "joins" in query:
                     for join in query["joins"]:
                         if "source-table" in join:
-                            source_table_name = next((table["name"] for table in source_tables if table["id"] == join["source-table"]), None)
+                            source_table_name = next(
+                                (table["name"] for table in source_tables if table["id"] == join["source-table"]),
+                                None
+                            )
                             if source_table_name:
                                 join["source-table"] = next(
                                     (table["id"] for table in target_tables if table["name"] == source_table_name),
                                     join["source-table"]
                                 )
+
+                # If we are at the top level, process `dataset_query` specifically
+                if is_top_level and "dataset_query" in query:
+                    query["dataset_query"] = update_query_recursively(query.get("dataset_query", {}), is_top_level=False)
+                    return query
+
+                # Process "source-query"
                 if "source-query" in query:
-                    query["source-query"] = update_query_recursively(query["source-query"])
+                    query["source-query"] = update_query_recursively(query["source-query"], is_top_level=False)
+
+                # Process "query" (specific to dataset_query)
+                if "query" in query:
+                    query["query"] = update_query_recursively(query["query"], is_top_level=False)
+
             elif isinstance(query, list):
                 for i, item in enumerate(query):
-                    query[i] = update_query_recursively(item)
+                    query[i] = update_query_recursively(item, is_top_level=False)
+
             return query
+
 
         def update_field_ref(field_ref, source_field_mapping, target_field_mapping):
             if len(field_ref) > 1 and isinstance(field_ref[1], str):
-                source_field_name = field_ref[1]
-                source_field_id = next(
-                    (field_id for field_id, field_data in source_field_mapping.items() if field_data["name"] == source_field_name),
-                    None
-                )
-                if source_field_id:
+                # Keep the field name as is and avoid converting it to an ID
+                return field_ref
+            elif len(field_ref) > 1 and isinstance(field_ref[1], int):
+                # Only replace the ID if necessary
+                source_field_id = field_ref[1]
+                source_field_name = source_field_mapping.get(source_field_id, {}).get("name")
+                if source_field_name:
                     target_field_id = next(
-                        (field_id for field_id, field_data in target_field_mapping.items() if field_data["name"] == source_field_name),
-                        None
+                        (field_id for field_id, field_data in target_field_mapping.items()
+                         if field_data["name"] == source_field_name), None
                     )
                     if target_field_id:
                         field_ref[1] = target_field_id
             return field_ref
 
-        # Update dataset_query
-        dataset_query = source_card.get("dataset_query", {})
-        if dataset_query:
-            dataset_query["query"] = update_query_recursively(dataset_query.get("query", {}))
-
+        # Begin by updating the top-level source_card
+        dataset_query = update_query_recursively(source_card)
         updated_card["dataset_query"] = dataset_query
 
         # Update table_id in the card metadata
@@ -322,8 +338,50 @@ def migrate_cards(
                     metadata["field_ref"] = update_field_ref(
                         metadata["field_ref"], source_field_mapping, target_field_mapping
                     )
+        updated_card = OrderedDict()
+        updated_card["cache_invalidated_at"] = source_card.get("cache_invalidated_at", None)
+        updated_card["description"] = source_card.get("description", "") or None
+        updated_card["archived"] = source_card.get("archived", False)
+        updated_card["view_count"] = source_card.get("view_count", 0)
+        updated_card["collection_position"] = source_card.get("collection_position", None)
+        updated_card["table_id"] = source_card.get("table_id", None)
+        updated_card["can_run_adhoc_query"] = source_card.get("can_run_adhoc_query", True)
+        updated_card["result_metadata"] = source_card.get("result_metadata", [])
+        updated_card["creator"] = source_card.get("creator", {})
+        updated_card["database_id"] = source_card.get("database_id", TARGET_DATABASE_ID)
+        updated_card["enable_embedding"] = source_card.get("enable_embedding", False)
+        updated_card["collection_id"] = collection_mapping.get(source_card.get("collection_id"), None)
+        updated_card["query_type"] = source_card.get("query_type", "query")
+        updated_card["name"] = source_card.get("name", "Unnamed")
+        updated_card["type"] = source_card.get("type", "question")
+        updated_card["dataset_query"] = source_card.get("dataset_query", {})
+        updated_card["visualization_settings"] = source_card.get("visualization_settings", {})
+        updated_card["last_query_start"] = source_card.get("last_query_start", None)
+        updated_card["last_used_at"] = source_card.get("last_used_at", None)
+        updated_card["created_at"] = source_card.get("created_at", None)
+        updated_card["updated_at"] = source_card.get("updated_at", None)
+        updated_card["id"] = source_card.get("id")
+        updated_card["initially_published_at"] = source_card.get("initially_published_at", None)
+        updated_card["can_write"] = source_card.get("can_write", True)
+        updated_card["dashboard_count"] = source_card.get("dashboard_count", 0)
+        updated_card["average_query_time"] = source_card.get("average_query_time", None)
+        updated_card["creator_id"] = source_card.get("creator_id", None)
+        updated_card["moderation_reviews"] = source_card.get("moderation_reviews", [])
+        updated_card["made_public_by_id"] = source_card.get("made_public_by_id", None)
+        updated_card["embedding_params"] = source_card.get("embedding_params", None)
+        updated_card["cache_ttl"] = source_card.get("cache_ttl", None)
+        updated_card["parameter_mappings"] = source_card.get("parameter_mappings", [])
+        updated_card["display"] = source_card.get("display", "table")
+        updated_card["entity_id"] = source_card.get("entity_id", None)
+        updated_card["collection_preview"] = source_card.get("collection_preview", False)
+        updated_card["last-edit-info"] = source_card.get("last-edit-info", {})
+        updated_card["collection"] = source_card.get("collection", {})
+        updated_card["metabase_version"] = source_card.get("metabase_version", None)
+        updated_card["parameters"] = source_card.get("parameters", [])
+        updated_card["parameter_usage_count"] = source_card.get("parameter_usage_count", 0)
+        updated_card["public_uuid"] = source_card.get("public_uuid", None)
 
-        # Create the updated card in the target
+        json_payload = json.dumps(updated_card, indent=4)
         created_card = create_resource(target_api_url, "card", headers_target, updated_card)
         if created_card:
             card_mapping[source_card["id"]] = created_card["id"]
@@ -375,7 +433,7 @@ def main():
 
         card_mapping = migrate_cards(
             SOURCE_API_URL, TARGET_API_URL, HEADERS_SOURCE, HEADERS_TARGET,
-            dashboard_id, collection_mapping, source_tables, target_tables, source_field_mapping,target_field_mapping
+            dashboard_id, collection_mapping, source_tables, target_tables, source_field_mapping, target_field_mapping
         )
 
         # Update dashboard with new cards
@@ -389,7 +447,6 @@ def main():
         logger.info(f"Dashboard ID {dashboard_id} migrated successfully.")
 
     logger.info("Migration process completed.")
-
 
 if __name__ == "__main__":
     main()
