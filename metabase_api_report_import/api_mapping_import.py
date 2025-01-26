@@ -238,9 +238,10 @@ def migrate_cards(
                     if key in query:
                         for item in query[key]:
                             if isinstance(item, list) and len(item) > 1 and isinstance(item[1], dict):
-                                if "fk_target_field_id" in item[1] and item[1]["fk_target_field_id"] is not None:
-                                    source_field_name = source_field_mapping.get(item[1]["fk_target_field_id"], {}).get("name")
-                                    if source_field_name:
+                                if "fk_target_field_id" in item[1]:
+                                    source_field_id = item[1].get("fk_target_field_id")
+                                    if source_field_id in source_field_mapping:
+                                        source_field_name = source_field_mapping[source_field_id]["name"]
                                         item[1]["fk_target_field_id"] = next(
                                             (field_id for field_id, field_data in target_field_mapping.items()
                                              if field_data["name"] == source_field_name),
@@ -277,9 +278,10 @@ def migrate_cards(
         # Update result_metadata fk_target_field_id
         if "result_metadata" in updated_card:
             for metadata in updated_card["result_metadata"]:
-                if "fk_target_field_id" in metadata and metadata["fk_target_field_id"] is not None:
-                    source_field_name = source_field_mapping.get(metadata["fk_target_field_id"], {}).get("name")
-                    if source_field_name:
+                if "fk_target_field_id" in metadata:
+                    source_field_id = metadata.get("id")
+                    if source_field_id in source_field_mapping:
+                        source_field_name = source_field_mapping[source_field_id]["name"]
                         metadata["fk_target_field_id"] = next(
                             (field_id for field_id, field_data in target_field_mapping.items()
                              if field_data["name"] == source_field_name),
