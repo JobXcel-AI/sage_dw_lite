@@ -16,12 +16,10 @@ DASHBOARDS = [4]  # Replace with your actual dashboard IDs
 
 HEADERS_SOURCE = {
     "x-api-key": SOURCE_API_KEY,
-    "Content-Type": "application/json"
 }
 
 HEADERS_TARGET = {
     "x-api-key": TARGET_API_KEY,
-    "Content-Type": "application/json"
 }
 
 # Configure logger
@@ -167,23 +165,43 @@ def migrate_collections(source_api_url, target_api_url, headers_source, headers_
     return collection_mapping
 
 
-def fetch_cards(api_url, dashboard_id, headers):
+def fetch_cards_from_dashboard(api_url, dashboard_id, headers):
+    """
+    Fetch the list of card IDs from a dashboard.
+
+    :param api_url: The base URL of the API.
+    :param dashboard_id: The ID of the dashboard to fetch.
+    :param headers: Headers for the API request.
+    :return: A list of card IDs in the dashboard.
+    """
     dashboard = fetch_resource(api_url, f"dashboard/{dashboard_id}", headers)
     if not dashboard:
         logger.error(f"Dashboard with ID {dashboard_id} not found.")
         return []
-    return dashboard.get("dashcards", [])
+
+    dashcards = dashboard.get("dashcards", [])
+    return [dashcard.get("card_id") for dashcard in dashcards if dashcard.get("card_id") is not None]
 
 
 def migrate_cards(
         source_api_url, target_api_url, headers_source, headers_target,
-        dashboard_id, table_mapping, field_mapping, collection_mapping, source_tables, target_tables, source_field_mapping, target_field_mapping
+        dashboard_id, collection_mapping, source_tables, target_tables, source_field_mapping, target_field_mapping
 ):
     """
     Migrate cards from source to target. Update the database, collection, table, field references, and field ids.
     """
-    source_cards = fetch_cards(source_api_url, dashboard_id, headers_source)
+    # Fetch card IDs from the dashboard
+    source_card_ids = fetch_cards_from_dashboard(source_api_url, dashboard_id, headers_source)
+    source_cards = []
+
     card_mapping = {}
+    # Fetch the card data for each card ID
+    for card_id in source_card_ids:
+        card_data = fetch_resource(source_api_url, f"card/{card_id}", headers_source)
+        if card_data:
+            source_cards.append(card_data)
+        else:
+            logger.warning(f"Card with ID {card_id} not found or could not be retrieved.")
 
     for card in source_cards:
         source_card = card.get("card", {})
@@ -222,6 +240,12 @@ def migrate_cards(
                             query["table_id"]
                         )
 
+                # Update field_ref
+                if "field_ref" in query:
+                    query["field_ref"] = update_field_ref(
+                        query["field_ref"], source_field_mapping, target_field_mapping
+                    )
+
                 # Update joins
                 if "joins" in query:
                     for join in query["joins"]:
@@ -244,6 +268,25 @@ def migrate_cards(
 
             return query
 
+        # Function to update field_ref
+        def update_field_ref(field_ref, source_field_mapping, target_field_mapping):
+            if len(field_ref) > 1 and isinstance(field_ref[1], str):  # Check if field_ref has a name to map
+                source_field_name = field_ref[1]
+                # Find the source field ID for the name
+                source_field_id = next(
+                    (field_id for field_id, field_data in source_field_mapping.items() if field_data["name"] == source_field_name),
+                    None
+                )
+                if source_field_id:
+                    # Find the target field ID for the source field ID
+                    target_field_id = next(
+                        (field_id for field_id, field_data in target_field_mapping.items() if field_data["name"] == source_field_name),
+                        None
+                    )
+                    if target_field_id:
+                        field_ref[1] = target_field_id
+            return field_ref
+
         # Update dataset_query
         dataset_query = source_card.get("dataset_query", {})
         if dataset_query:
@@ -260,9 +303,10 @@ def migrate_cards(
                     updated_card["table_id"]
                 )
 
-        # Update result_metadata field ids
+        # Update result_metadata field ids and field_ref
         if "result_metadata" in updated_card:
             for metadata in updated_card["result_metadata"]:
+                # Update id
                 if "id" in metadata:
                     source_field_id = metadata["id"]
                     source_field_name = source_field_mapping.get(source_field_id, {}).get("name")
@@ -272,6 +316,12 @@ def migrate_cards(
                              if field_data["name"] == source_field_name),
                             metadata["id"]
                         )
+
+                # Update field_ref
+                if "field_ref" in metadata:
+                    metadata["field_ref"] = update_field_ref(
+                        metadata["field_ref"], source_field_mapping, target_field_mapping
+                    )
 
         # Final pass to check for unmapped field ids
         if "result_metadata" in updated_card:
@@ -331,8 +381,7 @@ def main():
 
         card_mapping = migrate_cards(
             SOURCE_API_URL, TARGET_API_URL, HEADERS_SOURCE, HEADERS_TARGET,
-            dashboard_id, source_table_mapping, field_mapping, collection_mapping,
-            source_tables, target_tables, source_field_mapping,target_field_mapping
+            dashboard_id, collection_mapping, source_tables, target_tables, source_field_mapping,target_field_mapping
         )
 
         # Update dashboard with new cards

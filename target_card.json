@@ -1,0 +1,1090 @@
+{
+  'archived': False,
+  'average_query_time': 1359.7937062937062,
+  'cache_invalidated_at': None,
+  'cache_ttl': None,
+  'can_run_adhoc_query': True,
+  'can_write': True,
+  'collection': {
+    'authority_level': None,
+    'can_write': True,
+    'id': 'root',
+    'is_personal': False,
+    'metabase.models.collection.root/is-root?': True,
+    'name': 'Our analytics'
+  },
+  'collection_id': None,
+  'collection_position': None,
+  'collection_preview': True,
+  'created_at': '2025-01-02T00:47:41.562649Z',
+  'creator': {
+    'common_name': 'Randy Fullmer',
+    'date_joined': '2024-12-11T20:51:12.035536Z',
+    'email': 'rfullmer@jobxcel.ai',
+    'first_name': 'Randy',
+    'id': 3,
+    'is_qbnewb': False,
+    'is_superuser': True,
+    'last_login': '2025-01-16T20:18:23.995076Z',
+    'last_name': 'Fullmer'
+  },
+  'creator_id': 3,
+  'dashboard_count': 4,
+  'database_id': 2,
+  'dataset_query': {
+    'database': 2,
+    'query': {
+      'aggregation': [
+        [
+          'sum',
+          [
+            'field',
+            'max',
+            {
+              ...
+            }
+          ]
+        ],
+        [
+          'sum',
+          [
+            'field',
+            'max_2',
+            {
+              ...
+            }
+          ]
+        ],
+        [
+          'sum',
+          [
+            'field',
+            'max_3',
+            {
+              ...
+            }
+          ]
+        ],
+        [
+          'sum',
+          [
+            'field',
+            'Percent Complete',
+            {
+              ...
+            }
+          ]
+        ],
+        [
+          'sum',
+          [
+            'field',
+            'max_4',
+            {
+              ...
+            }
+          ]
+        ],
+        [
+          'sum',
+          [
+            'field',
+            'sum',
+            {
+              ...
+            }
+          ]
+        ],
+        [
+          'sum',
+          [
+            'field',
+            'Income',
+            {
+              ...
+            }
+          ]
+        ],
+        [
+          'sum',
+          [
+            'expression',
+            'Overbilled',
+            {
+              ...
+            }
+          ]
+        ],
+        [
+          'sum',
+          [
+            'expression',
+            'Underbilled',
+            {
+              ...
+            }
+          ]
+        ],
+        [
+          'sum',
+          [
+            'field',
+            'Earned Revenue',
+            {
+              ...
+            }
+          ]
+        ],
+        [
+          'sum',
+          [
+            'expression',
+            'Cost of Revenue',
+            {
+              ...
+            }
+          ]
+        ],
+        [
+          'sum',
+          [
+            'field',
+            'max_6',
+            {
+              ...
+            }
+          ]
+        ]
+      ],
+      'breakout': [
+        [
+          'field',
+          'job_number_job_name',
+          {
+            'base-type': 'type/Text'
+          }
+        ],
+        [
+          'field',
+          'job_status',
+          {
+            'base-type': 'type/Text'
+          }
+        ],
+        [
+          'field',
+          'project_complete_date',
+          {
+            'base-type': 'type/Date',
+            'temporal-unit': 'day'
+          }
+        ],
+        [
+          'field',
+          'job_number',
+          {
+            'base-type': 'type/BigInteger'
+          }
+        ],
+        [
+          'field',
+          'project_start_date',
+          {
+            'base-type': 'type/Date',
+            'temporal-unit': 'day'
+          }
+        ]
+      ],
+      'expressions': {
+        'Cost of Revenue': [
+          '-',
+          [
+            'field',
+            'Earned Revenue',
+            {
+              ...
+            }
+          ],
+          [
+            'field',
+            'max_6',
+            {
+              ...
+            }
+          ]
+        ],
+        'Overbilled': [
+          'case',
+          [
+            [
+              ...
+            ]
+          ],
+          {
+            'default': 0
+          }
+        ],
+        'Underbilled': [
+          'case',
+          [
+            [
+              ...
+            ]
+          ],
+          {
+            'default': 0
+          }
+        ]
+      },
+      'source-query': {
+        'aggregation': [
+          [
+            'max',
+            [
+              ...
+            ]
+          ],
+          [
+            'max',
+            [
+              ...
+            ]
+          ],
+          [
+            'max',
+            [
+              ...
+            ]
+          ],
+          [
+            'aggregation-options',
+            [
+              ...
+            ],
+            {
+              ...
+            }
+          ],
+          [
+            'max',
+            [
+              ...
+            ]
+          ],
+          [
+            'sum',
+            [
+              ...
+            ]
+          ],
+          [
+            'max',
+            [
+              ...
+            ]
+          ],
+          [
+            'aggregation-options',
+            [
+              ...
+            ],
+            {
+              ...
+            }
+          ],
+          [
+            'aggregation-options',
+            [
+              ...
+            ],
+            {
+              ...
+            }
+          ],
+          [
+            'max',
+            [
+              ...
+            ]
+          ]
+        ],
+        'breakout': [
+          [
+            'field',
+            'job_number_job_name',
+            {
+              ...
+            }
+          ],
+          [
+            'field',
+            'job_number',
+            {
+              ...
+            }
+          ],
+          [
+            'field',
+            'job_status',
+            {
+              ...
+            }
+          ],
+          [
+            'field',
+            'project_complete_date',
+            {
+              ...
+            }
+          ],
+          [
+            'field',
+            'project_start_date',
+            {
+              ...
+            }
+          ]
+        ],
+        'joins': [
+          {
+            'alias': 'Job Cost - Job Number',
+            'condition': [
+              ...
+            ],
+            'source-table': 1077,
+            'strategy': 'inner-join'
+          }
+        ],
+        'source-query': {
+          'aggregation': [
+            [
+              ...
+            ],
+            [
+              ...
+            ],
+            [
+              ...
+            ],
+            [
+              ...
+            ],
+            [
+              ...
+            ],
+            [
+              ...
+            ]
+          ],
+          'breakout': [
+            [
+              ...
+            ],
+            [
+              ...
+            ],
+            [
+              ...
+            ],
+            [
+              ...
+            ],
+            [
+              ...
+            ]
+          ],
+          'source-table': 1074
+        }
+      }
+    },
+    'type': 'query'
+  },
+  'description': None,
+  'display': 'table',
+  'embedding_params': None,
+  'enable_embedding': False,
+  'entity_id': 'kqpJurAbRQLnbkC31SZB3',
+  'id': 40,
+  'initially_published_at': None,
+  'last-edit-info': {
+    'email': 'rfullmer@jobxcel.ai',
+    'first_name': 'Randy',
+    'id': 3,
+    'last_name': 'Fullmer',
+    'timestamp': '2025-01-02T14:48:44.15565Z'
+  },
+  'last_query_start': '2025-01-26T02:46:24.899215Z',
+  'last_used_at': '2025-01-26T02:46:25.154306Z',
+  'made_public_by_id': None,
+  'metabase_version': 'v0.50.26 (5a65f46)',
+  'moderation_reviews': [],
+  'name': 'Over / Under Billings',
+  'parameter_mappings': [],
+  'parameter_usage_count': 0,
+  'parameters': [],
+  'public_uuid': None,
+  'query_type': 'query',
+  'result_metadata': [
+    {
+      'base_type': 'type/Text',
+      'coercion_strategy': None,
+      'description': None,
+      'display_name': 'Job Number Job Name',
+      'effective_type': 'type/Text',
+      'field_ref': [
+        'field',
+        'job_number_job_name',
+        {
+          'base-type': 'type/Text'
+        }
+      ],
+      'fingerprint': {
+        'global': {
+          'distinct-count': 11,
+          'nil%': 0.0
+        },
+        'type': {
+          'type/Text': {
+            'average-length': 24.454545454545453,
+            'percent-email': 0.0,
+            'percent-json': 0.0,
+            'percent-state': 0.0,
+            'percent-url': 0.0
+          }
+        }
+      },
+      'fk_target_field_id': None,
+      'id': 23838,
+      'name': 'job_number_job_name',
+      'semantic_type': 'type/Category',
+      'settings': None,
+      'visibility_type': 'normal'
+    },
+    {
+      'base_type': 'type/Text',
+      'coercion_strategy': None,
+      'description': None,
+      'display_name': 'Job Status',
+      'effective_type': 'type/Text',
+      'field_ref': [
+        'field',
+        'job_status',
+        {
+          'base-type': 'type/Text'
+        }
+      ],
+      'fingerprint': {
+        'global': {
+          'distinct-count': 2,
+          'nil%': 0.0
+        },
+        'type': {
+          'type/Text': {
+            'average-length': 7.090909090909091,
+            'percent-email': 0.0,
+            'percent-json': 0.0,
+            'percent-state': 0.0,
+            'percent-url': 0.0
+          }
+        }
+      },
+      'fk_target_field_id': None,
+      'id': 23834,
+      'name': 'job_status',
+      'semantic_type': 'type/Category',
+      'settings': None,
+      'visibility_type': 'normal'
+    },
+    {
+      'base_type': 'type/Date',
+      'coercion_strategy': None,
+      'description': None,
+      'display_name': 'Project Complete Date',
+      'effective_type': 'type/Date',
+      'field_ref': [
+        'field',
+        'project_complete_date',
+        {
+          'base-type': 'type/Date',
+          'temporal-unit': 'day'
+        }
+      ],
+      'fingerprint': {
+        'global': {
+          'distinct-count': 6,
+          'nil%': 0.5454545454545455
+        },
+        'type': {
+          'type/DateTime': {
+            'earliest': '2023-06-15',
+            'latest': '2023-12-20'
+          }
+        }
+      },
+      'fk_target_field_id': None,
+      'id': 23797,
+      'name': 'project_complete_date',
+      'semantic_type': None,
+      'settings': None,
+      'unit': 'day',
+      'visibility_type': 'normal'
+    },
+    {
+      'base_type': 'type/BigInteger',
+      'coercion_strategy': None,
+      'description': None,
+      'display_name': 'Job Number',
+      'effective_type': 'type/BigInteger',
+      'field_ref': [
+        'field',
+        'job_number',
+        {
+          'base-type': 'type/BigInteger'
+        }
+      ],
+      'fingerprint': {
+        'global': {
+          'distinct-count': 11,
+          'nil%': 0.0
+        },
+        'type': {
+          'type/Number': {
+            'avg': 194.1818181818182,
+            'max': 224.0,
+            'min': 1.0,
+            'q1': 202.5,
+            'q3': 221.75,
+            'sd': 65.10425206055007
+          }
+        }
+      },
+      'fk_target_field_id': None,
+      'id': 23779,
+      'name': 'job_number',
+      'semantic_type': 'type/Quantity',
+      'settings': None,
+      'visibility_type': 'normal'
+    },
+    {
+      'base_type': 'type/Date',
+      'coercion_strategy': None,
+      'description': None,
+      'display_name': 'Project Start Date',
+      'effective_type': 'type/Date',
+      'field_ref': [
+        'field',
+        'project_start_date',
+        {
+          'base-type': 'type/Date',
+          'temporal-unit': 'day'
+        }
+      ],
+      'fingerprint': {
+        'global': {
+          'distinct-count': 7,
+          'nil%': 0.3636363636363636
+        },
+        'type': {
+          'type/DateTime': {
+            'earliest': '2023-01-01',
+            'latest': '2023-07-01'
+          }
+        }
+      },
+      'fk_target_field_id': None,
+      'id': 23825,
+      'name': 'project_start_date',
+      'semantic_type': 'type/CreationDate',
+      'settings': None,
+      'unit': 'day',
+      'visibility_type': 'normal'
+    },
+    {
+      'base_type': 'type/Decimal',
+      'display_name': 'Sum of Max of Sum of Total Contract Amount',
+      'effective_type': 'type/Decimal',
+      'field_ref': [
+        'aggregation',
+        0
+      ],
+      'fingerprint': {
+        'global': {
+          'distinct-count': 356,
+          'nil%': 0.0
+        },
+        'type': {
+          'type/Number': {
+            'avg': 2610110.5615686276,
+            'max': 4975449.41,
+            'min': 0.0,
+            'q1': 1401866.3408346092,
+            'q3': 3867512.297723551,
+            'sd': 1430704.353476612
+          }
+        }
+      },
+      'name': 'sum',
+      'semantic_type': None
+    },
+    {
+      'base_type': 'type/Decimal',
+      'display_name': 'Sum of Max of Sum of Original Budget Amount',
+      'effective_type': 'type/Decimal',
+      'field_ref': [
+        'aggregation',
+        1
+      ],
+      'fingerprint': {
+        'global': {
+          'distinct-count': 357,
+          'nil%': 0.0
+        },
+        'type': {
+          'type/Number': {
+            'avg': 2280384.8771988796,
+            'max': 4584438.29,
+            'min': 0.0,
+            'q1': 1201522.7682775764,
+            'q3': 3261960.8730000006,
+            'sd': 1254895.5072387254
+          }
+        }
+      },
+      'name': 'sum_2',
+      'semantic_type': None
+    },
+    {
+      'base_type': 'type/Decimal',
+      'display_name': 'Sum of Max of Sum of Estimated Gross Profit',
+      'effective_type': 'type/Decimal',
+      'field_ref': [
+        'aggregation',
+        2
+      ],
+      'fingerprint': {
+        'global': {
+          'distinct-count': 357,
+          'nil%': 0.0
+        },
+        'type': {
+          'type/Number': {
+            'avg': 326746.5823809523,
+            'max': 954675.96,
+            'min': -379155.62,
+            'q1': 148548.51749999996,
+            'q3': 456590.38750347315,
+            'sd': 224624.14088956363
+          }
+        }
+      },
+      'name': 'sum_3',
+      'semantic_type': None
+    },
+    {
+      'base_type': 'type/Float',
+      'display_name': 'Sum of Percent Complete',
+      'effective_type': 'type/Float',
+      'field_ref': [
+        'aggregation',
+        3
+      ],
+      'fingerprint': {
+        'global': {
+          'distinct-count': 357,
+          'nil%': 0.002801120448179272
+        },
+        'type': {
+          'type/Number': {
+            'avg': 1.2025576915553637,
+            'max': 1.329405609528941,
+            'min': 0.03693316720172409,
+            'q1': 1.1621947358511897,
+            'q3': 1.2758850246797575,
+            'sd': 0.13863965888764085
+          }
+        }
+      },
+      'name': 'sum_4',
+      'semantic_type': None
+    },
+    {
+      'base_type': 'type/Decimal',
+      'display_name': 'Sum of Max of Sum of Invoice Billed',
+      'effective_type': 'type/Decimal',
+      'field_ref': [
+        'aggregation',
+        4
+      ],
+      'fingerprint': {
+        'global': {
+          'distinct-count': 354,
+          'nil%': 0.0
+        },
+        'type': {
+          'type/Number': {
+            'avg': 2307820.233165266,
+            'max': 6465473.0,
+            'min': 0.0,
+            'q1': 1114003.342685521,
+            'q3': 3358757.416018518,
+            'sd': 1411475.0993258778
+          }
+        }
+      },
+      'name': 'sum_5',
+      'semantic_type': None
+    },
+    {
+      'base_type': 'type/Decimal',
+      'display_name': 'Sum of Sum of Job Cost - Job Number → Cost Amount',
+      'effective_type': 'type/Decimal',
+      'field_ref': [
+        'aggregation',
+        5
+      ],
+      'fingerprint': {
+        'global': {
+          'distinct-count': 357,
+          'nil%': 0.0
+        },
+        'type': {
+          'type/Number': {
+            'avg': 2754834.404565826,
+            'max': 5341718.35,
+            'min': 293.19,
+            'q1': 1443571.9101493715,
+            'q3': 4093071.8329454893,
+            'sd': 1534734.0876289506
+          }
+        }
+      },
+      'name': 'sum_6',
+      'semantic_type': 'type/Cost'
+    },
+    {
+      'base_type': 'type/Decimal',
+      'display_name': 'Sum of Income',
+      'effective_type': 'type/Decimal',
+      'field_ref': [
+        'aggregation',
+        6
+      ],
+      'fingerprint': {
+        'global': {
+          'distinct-count': 357,
+          'nil%': 0.0
+        },
+        'type': {
+          'type/Number': {
+            'avg': -447014.17140056024,
+            'max': 1384875.17,
+            'min': -2101899.68,
+            'q1': -823488.4020432212,
+            'q3': -50106.485314311474,
+            'sd': 615675.5805272193
+          }
+        }
+      },
+      'name': 'sum_7',
+      'semantic_type': None
+    },
+    {
+      'base_type': 'type/Float',
+      'display_name': 'Sum of Overbilled',
+      'effective_type': 'type/Float',
+      'field_ref': [
+        'aggregation',
+        7
+      ],
+      'fingerprint': {
+        'global': {
+          'distinct-count': 334,
+          'nil%': 0.0
+        },
+        'type': {
+          'type/Number': {
+            'avg': 863042.7395122421,
+            'max': 2897381.432598487,
+            'min': 0.0,
+            'q1': 274863.7134327834,
+            'q3': 1338884.475469635,
+            'sd': 719879.5127297183
+          }
+        }
+      },
+      'name': 'sum_8',
+      'semantic_type': None
+    },
+    {
+      'base_type': 'type/Float',
+      'display_name': 'Sum of Underbilled',
+      'effective_type': 'type/Float',
+      'field_ref': [
+        'aggregation',
+        8
+      ],
+      'fingerprint': {
+        'global': {
+          'distinct-count': 24,
+          'nil%': 0.0
+        },
+        'type': {
+          'type/Number': {
+            'avg': -10295.499291427283,
+            'max': 0.0,
+            'min': -577704.5063669244,
+            'q1': -1592.8107783038267,
+            'q3': 0.0,
+            'sd': 56037.65928889941
+          }
+        }
+      },
+      'name': 'sum_9',
+      'semantic_type': None
+    },
+    {
+      'base_type': 'type/Float',
+      'display_name': 'Sum of Earned Revenue',
+      'effective_type': 'type/Float',
+      'field_ref': [
+        'aggregation',
+        9
+      ],
+      'fingerprint': {
+        'global': {
+          'distinct-count': 357,
+          'nil%': 0.002801120448179272
+        },
+        'type': {
+          'type/Number': {
+            'avg': 3169445.471906828,
+            'max': 6613849.359204726,
+            'min': 0.0,
+            'q1': 1645038.2549542151,
+            'q3': 4693672.409208836,
+            'sd': 1766018.9948687607
+          }
+        }
+      },
+      'name': 'sum_10',
+      'semantic_type': None
+    },
+    {
+      'base_type': 'type/Float',
+      'display_name': 'Sum of Cost of Revenue',
+      'effective_type': 'type/Float',
+      'field_ref': [
+        'aggregation',
+        10
+      ],
+      'fingerprint': {
+        'global': {
+          'distinct-count': 357,
+          'nil%': 0.002801120448179272
+        },
+        'type': {
+          'type/Number': {
+            'avg': 2841781.062047278,
+            'max': 5659173.399204726,
+            'min': -262812.2419909225,
+            'q1': 1499727.8903967645,
+            'q3': 4229746.032817744,
+            'sd': 1578803.0395066754
+          }
+        }
+      },
+      'name': 'sum_11',
+      'semantic_type': None
+    },
+    {
+      'base_type': 'type/Decimal',
+      'display_name': 'Sum of Max of Gross Profit',
+      'effective_type': 'type/Decimal',
+      'field_ref': [
+        'aggregation',
+        11
+      ],
+      'fingerprint': {
+        'global': {
+          'distinct-count': 357,
+          'nil%': 0.0
+        },
+        'type': {
+          'type/Number': {
+            'avg': 326746.5823809523,
+            'max': 954675.96,
+            'min': -379155.62,
+            'q1': 148548.51749999996,
+            'q3': 456590.38750347315,
+            'sd': 224624.14088956363
+          }
+        }
+      },
+      'name': 'sum_12',
+      'semantic_type': None
+    }
+  ],
+  'table_id': 1074,
+  'type': 'question',
+  'updated_at': '2025-01-02T14:48:44.138545Z',
+  'view_count': 282,
+  'visualization_settings': {
+    'column_settings': {
+      '["name","sum"]': {
+        'column_title': 'Total Contract',
+        'currency_in_header': False,
+        'decimals': 0,
+        'number_style': 'currency'
+      },
+      '["name","sum_10"]': {
+        'column_title': 'Earned Revenue',
+        'currency_in_header': False,
+        'decimals': 0,
+        'number_style': 'currency'
+      },
+      '["name","sum_11"]': {
+        'column_title': 'Cost of Revenue',
+        'currency_in_header': False,
+        'decimals': 0,
+        'number_style': 'currency'
+      },
+      '["name","sum_12"]': {
+        'column_title': 'Gross Profit',
+        'currency_in_header': False,
+        'decimals': 0,
+        'number_style': 'currency'
+      },
+      '["name","sum_2"]': {
+        'column_title': 'Est. Cost at Completion',
+        'currency_in_header': False,
+        'decimals': 0,
+        'number_style': 'currency'
+      },
+      '["name","sum_3"]': {
+        'column_title': 'Estimated Gross Profit',
+        'currency_in_header': False,
+        'decimals': 0,
+        'number_style': 'currency'
+      },
+      '["name","sum_4"]': {
+        'column_title': 'Percent Complete',
+        'decimals': 0,
+        'number_style': 'percent'
+      },
+      '["name","sum_5"]': {
+        'column_title': 'Billed',
+        'currency_in_header': False,
+        'decimals': 0,
+        'number_style': 'currency'
+      },
+      '["name","sum_6"]': {
+        'column_title': 'Costs',
+        'currency_in_header': False,
+        'decimals': 0
+      },
+      '["name","sum_7"]': {
+        'column_title': 'Income',
+        'currency_in_header': False,
+        'decimals': 0,
+        'number_style': 'currency'
+      },
+      '["name","sum_8"]': {
+        'column_title': 'Overbilled',
+        'currency_in_header': False,
+        'decimals': 0,
+        'number_style': 'currency'
+      },
+      '["name","sum_9"]': {
+        'column_title': 'Underbilled',
+        'currency_in_header': False,
+        'decimals': 0,
+        'number_style': 'currency'
+      }
+    },
+    'table.cell_column': 'sum',
+    'table.column_formatting': [
+      {
+        'color': '#F7C4C4',
+        'columns': [
+          'sum_9'
+        ],
+        'highlight_row': True,
+        'id': 0,
+        'operator': '<',
+        'type': 'single',
+        'value': 0
+      }
+    ],
+    'table.columns': [
+      {
+        'enabled': True,
+        'name': 'job_number_job_name'
+      },
+      {
+        'enabled': False,
+        'name': 'job_status'
+      },
+      {
+        'enabled': False,
+        'name': 'project_complete_date'
+      },
+      {
+        'enabled': True,
+        'name': 'sum'
+      },
+      {
+        'enabled': True,
+        'name': 'sum_2'
+      },
+      {
+        'enabled': True,
+        'name': 'sum_3'
+      },
+      {
+        'enabled': True,
+        'name': 'sum_4'
+      },
+      {
+        'enabled': True,
+        'name': 'sum_5'
+      },
+      {
+        'enabled': True,
+        'name': 'sum_6'
+      },
+      {
+        'enabled': True,
+        'name': 'sum_7'
+      },
+      {
+        'enabled': True,
+        'name': 'sum_8'
+      },
+      {
+        'enabled': True,
+        'name': 'sum_9'
+      },
+      {
+        'enabled': True,
+        'name': 'sum_10'
+      },
+      {
+        'enabled': True,
+        'name': 'sum_11'
+      },
+      {
+        'enabled': True,
+        'name': 'sum_12'
+      },
+      {
+        'enabled': False,
+        'name': 'job_number'
+      },
+      {
+        'enabled': False,
+        'name': 'project_start_date'
+      }
+    ],
+    'table.pivot_column': 'job_number_job_name'
+  }
+}

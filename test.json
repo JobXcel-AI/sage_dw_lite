@@ -1,0 +1,1009 @@
+{
+  'archived': False,
+  'auto_apply_filters': True,
+  'cache_ttl': None,
+  'can_write': True,
+  'caveats': None,
+  'collection': {
+    'authority_level': None,
+    'can_write': True,
+    'id': 'root',
+    'is_personal': False,
+    'metabase.models.collection.root/is-root?': True,
+    'name': 'Our analytics'
+  },
+  'collection_authority_level': None,
+  'collection_id': None,
+  'collection_position': None,
+  'created_at': '2025-01-02T00:48:22.390119Z',
+  'creator_id': 3,
+  'dashcards': [
+    {
+      'action_id': None,
+      'card': {
+        'archived': False,
+        'cache_invalidated_at': None,
+        'cache_ttl': None,
+        'can_write': True,
+        'collection_id': None,
+        'collection_position': None,
+        'collection_preview': True,
+        'created_at': '2025-01-02T00:47:41.562649Z',
+        'creator_id': 3,
+        'database_id': 2,
+        'dataset_query': {
+          'database': 2,
+          'query': {
+            'aggregation': [
+              ...
+            ],
+            'breakout': [
+              ...
+            ],
+            'expressions': {
+              ...
+            },
+            'source-query': {
+              ...
+            }
+          },
+          'type': 'query'
+        },
+        'description': None,
+        'display': 'table',
+        'embedding_params': None,
+        'enable_embedding': False,
+        'entity_id': 'kqpJurAbRQLnbkC31SZB3',
+        'id': 40,
+        'initially_published_at': None,
+        'last_used_at': '2025-01-26T02:46:25.154306Z',
+        'made_public_by_id': None,
+        'metabase_version': 'v0.50.26 (5a65f46)',
+        'moderation_reviews': [],
+        'name': 'Over / Under Billings',
+        'parameter_mappings': [],
+        'parameters': [],
+        'public_uuid': None,
+        'query_average_duration': 316,
+        'query_type': 'query',
+        'result_metadata': [
+          {
+            'base_type': 'type/Text',
+            'coercion_strategy': None,
+            'description': None,
+            'display_name': 'Job Number Job Name',
+            'effective_type': 'type/Text',
+            'field_ref': [
+              ...
+            ],
+            'fingerprint': {
+              ...
+            },
+            'fk_target_field_id': None,
+            'id': 23838,
+            'name': 'job_number_job_name',
+            'semantic_type': 'type/Category',
+            'settings': None,
+            'visibility_type': 'normal'
+          },
+          {
+            'base_type': 'type/Text',
+            'coercion_strategy': None,
+            'description': None,
+            'display_name': 'Job Status',
+            'effective_type': 'type/Text',
+            'field_ref': [
+              ...
+            ],
+            'fingerprint': {
+              ...
+            },
+            'fk_target_field_id': None,
+            'id': 23834,
+            'name': 'job_status',
+            'semantic_type': 'type/Category',
+            'settings': None,
+            'visibility_type': 'normal'
+          },
+          {
+            'base_type': 'type/Date',
+            'coercion_strategy': None,
+            'description': None,
+            'display_name': 'Project Complete Date',
+            'effective_type': 'type/Date',
+            'field_ref': [
+              ...
+            ],
+            'fingerprint': {
+              ...
+            },
+            'fk_target_field_id': None,
+            'id': 23797,
+            'name': 'project_complete_date',
+            'semantic_type': None,
+            'settings': None,
+            'unit': 'day',
+            'visibility_type': 'normal'
+          },
+          {
+            'base_type': 'type/BigInteger',
+            'coercion_strategy': None,
+            'description': None,
+            'display_name': 'Job Number',
+            'effective_type': 'type/BigInteger',
+            'field_ref': [
+              ...
+            ],
+            'fingerprint': {
+              ...
+            },
+            'fk_target_field_id': None,
+            'id': 23779,
+            'name': 'job_number',
+            'semantic_type': 'type/Quantity',
+            'settings': None,
+            'visibility_type': 'normal'
+          },
+          {
+            'base_type': 'type/Date',
+            'coercion_strategy': None,
+            'description': None,
+            'display_name': 'Project Start Date',
+            'effective_type': 'type/Date',
+            'field_ref': [
+              ...
+            ],
+            'fingerprint': {
+              ...
+            },
+            'fk_target_field_id': None,
+            'id': 23825,
+            'name': 'project_start_date',
+            'semantic_type': 'type/CreationDate',
+            'settings': None,
+            'unit': 'day',
+            'visibility_type': 'normal'
+          },
+          {
+            'base_type': 'type/Decimal',
+            'display_name': 'Sum of Max of Sum of Total Contract Amount',
+            'effective_type': 'type/Decimal',
+            'field_ref': [
+              ...
+            ],
+            'fingerprint': {
+              ...
+            },
+            'name': 'sum',
+            'semantic_type': None
+          },
+          {
+            'base_type': 'type/Decimal',
+            'display_name': 'Sum of Max of Sum of Original Budget Amount',
+            'effective_type': 'type/Decimal',
+            'field_ref': [
+              ...
+            ],
+            'fingerprint': {
+              ...
+            },
+            'name': 'sum_2',
+            'semantic_type': None
+          },
+          {
+            'base_type': 'type/Decimal',
+            'display_name': 'Sum of Max of Sum of Estimated Gross Profit',
+            'effective_type': 'type/Decimal',
+            'field_ref': [
+              ...
+            ],
+            'fingerprint': {
+              ...
+            },
+            'name': 'sum_3',
+            'semantic_type': None
+          },
+          {
+            'base_type': 'type/Float',
+            'display_name': 'Sum of Percent Complete',
+            'effective_type': 'type/Float',
+            'field_ref': [
+              ...
+            ],
+            'fingerprint': {
+              ...
+            },
+            'name': 'sum_4',
+            'semantic_type': None
+          },
+          {
+            'base_type': 'type/Decimal',
+            'display_name': 'Sum of Max of Sum of Invoice Billed',
+            'effective_type': 'type/Decimal',
+            'field_ref': [
+              ...
+            ],
+            'fingerprint': {
+              ...
+            },
+            'name': 'sum_5',
+            'semantic_type': None
+          },
+          {
+            'base_type': 'type/Decimal',
+            'display_name': 'Sum of Sum of Job Cost - Job Number → Cost Amount',
+            'effective_type': 'type/Decimal',
+            'field_ref': [
+              ...
+            ],
+            'fingerprint': {
+              ...
+            },
+            'name': 'sum_6',
+            'semantic_type': 'type/Cost'
+          },
+          {
+            'base_type': 'type/Decimal',
+            'display_name': 'Sum of Income',
+            'effective_type': 'type/Decimal',
+            'field_ref': [
+              ...
+            ],
+            'fingerprint': {
+              ...
+            },
+            'name': 'sum_7',
+            'semantic_type': None
+          },
+          {
+            'base_type': 'type/Float',
+            'display_name': 'Sum of Overbilled',
+            'effective_type': 'type/Float',
+            'field_ref': [
+              ...
+            ],
+            'fingerprint': {
+              ...
+            },
+            'name': 'sum_8',
+            'semantic_type': None
+          },
+          {
+            'base_type': 'type/Float',
+            'display_name': 'Sum of Underbilled',
+            'effective_type': 'type/Float',
+            'field_ref': [
+              ...
+            ],
+            'fingerprint': {
+              ...
+            },
+            'name': 'sum_9',
+            'semantic_type': None
+          },
+          {
+            'base_type': 'type/Float',
+            'display_name': 'Sum of Earned Revenue',
+            'effective_type': 'type/Float',
+            'field_ref': [
+              ...
+            ],
+            'fingerprint': {
+              ...
+            },
+            'name': 'sum_10',
+            'semantic_type': None
+          },
+          {
+            'base_type': 'type/Float',
+            'display_name': 'Sum of Cost of Revenue',
+            'effective_type': 'type/Float',
+            'field_ref': [
+              ...
+            ],
+            'fingerprint': {
+              ...
+            },
+            'name': 'sum_11',
+            'semantic_type': None
+          },
+          {
+            'base_type': 'type/Decimal',
+            'display_name': 'Sum of Max of Gross Profit',
+            'effective_type': 'type/Decimal',
+            'field_ref': [
+              ...
+            ],
+            'fingerprint': {
+              ...
+            },
+            'name': 'sum_12',
+            'semantic_type': None
+          }
+        ],
+        'table_id': 1074,
+        'type': 'question',
+        'updated_at': '2025-01-02T14:48:44.138545Z',
+        'view_count': 282,
+        'visualization_settings': {
+          'column_settings': {
+            '["name","sum"]': {
+              ...
+            },
+            '["name","sum_10"]': {
+              ...
+            },
+            '["name","sum_11"]': {
+              ...
+            },
+            '["name","sum_12"]': {
+              ...
+            },
+            '["name","sum_2"]': {
+              ...
+            },
+            '["name","sum_3"]': {
+              ...
+            },
+            '["name","sum_4"]': {
+              ...
+            },
+            '["name","sum_5"]': {
+              ...
+            },
+            '["name","sum_6"]': {
+              ...
+            },
+            '["name","sum_7"]': {
+              ...
+            },
+            '["name","sum_8"]': {
+              ...
+            },
+            '["name","sum_9"]': {
+              ...
+            }
+          },
+          'table.cell_column': 'sum',
+          'table.column_formatting': [
+            {
+              ...
+            }
+          ],
+          'table.columns': [
+            {
+              ...
+            },
+            {
+              ...
+            },
+            {
+              ...
+            },
+            {
+              ...
+            },
+            {
+              ...
+            },
+            {
+              ...
+            },
+            {
+              ...
+            },
+            {
+              ...
+            },
+            {
+              ...
+            },
+            {
+              ...
+            },
+            {
+              ...
+            },
+            {
+              ...
+            },
+            {
+              ...
+            },
+            {
+              ...
+            },
+            {
+              ...
+            },
+            {
+              ...
+            },
+            {
+              ...
+            }
+          ],
+          'table.pivot_column': 'job_number_job_name'
+        }
+      },
+      'card_id': 40,
+      'col': 0,
+      'collection_authority_level': None,
+      'created_at': '2025-01-02T00:50:37.328797Z',
+      'dashboard_id': 4,
+      'dashboard_tab_id': None,
+      'entity_id': 'O4RiUiWB_jLYru3Ad1u0t',
+      'id': 38,
+      'parameter_mappings': [
+        {
+          'card_id': 40,
+          'parameter_id': 'ada0ab44',
+          'target': [
+            'dimension',
+            [
+              ...
+            ]
+          ]
+        },
+        {
+          'card_id': 40,
+          'parameter_id': '731098',
+          'target': [
+            'dimension',
+            [
+              ...
+            ]
+          ]
+        },
+        {
+          'card_id': 40,
+          'parameter_id': '704e61f0',
+          'target': [
+            'dimension',
+            [
+              ...
+            ]
+          ]
+        },
+        {
+          'card_id': 40,
+          'parameter_id': '78d9663b',
+          'target': [
+            'dimension',
+            [
+              ...
+            ]
+          ]
+        },
+        {
+          'card_id': 40,
+          'parameter_id': 'afa08c41',
+          'target': [
+            'dimension',
+            [
+              ...
+            ]
+          ]
+        }
+      ],
+      'row': 5,
+      'series': [],
+      'size_x': 24,
+      'size_y': 8,
+      'updated_at': '2025-01-14T22:27:12.356416Z',
+      'visualization_settings': {
+        'column_settings': {
+          '["name","job_number_job_name"]': {
+            'click_behavior': {
+              ...
+            }
+          }
+        }
+      }
+    },
+    {
+      'action_id': None,
+      'card': {
+        'archived': False,
+        'cache_invalidated_at': None,
+        'cache_ttl': None,
+        'can_write': True,
+        'collection_id': None,
+        'collection_position': None,
+        'collection_preview': True,
+        'created_at': '2025-01-02T00:56:25.14879Z',
+        'creator_id': 3,
+        'database_id': 2,
+        'dataset_query': {
+          'database': 2,
+          'query': {
+            'aggregation': [
+              ...
+            ],
+            'breakout': [
+              ...
+            ],
+            'source-table': 'card__40'
+          },
+          'type': 'query'
+        },
+        'description': None,
+        'display': 'bar',
+        'embedding_params': None,
+        'enable_embedding': False,
+        'entity_id': 'qAsoyIkqPnDAv_puxBRcg',
+        'id': 41,
+        'initially_published_at': None,
+        'last_used_at': '2025-01-26T02:43:07.342329Z',
+        'made_public_by_id': None,
+        'metabase_version': 'v0.50.26 (5a65f46)',
+        'moderation_reviews': [],
+        'name': 'Over / Under Billings by Completion Month',
+        'parameter_mappings': [],
+        'parameters': [],
+        'public_uuid': None,
+        'query_average_duration': 383,
+        'query_type': 'query',
+        'result_metadata': [
+          {
+            'base_type': 'type/Date',
+            'coercion_strategy': None,
+            'description': None,
+            'display_name': 'Project Complete Date',
+            'effective_type': 'type/Date',
+            'field_ref': [
+              ...
+            ],
+            'fingerprint': {
+              ...
+            },
+            'fk_target_field_id': None,
+            'id': 23797,
+            'name': 'project_complete_date',
+            'semantic_type': None,
+            'settings': None,
+            'unit': 'month',
+            'visibility_type': 'normal'
+          },
+          {
+            'base_type': 'type/Float',
+            'display_name': 'Sum of Sum of Overbilled',
+            'effective_type': 'type/Float',
+            'field_ref': [
+              ...
+            ],
+            'fingerprint': {
+              ...
+            },
+            'name': 'sum',
+            'semantic_type': None
+          },
+          {
+            'base_type': 'type/Float',
+            'display_name': 'Sum of Sum of Underbilled',
+            'effective_type': 'type/Float',
+            'field_ref': [
+              ...
+            ],
+            'fingerprint': {
+              ...
+            },
+            'name': 'sum_2',
+            'semantic_type': None
+          }
+        ],
+        'table_id': 1074,
+        'type': 'question',
+        'updated_at': '2025-01-02T14:53:02.871925Z',
+        'view_count': 238,
+        'visualization_settings': {
+          'graph.dimensions': [
+            'project_complete_date'
+          ],
+          'graph.metrics': [
+            'sum',
+            'sum_2'
+          ],
+          'graph.y_axis.auto_split': False,
+          'series_settings': {
+            'sum': {
+              ...
+            },
+            'sum_2': {
+              ...
+            }
+          }
+        }
+      },
+      'card_id': 41,
+      'col': 12,
+      'collection_authority_level': None,
+      'created_at': '2025-01-02T00:57:28.87016Z',
+      'dashboard_id': 4,
+      'dashboard_tab_id': None,
+      'entity_id': '32ivgZJwBAIbkKC_dmvHv',
+      'id': 39,
+      'parameter_mappings': [
+        {
+          'card_id': 41,
+          'parameter_id': '731098',
+          'target': [
+            'dimension',
+            [
+              ...
+            ]
+          ]
+        },
+        {
+          'card_id': 41,
+          'parameter_id': '704e61f0',
+          'target': [
+            'dimension',
+            [
+              ...
+            ]
+          ]
+        },
+        {
+          'card_id': 41,
+          'parameter_id': 'ada0ab44',
+          'target': [
+            'dimension',
+            [
+              ...
+            ]
+          ]
+        },
+        {
+          'card_id': 41,
+          'parameter_id': '78d9663b',
+          'target': [
+            'dimension',
+            [
+              ...
+            ]
+          ]
+        }
+      ],
+      'row': 0,
+      'series': [],
+      'size_x': 12,
+      'size_y': 5,
+      'updated_at': '2025-01-02T14:51:18.473485Z',
+      'visualization_settings': {
+        'click_behavior': {
+          'parameterMapping': {
+            '704e61f0': {
+              ...
+            }
+          },
+          'type': 'crossfilter'
+        }
+      }
+    },
+    {
+      'action_id': None,
+      'card': {
+        'archived': False,
+        'cache_invalidated_at': None,
+        'cache_ttl': None,
+        'can_write': True,
+        'collection_id': None,
+        'collection_position': None,
+        'collection_preview': True,
+        'created_at': '2025-01-02T14:49:51.008272Z',
+        'creator_id': 3,
+        'database_id': 2,
+        'dataset_query': {
+          'database': 2,
+          'query': {
+            'aggregation': [
+              ...
+            ],
+            'breakout': [
+              ...
+            ],
+            'source-table': 'card__40'
+          },
+          'type': 'query'
+        },
+        'description': None,
+        'display': 'bar',
+        'embedding_params': None,
+        'enable_embedding': False,
+        'entity_id': 'CoCw159k9IrCTihK55nqq',
+        'id': 43,
+        'initially_published_at': None,
+        'last_used_at': '2025-01-26T02:43:07.342329Z',
+        'made_public_by_id': None,
+        'metabase_version': 'v0.50.26 (5a65f46)',
+        'moderation_reviews': [],
+        'name': 'Over / Under Billings by Start Month',
+        'parameter_mappings': [],
+        'parameters': [],
+        'public_uuid': None,
+        'query_average_duration': 552,
+        'query_type': 'query',
+        'result_metadata': [
+          {
+            'base_type': 'type/Date',
+            'coercion_strategy': None,
+            'description': None,
+            'display_name': 'Project Start Date',
+            'effective_type': 'type/Date',
+            'field_ref': [
+              ...
+            ],
+            'fingerprint': {
+              ...
+            },
+            'fk_target_field_id': None,
+            'id': 23825,
+            'name': 'project_start_date',
+            'semantic_type': 'type/CreationDate',
+            'settings': None,
+            'unit': 'month',
+            'visibility_type': 'normal'
+          },
+          {
+            'base_type': 'type/Float',
+            'display_name': 'Sum of Sum of Overbilled',
+            'effective_type': 'type/Float',
+            'field_ref': [
+              ...
+            ],
+            'fingerprint': {
+              ...
+            },
+            'name': 'sum',
+            'semantic_type': None
+          },
+          {
+            'base_type': 'type/Float',
+            'display_name': 'Sum of Sum of Underbilled',
+            'effective_type': 'type/Float',
+            'field_ref': [
+              ...
+            ],
+            'fingerprint': {
+              ...
+            },
+            'name': 'sum_2',
+            'semantic_type': None
+          }
+        ],
+        'table_id': 1074,
+        'type': 'question',
+        'updated_at': '2025-01-02T14:52:39.301989Z',
+        'view_count': 230,
+        'visualization_settings': {
+          'graph.dimensions': [
+            'project_start_date'
+          ],
+          'graph.metrics': [
+            'sum',
+            'sum_2'
+          ],
+          'graph.y_axis.auto_split': False,
+          'series_settings': {
+            'sum': {
+              ...
+            },
+            'sum_2': {
+              ...
+            }
+          }
+        }
+      },
+      'card_id': 43,
+      'col': 0,
+      'collection_authority_level': None,
+      'created_at': '2025-01-02T14:50:21.303883Z',
+      'dashboard_id': 4,
+      'dashboard_tab_id': None,
+      'entity_id': 'FjX5FjgYaONdMjsqW7m8E',
+      'id': 40,
+      'parameter_mappings': [
+        {
+          'card_id': 43,
+          'parameter_id': 'ada0ab44',
+          'target': [
+            'dimension',
+            [
+              ...
+            ]
+          ]
+        },
+        {
+          'card_id': 43,
+          'parameter_id': '731098',
+          'target': [
+            'dimension',
+            [
+              ...
+            ]
+          ]
+        },
+        {
+          'card_id': 43,
+          'parameter_id': '78d9663b',
+          'target': [
+            'dimension',
+            [
+              ...
+            ]
+          ]
+        },
+        {
+          'card_id': 43,
+          'parameter_id': '704e61f0',
+          'target': [
+            'dimension',
+            [
+              ...
+            ]
+          ]
+        }
+      ],
+      'row': 0,
+      'series': [],
+      'size_x': 12,
+      'size_y': 5,
+      'updated_at': '2025-01-02T14:51:18.473485Z',
+      'visualization_settings': {
+        'click_behavior': {
+          'parameterMapping': {
+            '78d9663b': {
+              ...
+            }
+          },
+          'type': 'crossfilter'
+        }
+      }
+    }
+  ],
+  'description': None,
+  'embedding_params': None,
+  'enable_embedding': False,
+  'entity_id': 'nkAqIgInUkF8cJUeDiV5_',
+  'id': 4,
+  'initially_published_at': None,
+  'last-edit-info': {
+    'email': 'mhagberg@jobxcel.ai',
+    'first_name': 'Mike',
+    'id': 2,
+    'last_name': 'Hagberg',
+    'timestamp': '2025-01-14T22:27:12.385907Z'
+  },
+  'last_used_param_values': {},
+  'made_public_by_id': None,
+  'name': 'Over / Under Billings Dashboard',
+  'param_fields': {
+    '23779': {
+      'base_type': 'type/BigInteger',
+      'dimensions': [],
+      'display_name': 'Job Number',
+      'fk_target_field_id': None,
+      'has_field_values': 'list',
+      'id': 23779,
+      'name': 'job_number',
+      'name_field': None,
+      'semantic_type': 'type/Quantity',
+      'table_id': 1074,
+      'target': None
+    },
+    '23797': {
+      'base_type': 'type/Date',
+      'dimensions': [],
+      'display_name': 'Project Complete Date',
+      'fk_target_field_id': None,
+      'has_field_values': 'none',
+      'id': 23797,
+      'name': 'project_complete_date',
+      'name_field': None,
+      'semantic_type': None,
+      'table_id': 1074,
+      'target': None
+    },
+    '23825': {
+      'base_type': 'type/Date',
+      'dimensions': [],
+      'display_name': 'Project Start Date',
+      'fk_target_field_id': None,
+      'has_field_values': 'none',
+      'id': 23825,
+      'name': 'project_start_date',
+      'name_field': None,
+      'semantic_type': 'type/CreationDate',
+      'table_id': 1074,
+      'target': None
+    },
+    '23834': {
+      'base_type': 'type/Text',
+      'dimensions': [],
+      'display_name': 'Job Status',
+      'fk_target_field_id': None,
+      'has_field_values': 'list',
+      'id': 23834,
+      'name': 'job_status',
+      'name_field': None,
+      'semantic_type': 'type/Category',
+      'table_id': 1074,
+      'target': None
+    }
+  },
+  'param_values': {
+    '23779': {
+      'field_id': 23779,
+      'human_readable_values': [],
+      'values': [
+        1,
+        186,
+        201,
+        207,
+        215,
+        216,
+        220,
+        221,
+        222,
+        223,
+        224
+      ]
+    },
+    '23834': {
+      'field_id': 23834,
+      'human_readable_values': [],
+      'values': [
+        'Closed',
+        'Complete',
+        'Contract',
+        'Current'
+      ]
+    }
+  },
+  'parameters': [
+    {
+      'id': 'ada0ab44',
+      'name': 'Job Number',
+      'sectionId': 'number',
+      'slug': 'job_number',
+      'type': 'number/='
+    },
+    {
+      'id': '731098',
+      'name': 'Job Status',
+      'sectionId': 'string',
+      'slug': 'job_status',
+      'type': 'string/='
+    },
+    {
+      'id': '78d9663b',
+      'name': 'Project Start Date',
+      'sectionId': 'date',
+      'slug': 'project_start_date',
+      'type': 'date/all-options'
+    },
+    {
+      'id': '704e61f0',
+      'name': 'Project Complete Date',
+      'sectionId': 'date',
+      'slug': 'project_complete_date',
+      'type': 'date/all-options'
+    },
+    {
+      'id': 'afa08c41',
+      'name': 'Gross Profit > ',
+      'sectionId': 'number',
+      'slug': 'gross_profit_%3E_',
+      'type': 'number/>='
+    }
+  ],
+  'points_of_interest': None,
+  'position': None,
+  'public_uuid': None,
+  'show_in_getting_started': False,
+  'tabs': [],
+  'updated_at': '2025-01-14T22:27:12.356416Z',
+  'view_count': 323,
+  'width': 'full'
+}
