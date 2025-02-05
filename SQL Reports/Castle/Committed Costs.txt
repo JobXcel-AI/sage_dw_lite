@@ -1,0 +1,418 @@
+SELECT
+  "source"."Job Number" AS "Job Number",
+  "source"."Cost Code" AS "Cost Code",
+  "source"."Cost Type" AS "Cost Type",
+  SUM("source"."Budget") AS "sum",
+  SUM("source"."Approved Change Amount") AS "sum_2",
+  SUM("source"."Revised Budget") AS "sum_3",
+  SUM("source"."Job Cost") AS "sum_4",
+  SUM("source"."Committed POs") AS "sum_5",
+  SUM("source"."Committed Subcontracts") AS "sum_6",
+  SUM("source"."Balance Remaining") AS "sum_7",
+  SUM(
+    CASE
+      WHEN "source"."Balance Remaining" < 0 THEN "source"."Revised Budget" - "source"."Balance Remaining"
+      ELSE "source"."Revised Budget"
+    END
+  ) AS "Projected Costs"
+FROM
+  (
+    SELECT
+      TOP(1048575) "source"."Job Number" AS "Job Number",
+      "source"."Cost Code" AS "Cost Code",
+      "source"."Cost Type" AS "Cost Type",
+      MAX(
+        CASE
+          WHEN "source"."Budget" IS NULL THEN 0
+          ELSE "source"."Budget"
+        END
+      ) AS "Budget",
+      MAX(
+        CASE
+          WHEN "source"."Approved Change Amount" IS NULL THEN 0
+          ELSE "source"."Approved Change Amount"
+        END
+      ) AS "Approved Change Amount",
+      MAX(
+        CASE
+          WHEN "source"."Revised Budget" IS NULL THEN 0
+          ELSE "source"."Revised Budget"
+        END
+      ) AS "Revised Budget",
+      MAX(
+        CASE
+          WHEN "source"."Job Cost" IS NULL THEN 0
+          ELSE "source"."Job Cost"
+        END
+      ) AS "Job Cost",
+      MAX(
+        CASE
+          WHEN "source"."Committed POs" IS NULL THEN 0
+          ELSE "source"."Committed POs"
+        END
+      ) AS "Committed POs",
+      SUM(
+        CASE
+          WHEN "source"."Subcontract Lines - Job Number3__committed_amount" IS NULL THEN 0
+          ELSE "source"."Subcontract Lines - Job Number3__committed_amount"
+        END
+      ) AS "Committed Subcontracts",
+      MAX(
+        CASE
+          WHEN "source"."Revised Budget" IS NULL THEN 0
+          ELSE "source"."Revised Budget"
+        END
+      ) - MAX(
+        CASE
+          WHEN "source"."Job Cost" IS NULL THEN 0
+          ELSE "source"."Job Cost"
+        END
+      ) - MAX(
+        CASE
+          WHEN "source"."Committed POs" IS NULL THEN 0
+          ELSE "source"."Committed POs"
+        END
+      ) - SUM(
+        CASE
+          WHEN "source"."Subcontract Lines - Job Number3__committed_amount" IS NULL THEN 0
+          ELSE "source"."Subcontract Lines - Job Number3__committed_amount"
+        END
+      ) AS "Balance Remaining"
+    FROM
+      (
+        SELECT
+          "source"."Job Number3" AS "Job Number3",
+          "source"."Cost Code3" AS "Cost Code3",
+          "source"."Cost Type3" AS "Cost Type3",
+          "source"."Cost Code Name2" AS "Cost Code Name2",
+          "source"."Budget" AS "Budget",
+          "source"."Approved Change Amount" AS "Approved Change Amount",
+          "source"."Revised Budget" AS "Revised Budget",
+          "source"."Job Cost" AS "Job Cost",
+          "source"."Committed POs" AS "Committed POs",
+          CONCAT(
+            COALESCE(
+              "source"."Cost Code3",
+              "Subcontract Lines - Job Number3"."cost_code"
+            ),
+            ' ',
+            "source"."Cost Code Name2"
+          ) AS "Cost Code",
+          COALESCE(
+            "source"."Cost Type3",
+            "Subcontract Lines - Job Number3"."cost_type"
+          ) AS "Cost Type",
+          LTRIM(
+            COALESCE(
+              "source"."Job Number3",
+              "Subcontract Lines - Job Number3"."job_number"
+            )
+          ) AS "Job Number",
+          "Subcontract Lines - Job Number3"."committed_amount" AS "Subcontract Lines - Job Number3__committed_amount",
+          "Subcontract Lines - Job Number3"."cost_code" AS "Subcontract Lines - Job Number3__cost_code",
+          "Subcontract Lines - Job Number3"."cost_type" AS "Subcontract Lines - Job Number3__cost_type",
+          "Subcontract Lines - Job Number3"."job_number" AS "Subcontract Lines - Job Number3__job_number"
+        FROM
+          (
+            SELECT
+              TOP(1048575) "source"."Job Number3" AS "Job Number3",
+              "source"."Cost Code3" AS "Cost Code3",
+              "source"."Cost Type3" AS "Cost Type3",
+              "source"."Cost Code Name2" AS "Cost Code Name2",
+              MAX(
+                CASE
+                  WHEN "source"."Budget" IS NULL THEN 0
+                  ELSE "source"."Budget"
+                END
+              ) AS "Budget",
+              MAX(
+                CASE
+                  WHEN "source"."Approved Change Amount" IS NULL THEN 0
+                  ELSE "source"."Approved Change Amount"
+                END
+              ) AS "Approved Change Amount",
+              MAX(
+                CASE
+                  WHEN "source"."Revised Budget" IS NULL THEN 0
+                  ELSE "source"."Revised Budget"
+                END
+              ) AS "Revised Budget",
+              MAX(
+                CASE
+                  WHEN "source"."Job Cost" IS NULL THEN 0
+                  ELSE "source"."Job Cost"
+                END
+              ) AS "Job Cost",
+              SUM(
+                CASE
+                  WHEN "source"."Purchase Order Lines - Job Number2__committed_total" IS NULL THEN 0
+                  ELSE "source"."Purchase Order Lines - Job Number2__committed_total"
+                END
+              ) AS "Committed POs"
+            FROM
+              (
+                SELECT
+                  "source"."Job Number2" AS "Job Number2",
+                  "source"."Cost Code2" AS "Cost Code2",
+                  "source"."Cost Type2" AS "Cost Type2",
+                  "source"."Cost Code Name2" AS "Cost Code Name2",
+                  "source"."Budget" AS "Budget",
+                  "source"."Approved Change Amount" AS "Approved Change Amount",
+                  "source"."Revised Budget" AS "Revised Budget",
+                  "source"."Job Cost" AS "Job Cost",
+                  COALESCE(
+                    "source"."Cost Code2",
+                    "Purchase Order Lines - Job Number2"."cost_code"
+                  ) AS "Cost Code3",
+                  COALESCE(
+                    "source"."Cost Type2",
+                    "Purchase Order Lines - Job Number2"."cost_type"
+                  ) AS "Cost Type3",
+                  COALESCE(
+                    "source"."Job Number2",
+                    "Purchase Order Lines - Job Number2"."job_number"
+                  ) AS "Job Number3",
+                  "Purchase Order Lines - Job Number2"."committed_total" AS "Purchase Order Lines - Job Number2__committed_total",
+                  "Purchase Order Lines - Job Number2"."cost_code" AS "Purchase Order Lines - Job Number2__cost_code",
+                  "Purchase Order Lines - Job Number2"."cost_type" AS "Purchase Order Lines - Job Number2__cost_type",
+                  "Purchase Order Lines - Job Number2"."job_number" AS "Purchase Order Lines - Job Number2__job_number"
+                FROM
+                  (
+                    SELECT
+                      TOP(1048575) "source"."Job Number2" AS "Job Number2",
+                      "source"."Cost Code2" AS "Cost Code2",
+                      "source"."Cost Type2" AS "Cost Type2",
+                      "source"."Cost Code Name2" AS "Cost Code Name2",
+                      MAX(
+                        CASE
+                          WHEN "source"."Budget" IS NULL THEN 0
+                          ELSE "source"."Budget"
+                        END
+                      ) AS "Budget",
+                      MAX(
+                        CASE
+                          WHEN "source"."Approved Change Amount" IS NULL THEN 0
+                          ELSE "source"."Approved Change Amount"
+                        END
+                      ) AS "Approved Change Amount",
+                      MAX(
+                        CASE
+                          WHEN "source"."Revised Budget" IS NULL THEN 0
+                          ELSE "source"."Revised Budget"
+                        END
+                      ) AS "Revised Budget",
+                      SUM(
+                        CASE
+                          WHEN "source"."Job Cost - Job Number1__cost_amount" IS NULL THEN 0
+                          ELSE "source"."Job Cost - Job Number1__cost_amount"
+                        END
+                      ) AS "Job Cost"
+                    FROM
+                      (
+                        SELECT
+                          "source"."Job Number1" AS "Job Number1",
+                          "source"."Cost Code1" AS "Cost Code1",
+                          "source"."Cost Code Name1" AS "Cost Code Name1",
+                          "source"."Cost Type1" AS "Cost Type1",
+                          "source"."Approved Change Amount" AS "Approved Change Amount",
+                          "source"."Budget" AS "Budget",
+                          "source"."Revised Budget" AS "Revised Budget",
+                          COALESCE(
+                            "source"."Cost Code Name1",
+                            "Job Cost - Job Number1"."job_cost_code_name"
+                          ) AS "Cost Code Name2",
+                          COALESCE(
+                            "source"."Cost Code1",
+                            "Job Cost - Job Number1"."job_cost_code"
+                          ) AS "Cost Code2",
+                          COALESCE(
+                            "source"."Cost Type1",
+                            "Job Cost - Job Number1"."cost_type"
+                          ) AS "Cost Type2",
+                          COALESCE(
+                            "source"."Job Number1",
+                            "Job Cost - Job Number1"."job_number"
+                          ) AS "Job Number2",
+                          "Job Cost - Job Number1"."job_cost_id" AS "Job Cost - Job Number1__job_cost_id",
+                          "Job Cost - Job Number1"."job_number" AS "Job Cost - Job Number1__job_number",
+                          "Job Cost - Job Number1"."job_name" AS "Job Cost - Job Number1__job_name",
+                          "Job Cost - Job Number1"."job_status" AS "Job Cost - Job Number1__job_status",
+                          "Job Cost - Job Number1"."job_cost_code_name" AS "Job Cost - Job Number1__job_cost_code_name",
+                          "Job Cost - Job Number1"."job_cost_code" AS "Job Cost - Job Number1__job_cost_code",
+                          "Job Cost - Job Number1"."work_order_number" AS "Job Cost - Job Number1__work_order_number",
+                          "Job Cost - Job Number1"."transaction_number" AS "Job Cost - Job Number1__transaction_number",
+                          "Job Cost - Job Number1"."job_cost_description" AS "Job Cost - Job Number1__job_cost_description",
+                          "Job Cost - Job Number1"."job_cost_source" AS "Job Cost - Job Number1__job_cost_source",
+                          "Job Cost - Job Number1"."vendor_id" AS "Job Cost - Job Number1__vendor_id",
+                          "Job Cost - Job Number1"."vendor" AS "Job Cost - Job Number1__vendor",
+                          "Job Cost - Job Number1"."cost_type" AS "Job Cost - Job Number1__cost_type",
+                          "Job Cost - Job Number1"."cost_in_hours" AS "Job Cost - Job Number1__cost_in_hours",
+                          "Job Cost - Job Number1"."cost_amount" AS "Job Cost - Job Number1__cost_amount",
+                          "Job Cost - Job Number1"."material_cost" AS "Job Cost - Job Number1__material_cost",
+                          "Job Cost - Job Number1"."labor_cost" AS "Job Cost - Job Number1__labor_cost",
+                          "Job Cost - Job Number1"."equipment_cost" AS "Job Cost - Job Number1__equipment_cost",
+                          "Job Cost - Job Number1"."other_cost" AS "Job Cost - Job Number1__other_cost",
+                          "Job Cost - Job Number1"."subcontract_cost" AS "Job Cost - Job Number1__subcontract_cost",
+                          "Job Cost - Job Number1"."billing_quantity" AS "Job Cost - Job Number1__billing_quantity",
+                          "Job Cost - Job Number1"."billing_amount" AS "Job Cost - Job Number1__billing_amount",
+                          "Job Cost - Job Number1"."overhead_amount" AS "Job Cost - Job Number1__overhead_amount",
+                          "Job Cost - Job Number1"."job_cost_status" AS "Job Cost - Job Number1__job_cost_status",
+                          "Job Cost - Job Number1"."created_date" AS "Job Cost - Job Number1__created_date",
+                          "Job Cost - Job Number1"."last_updated_date" AS "Job Cost - Job Number1__last_updated_date",
+                          "Job Cost - Job Number1"."is_deleted" AS "Job Cost - Job Number1__is_deleted",
+                          "Job Cost - Job Number1"."deleted_date" AS "Job Cost - Job Number1__deleted_date"
+                        FROM
+                          (
+                            SELECT
+                              TOP(1048575) "source"."Job Number1" AS "Job Number1",
+                              "source"."Cost Code1" AS "Cost Code1",
+                              "source"."Cost Code Name1" AS "Cost Code Name1",
+                              "source"."Cost Type1" AS "Cost Type1",
+                              SUM(
+                                CASE
+                                  WHEN "source"."Change Order Lines - Job Number__approved_change_amount" IS NULL THEN 0
+                                  ELSE "source"."Change Order Lines - Job Number__approved_change_amount"
+                                END
+                              ) AS "Approved Change Amount",
+                              MAX(
+                                CASE
+                                  WHEN "source"."budget" IS NULL THEN 0
+                                  ELSE "source"."budget"
+                                END
+                              ) AS "Budget",
+                              MAX(
+                                CASE
+                                  WHEN "source"."budget" IS NULL THEN 0
+                                  ELSE "source"."budget"
+                                END
+                              ) + SUM(
+                                CASE
+                                  WHEN "source"."Change Order Lines - Job Number__approved_change_amount" IS NULL THEN 0
+                                  ELSE "source"."Change Order Lines - Job Number__approved_change_amount"
+                                END
+                              ) AS "Revised Budget"
+                            FROM
+                              (
+                                SELECT
+                                  "dbo"."Job_Budget_Lines"."job_number" AS "job_number",
+                                  "dbo"."Job_Budget_Lines"."cost_code" AS "cost_code",
+                                  "dbo"."Job_Budget_Lines"."cost_code_name" AS "cost_code_name",
+                                  "dbo"."Job_Budget_Lines"."cost_type" AS "cost_type",
+                                  "dbo"."Job_Budget_Lines"."budget" AS "budget",
+                                  COALESCE(
+                                    "dbo"."Job_Budget_Lines"."cost_code_name",
+                                    "Change Order Lines - Job Number"."cost_code_name"
+                                  ) AS "Cost Code Name1",
+                                  COALESCE(
+                                    "dbo"."Job_Budget_Lines"."cost_code",
+                                    "Change Order Lines - Job Number"."cost_code"
+                                  ) AS "Cost Code1",
+                                  COALESCE(
+                                    "dbo"."Job_Budget_Lines"."cost_type",
+                                    "Change Order Lines - Job Number"."cost_type"
+                                  ) AS "Cost Type1",
+                                  COALESCE(
+                                    "Change Order Lines - Job Number"."job_number",
+                                    "dbo"."Job_Budget_Lines"."job_number"
+                                  ) AS "Job Number1",
+                                  "Change Order Lines - Job Number"."approved_change_amount" AS "Change Order Lines - Job Number__approved_change_amount",
+                                  "Change Order Lines - Job Number"."cost_code_name" AS "Change Order Lines - Job Number__cost_code_name",
+                                  "Change Order Lines - Job Number"."cost_code" AS "Change Order Lines - Job Number__cost_code",
+                                  "Change Order Lines - Job Number"."cost_type" AS "Change Order Lines - Job Number__cost_type",
+                                  "Change Order Lines - Job Number"."job_number" AS "Change Order Lines - Job Number__job_number"
+                                FROM
+                                  "dbo"."Job_Budget_Lines"
+                                  FULL JOIN "dbo"."Change_Order_Lines" AS "Change Order Lines - Job Number" ON (
+                                    "dbo"."Job_Budget_Lines"."job_number" = "Change Order Lines - Job Number"."job_number"
+                                  )
+                                 
+   AND (
+                                    "dbo"."Job_Budget_Lines"."cost_code" = "Change Order Lines - Job Number"."cost_code"
+                                  )
+                                  AND (
+                                    "dbo"."Job_Budget_Lines"."cost_type" = "Change Order Lines - Job Number"."cost_type"
+                                  )
+                              ) AS "source"
+                           
+GROUP BY
+                              "source"."Job Number1",
+                              "source"."Cost Code1",
+                              "source"."Cost Code Name1",
+                              "source"."Cost Type1"
+                           
+ORDER BY
+                              "source"."Job Number1" ASC,
+                              "source"."Cost Code1" ASC,
+                              "source"."Cost Code Name1" ASC,
+                              "source"."Cost Type1" ASC
+                          ) AS "source"
+                          FULL JOIN "dbo"."Job_Cost" AS "Job Cost - Job Number1" ON (
+                            "source"."Job Number1" = "Job Cost - Job Number1"."job_number"
+                          )
+                          AND (
+                            "source"."Cost Code1" = "Job Cost - Job Number1"."job_cost_code"
+                          )
+                          AND (
+                            "source"."Cost Type1" = "Job Cost - Job Number1"."cost_type"
+                          )
+                      ) AS "source"
+                    GROUP BY
+                      "source"."Job Number2",
+                      "source"."Cost Code2",
+                      "source"."Cost Type2",
+                      "source"."Cost Code Name2"
+                    ORDER BY
+                      "source"."Job Number2" ASC,
+                      "source"."Cost Code2" ASC,
+                      "source"."Cost Type2" ASC,
+                      "source"."Cost Code Name2" ASC
+                  ) AS "source"
+                  FULL JOIN "dbo"."Purchase_Order_Lines" AS "Purchase Order Lines - Job Number2" ON (
+                    "source"."Job Number2" = "Purchase Order Lines - Job Number2"."job_number"
+                  )
+                  AND (
+                    "source"."Cost Type2" = "Purchase Order Lines - Job Number2"."cost_type"
+                  )
+                  AND (
+                    "source"."Cost Code2" = "Purchase Order Lines - Job Number2"."cost_code"
+                  )
+              ) AS "source"
+            GROUP BY
+              "source"."Job Number3",
+              "source"."Cost Code3",
+              "source"."Cost Type3",
+              "source"."Cost Code Name2"
+            ORDER BY
+              "source"."Job Number3" ASC,
+              "source"."Cost Code3" ASC,
+              "source"."Cost Type3" ASC,
+              "source"."Cost Code Name2" ASC
+          ) AS "source"
+         
+LEFT JOIN "dbo"."Subcontract_Lines" AS "Subcontract Lines - Job Number3" ON (
+            "source"."Job Number3" = "Subcontract Lines - Job Number3"."job_number"
+          )
+          AND (
+            "source"."Cost Code3" = "Subcontract Lines - Job Number3"."cost_code"
+          )
+          AND (
+            "source"."Cost Type3" = "Subcontract Lines - Job Number3"."cost_type"
+          )
+      ) AS "source"
+    GROUP BY
+      "source"."Job Number",
+      "source"."Cost Code",
+      "source"."Cost Type"
+    ORDER BY
+      "source"."Job Number" ASC,
+      "source"."Cost Code" ASC,
+      "source"."Cost Type" ASC
+  ) AS "source"
+GROUP BY
+  "source"."Job Number",
+  "source"."Cost Code",
+  "source"."Cost Type"
+ORDER BY
+  "source"."Job Number" ASC,
+  "source"."Cost Code" ASC,
+  "source"."Cost Type" ASC
