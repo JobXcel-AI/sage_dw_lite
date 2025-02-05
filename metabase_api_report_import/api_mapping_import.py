@@ -1,3 +1,4 @@
+import os
 import json
 import requests
 import logging
@@ -7,14 +8,14 @@ from collections import OrderedDict
 # Metabase API credentials and endpoints
 SOURCE_API_URL = "https://sagexcel.jobxcel.report/api"
 TARGET_API_URL = "https://asg.xcel.report/api"
-SOURCE_API_KEY = "mb_blLUnFYZ+diBCC1OY8zBmLXRkKZiRy5f+iFHf1Cj+9E="
-TARGET_API_KEY = "mb_/eIVf6avszWL2YkjlUU21gfD2//Ip2iLgzhuVs+g2rI="
+SOURCE_API_KEY = ""
+TARGET_API_KEY = ""
 SOURCE_DATABASE_ID = 2  # Set the source database ID
 TARGET_DATABASE_ID = 2  # Set the target database ID
 
 # List of dashboards to migrate
-DASHBOARDS = []
-CARDS = [31]
+DASHBOARDS = [4]
+CARDS = []
 
 HEADERS_SOURCE = {
     "x-api-key": SOURCE_API_KEY,
@@ -529,15 +530,39 @@ def migrate_cards(
         updated_card["public_uuid"] = source_card.get("public_uuid", None)
 
         json_payload = json.dumps(updated_card, indent=4)
+        logger.debug(f"Updated card JSON: {json_payload}")
         created_card = create_resource(target_api_url, "card", headers_target, updated_card)
         if created_card:
             card_mapping[source_card["id"]] = created_card["id"]
-            logger.info(f"Card '{updated_card.get('name', 'Unnamed')}' migrated successfully.")
+            logger.info(f"Card '{updated_card.get('name', 'Unnamed')}, Source Card ID: {source_card['id']}, Target Card ID: {created_card['id']}: ' migrated successfully.")
         else:
             logger.error(f"Failed to create card: {updated_card.get('name', 'Unnamed')}")
 
     return card_mapping
 
+
+def save_json_payload(json_payload, filename="updated_card.json"):
+    """
+    Save JSON payload to a file if in debug mode.
+
+    :param json_payload: JSON payload to save.
+    :param filename: Name of the file to save the payload to.
+    """
+    if logger.getEffectiveLevel() <= logging.DEBUG:
+        try:
+            project_dir = os.path.dirname(os.path.abspath(__file__))  # Project directory
+            debug_dir = os.path.join(project_dir, "debug_payloads")
+            os.makedirs(debug_dir, exist_ok=True)  # Ensure the directory exists
+            file_path = os.path.join(debug_dir, filename)
+
+            with open(file_path, "w", encoding="utf-8") as file:
+                json.dump(json_payload, file, indent=4)
+
+            logger.debug(f"JSON payload saved to {file_path}")
+        except Exception as e:
+            logger.error(f"Failed to save JSON payload: {e}")
+    else:
+        logger.debug("Debug mode is off; payload not saved.")
 
 def update_dashboard_with_cards(source_dashboard, card_mapping):
     if not source_dashboard:
