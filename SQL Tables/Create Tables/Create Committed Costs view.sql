@@ -1,3 +1,5 @@
+CREATE VIEW vw_committed_costs
+AS
 SELECT 
 	*, 
 	CASE 
