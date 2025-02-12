@@ -7,15 +7,15 @@ from collections import OrderedDict
 
 # Metabase API credentials and endpoints
 SOURCE_API_URL = "https://sagexcel.jobxcel.report/api"
-TARGET_API_URL = "https://asg.xcel.report/api"
-SOURCE_API_KEY = ""
-TARGET_API_KEY = ""
+TARGET_API_URL = "https://brekhus.xcel.report/api"
+SOURCE_API_KEY = "mb_blLUnFYZ+diBCC1OY8zBmLXRkKZiRy5f+iFHf1Cj+9E="
+TARGET_API_KEY = "mb_N0G2ThcRv3WTjhl+xsbHrv1fuDGA/XfLL4XiRaagXIA="
 SOURCE_DATABASE_ID = 2  # Set the source database ID
 TARGET_DATABASE_ID = 2  # Set the target database ID
 
 # List of dashboards to migrate
-DASHBOARDS = [4]
-CARDS = []
+DASHBOARDS = []
+CARDS = [40]
 
 HEADERS_SOURCE = {
     "x-api-key": SOURCE_API_KEY,
@@ -135,47 +135,6 @@ def get_table_mapping(source_tables, target_tables):
             logger.debug(f"Source table '{source_table['name']}' not found in target tables.")
     return mapping
 
-
-def migrate_collections(source_api_url, target_api_url, headers_source, headers_target):
-    """
-    Migrate collections from source to target. Check if a collection already exists in the target before creating it.
-    """
-    source_collections = fetch_resource(source_api_url, "collection", headers_source)
-    target_collections = fetch_resource(target_api_url, "collection", headers_target)
-
-    if not source_collections:
-        logger.warning("No collections found in the source.")
-        return {}
-
-    if not target_collections:
-        logger.warning("No collections found in the target.")
-        target_collections = []
-
-    # Map target collections by name to avoid duplicates
-    target_collection_lookup = {collection["name"]: collection["id"] for collection in target_collections}
-
-    collection_mapping = {}
-    for source_collection in source_collections:
-        source_collection_name = source_collection["name"]
-
-        if source_collection_name in target_collection_lookup:
-            # Collection exists, map its ID
-            collection_mapping[source_collection["id"]] = target_collection_lookup[source_collection_name]
-            logger.info(f"Collection '{source_collection_name}' already exists in the target. Skipping creation.")
-        else:
-            # Collection does not exist, create it
-            created_collection = create_resource(
-                target_api_url, "collection", headers_target, {"name": source_collection_name}
-            )
-            if created_collection:
-                collection_mapping[source_collection["id"]] = created_collection["id"]
-                logger.info(f"Collection '{source_collection_name}' created successfully.")
-            else:
-                logger.error(f"Failed to create collection: {source_collection_name}")
-
-    return collection_mapping
-
-
 def fetch_cards_from_dashboard(api_url, dashboard_id, headers):
     """
     Fetch the list of card IDs from a dashboard.
@@ -196,7 +155,7 @@ def fetch_cards_from_dashboard(api_url, dashboard_id, headers):
 
 def migrate_cards(
         source_api_url, target_api_url, headers_source, headers_target,
-        dashboard_id, collection_mapping, source_tables, target_tables, source_field_mapping, target_field_mapping,
+        dashboard_id, source_tables, target_tables, source_field_mapping, target_field_mapping,
         source_table_mapping, target_table_mapping
 ):
     """
@@ -229,10 +188,6 @@ def migrate_cards(
         if SOURCE_DATABASE_ID != TARGET_DATABASE_ID:
             updated_card["database_id"] = TARGET_DATABASE_ID
 
-        # Update collection ID
-        source_collection_id = source_card.get("collection_id")
-        if source_collection_id and source_collection_id in collection_mapping:
-            updated_card["collection_id"] = collection_mapping[source_collection_id]
 
         def update_joins(joins, source_table_mapping, target_table_mapping, source_field_mapping, target_field_mapping):
             """
@@ -498,7 +453,7 @@ def migrate_cards(
         updated_card["creator"] = source_card.get("creator", {})
         updated_card["database_id"] = source_card.get("database_id", TARGET_DATABASE_ID)
         updated_card["enable_embedding"] = source_card.get("enable_embedding", False)
-        updated_card["collection_id"] = collection_mapping.get(source_card.get("collection_id"), None)
+        updated_card["collection_id"] = None
         updated_card["query_type"] = source_card.get("query_type", "query")
         updated_card["name"] = source_card.get("name", "Unnamed")
         updated_card["type"] = source_card.get("type", "question")
@@ -582,7 +537,6 @@ def main():
     logger.info("Starting migration process...")
 
     # Migrate collections
-    collection_mapping = migrate_collections(SOURCE_API_URL, TARGET_API_URL, HEADERS_SOURCE, HEADERS_TARGET)
     source_metadata = fetch_resource(SOURCE_API_URL, f"database/{SOURCE_DATABASE_ID}/metadata", HEADERS_SOURCE)
     target_metadata = fetch_resource(TARGET_API_URL, f"database/{TARGET_DATABASE_ID}/metadata", HEADERS_TARGET)
 
@@ -606,7 +560,7 @@ def main():
 
             card_mapping = migrate_cards(
                 SOURCE_API_URL, TARGET_API_URL, HEADERS_SOURCE, HEADERS_TARGET,
-                dashboard_id, collection_mapping, source_tables, target_tables, source_field_mapping, target_field_mapping,
+                dashboard_id, source_tables, target_tables, source_field_mapping, target_field_mapping,
                 source_table_mapping, target_table_mapping
             )
 
@@ -622,7 +576,7 @@ def main():
     else:
         card_mapping = migrate_cards(
             SOURCE_API_URL, TARGET_API_URL, HEADERS_SOURCE, HEADERS_TARGET,
-            [], collection_mapping, source_tables, target_tables, source_field_mapping, target_field_mapping,
+            [], source_tables, target_tables, source_field_mapping, target_field_mapping,
             source_table_mapping, target_table_mapping
         )
         logger.info(f"New card mappings. {card_mapping}")
