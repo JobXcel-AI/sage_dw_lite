@@ -379,6 +379,12 @@ def migrate_cards(
                 if "aggregation" in query:
                     update_aggregations(query["aggregation"], source_field_mapping, target_field_mapping)
 
+                # Process "database" field inside dataset_query
+                if "database" in query:
+                    if query["database"] == SOURCE_DATABASE_ID:
+                        logger.debug(f"Updating dataset_query database ID from {query['database']} to {TARGET_DATABASE_ID}")
+                        query["database"] = TARGET_DATABASE_ID
+
                 # Process "source-table"
                 if "source-table" in query:
                     source_table_name = next(
@@ -423,15 +429,13 @@ def migrate_cards(
 
                 # Process "condition"
                 if "condition" in query:
-                    query["condition"] = update_condition(query["condition"], source_field_mapping,
-                                                          target_field_mapping)
+                    query["condition"] = update_condition(query["condition"], source_field_mapping, target_field_mapping)
 
                 # Process "aggregation"
                 if "aggregation" in query:
                     for aggregation in query["aggregation"]:
                         if isinstance(aggregation, list) and len(aggregation) > 1:
-                            aggregation[1] = update_field_ref(aggregation[1], source_field_mapping,
-                                                              target_field_mapping)
+                            aggregation[1] = update_field_ref(aggregation[1], source_field_mapping, target_field_mapping)
 
                 # If we are at the top level, process `dataset_query` specifically
                 if is_top_level and "dataset_query" in query:
