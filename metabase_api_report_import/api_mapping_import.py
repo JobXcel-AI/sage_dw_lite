@@ -7,15 +7,15 @@ from collections import OrderedDict
 
 # Metabase API credentials and endpoints
 SOURCE_API_URL = "https://sagexcel.jobxcel.report/api"
-TARGET_API_URL = "https://asg.xcel.report/api"
-SOURCE_API_KEY = ""
-TARGET_API_KEY = ""
-SOURCE_DATABASE_ID = 2  # Set the source database ID
-TARGET_DATABASE_ID = 2  # Set the target database ID
+TARGET_API_URL = "https://brekhus.xcel.report/api"
+SOURCE_API_KEY = "mb_blLUnFYZ+diBCC1OY8zBmLXRkKZiRy5f+iFHf1Cj+9E="
+TARGET_API_KEY = "mb_N0G2ThcRv3WTjhl+xsbHrv1fuDGA/XfLL4XiRaagXIA="
+SOURCE_DATABASE_ID = 2 # Set the source database ID
+TARGET_DATABASE_ID = 5  # Set the target database ID
 
 # List of dashboards to migrate
-DASHBOARDS = [4]
-CARDS = []
+DASHBOARDS = []
+CARDS = [40]
 
 HEADERS_SOURCE = {
     "x-api-key": SOURCE_API_KEY,
@@ -496,7 +496,7 @@ def migrate_cards(
         updated_card["can_run_adhoc_query"] = source_card.get("can_run_adhoc_query", True)
         updated_card["result_metadata"] = source_card.get("result_metadata", [])
         updated_card["creator"] = source_card.get("creator", {})
-        updated_card["database_id"] = source_card.get("database_id", TARGET_DATABASE_ID)
+        updated_card["database_id"] = TARGET_DATABASE_ID
         updated_card["enable_embedding"] = source_card.get("enable_embedding", False)
         updated_card["collection_id"] = collection_mapping.get(source_card.get("collection_id"), None)
         updated_card["query_type"] = source_card.get("query_type", "query")
