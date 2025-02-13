@@ -10,8 +10,8 @@ SOURCE_API_URL = "https://sagexcel.jobxcel.report/api"
 TARGET_API_URL = "https://brekhus.xcel.report/api"
 SOURCE_API_KEY = "mb_blLUnFYZ+diBCC1OY8zBmLXRkKZiRy5f+iFHf1Cj+9E="
 TARGET_API_KEY = "mb_N0G2ThcRv3WTjhl+xsbHrv1fuDGA/XfLL4XiRaagXIA="
-SOURCE_DATABASE_ID = 2  # Set the source database ID
-TARGET_DATABASE_ID = 2  # Set the target database ID
+SOURCE_DATABASE_ID = 2 # Set the source database ID
+TARGET_DATABASE_ID = 5  # Set the target database ID
 
 # List of dashboards to migrate
 DASHBOARDS = []
@@ -451,7 +451,7 @@ def migrate_cards(
         updated_card["can_run_adhoc_query"] = source_card.get("can_run_adhoc_query", True)
         updated_card["result_metadata"] = source_card.get("result_metadata", [])
         updated_card["creator"] = source_card.get("creator", {})
-        updated_card["database_id"] = source_card.get("database_id", TARGET_DATABASE_ID)
+        updated_card["database_id"] = TARGET_DATABASE_ID
         updated_card["enable_embedding"] = source_card.get("enable_embedding", False)
         updated_card["collection_id"] = None
         updated_card["query_type"] = source_card.get("query_type", "query")
@@ -570,8 +570,43 @@ def main():
                 logger.error(f"Failed to update dashboard ID {dashboard_id}. Skipping.")
                 continue
 
+            dashboard_order_dict = OrderedDict([
+                ("description", updated_dashboard.get("description", "")),
+                ("archived", False),
+                ("view_count", updated_dashboard.get("view_count", 0)),
+                ("collection_position", updated_dashboard.get("collection_position", None)),
+                ("dashcards", updated_dashboard.get("dashcards", [])),
+                ("param_values", updated_dashboard.get("param_values", {})),
+                ("initially_published_at", updated_dashboard.get("initially_published_at", None)),
+                ("can_write", True),
+                ("tabs", updated_dashboard.get("tabs", [])),
+                ("enable_embedding", updated_dashboard.get("enable_embedding", False)),
+                ("collection_id", None),
+                ("show_in_getting_started", updated_dashboard.get("show_in_getting_started", False)),
+                ("name", updated_dashboard.get("name", "Unnamed")),
+                ("width", updated_dashboard.get("width", 800)),
+                ("caveats", updated_dashboard),
+                ("collection_authority_level", updated_dashboard.get("collection_authority_level", "all")),
+                ("creator_id", None),
+                ("updated_at", None),
+                ("made_public_by_id", None),
+                ("embedding_params", updated_dashboard.get("embedding_params", None)),
+                ("cache_ttl", updated_dashboard.get("cache_ttl", None)),
+                ("last_used_param_values", {}),
+                ("id", None),
+                ("position", updated_dashboard.get("position", 0)),
+                ("entity_id", updated_dashboard.get("entity_id", None)),
+                ("param_fields", updated_dashboard.get("param_fields", [])),
+                ("last-edit-info", updated_dashboard.get("last-edit-info", {})),
+                ("collection", updated_dashboard.get("collection", {})),
+                ("parameters", updated_dashboard.get("parameters", [])),
+                ("auto_apply_filters", updated_dashboard.get("auto_apply_filters", False)),
+                ("created_at", updated_dashboard.get("created_at", None)),
+                ("public_uuid", updated_dashboard.get("public_uuid", None)),
+                ("points_of_interest", updated_dashboard.get("points_of_interest", [])),
+            ])
             # Create the updated dashboard in the target
-            create_resource(TARGET_API_URL, "dashboard", HEADERS_TARGET, updated_dashboard)
+            create_resource(TARGET_API_URL, "dashboard", HEADERS_TARGET, dashboard_order_dict)
             logger.info(f"Dashboard ID {dashboard_id} migrated successfully.")
     else:
         card_mapping = migrate_cards(
