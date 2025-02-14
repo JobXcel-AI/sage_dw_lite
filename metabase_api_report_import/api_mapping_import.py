@@ -6,9 +6,9 @@ from tabulate import tabulate
 from collections import OrderedDict
 
 # Metabase API credentials and endpoints
-SOURCE_API_URL = "https://sagexcel.jobxcel.report/api"
+SOURCE_API_URL = "https://castle.jobxcel.report/api"
 TARGET_API_URL = "https://brekhus.xcel.report/api"
-SOURCE_API_KEY = "mb_blLUnFYZ+diBCC1OY8zBmLXRkKZiRy5f+iFHf1Cj+9E="
+SOURCE_API_KEY = "mb_vsr+JXyizthuSTeWiVzf5BZu1lXc1gS5hUsExbEsvyI="
 TARGET_API_KEY = "mb_N0G2ThcRv3WTjhl+xsbHrv1fuDGA/XfLL4XiRaagXIA="
 SOURCE_DATABASE_ID = 2 # Set the source database ID
 TARGET_DATABASE_ID = 5  # Set the target database ID
