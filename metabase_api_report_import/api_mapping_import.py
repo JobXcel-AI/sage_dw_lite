@@ -7,11 +7,12 @@ from collections import OrderedDict
 
 # Metabase API credentials and endpoints
 SOURCE_API_URL = "https://castle.jobxcel.report/api"
-TARGET_API_URL = "https://brekhus.xcel.report/api"
+TARGET_API_URL = "https://sagexcel.jobxcel.report/api"
 SOURCE_API_KEY = "mb_vsr+JXyizthuSTeWiVzf5BZu1lXc1gS5hUsExbEsvyI="
-TARGET_API_KEY = "mb_N0G2ThcRv3WTjhl+xsbHrv1fuDGA/XfLL4XiRaagXIA=" # Set the target to SageXcel Demo
+TARGET_API_KEY = "mb_blLUnFYZ+diBCC1OY8zBmLXRkKZiRy5f+iFHf1Cj+9E=" # Set the target to SageXcel Demo
 SOURCE_DATABASE_ID = 2 # Set the source database ID
 TARGET_DATABASE_ID = 5  # Set the target database ID
+COLLECTION_ID = 9
 
 # List of dashboards to migrate
 DASHBOARDS = [4]
@@ -473,7 +474,7 @@ def migrate_cards(
         updated_card["creator"] = source_card.get("creator", {})
         updated_card["database_id"] = TARGET_DATABASE_ID
         updated_card["enable_embedding"] = source_card.get("enable_embedding", False)
-        updated_card["collection_id"] = None
+        updated_card["collection_id"] = COLLECTION_ID
         updated_card["query_type"] = source_card.get("query_type", "query")
         updated_card["name"] = source_card.get("name", "Unnamed")
         updated_card["type"] = source_card.get("type", "question")
@@ -605,7 +606,7 @@ def main():
                 ("can_write", True),
                 ("tabs", updated_dashboard.get("tabs", [])),
                 ("enable_embedding", updated_dashboard.get("enable_embedding", False)),
-                ("collection_id", None),
+                ("collection_id", COLLECTION_ID),
                 ("show_in_getting_started", updated_dashboard.get("show_in_getting_started", False)),
                 ("name", updated_dashboard.get("name", "Unnamed")),
                 ("width", updated_dashboard.get("width", 800)),
