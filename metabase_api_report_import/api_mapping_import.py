@@ -9,7 +9,7 @@ from collections import OrderedDict
 SOURCE_API_URL = "https://castle.jobxcel.report/api"
 TARGET_API_URL = "https://brekhus.xcel.report/api"
 SOURCE_API_KEY = "mb_vsr+JXyizthuSTeWiVzf5BZu1lXc1gS5hUsExbEsvyI="
-TARGET_API_KEY = "mb_N0G2ThcRv3WTjhl+xsbHrv1fuDGA/XfLL4XiRaagXIA="
+TARGET_API_KEY = "mb_N0G2ThcRv3WTjhl+xsbHrv1fuDGA/XfLL4XiRaagXIA=" # Set the target to SageXcel Demo
 SOURCE_DATABASE_ID = 2 # Set the source database ID
 TARGET_DATABASE_ID = 5  # Set the target database ID
 
