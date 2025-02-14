@@ -14,8 +14,8 @@ SOURCE_DATABASE_ID = 2 # Set the source database ID
 TARGET_DATABASE_ID = 5  # Set the target database ID
 
 # List of dashboards to migrate
-DASHBOARDS = []
-CARDS = [40]
+DASHBOARDS = [2]
+CARDS = []
 
 HEADERS_SOURCE = {
     "x-api-key": SOURCE_API_KEY,
@@ -153,6 +153,243 @@ def fetch_cards_from_dashboard(api_url, dashboard_id, headers):
     return [dashcard.get("card_id") for dashcard in dashcards if dashcard.get("card_id") is not None]
 
 
+
+def update_joins(joins, source_table_mapping, target_table_mapping, source_field_mapping, target_field_mapping):
+    """
+    Update the joins array to map source field IDs to target field IDs and source-table IDs to target-table IDs.
+    """
+    # Reverse the source table mapping for lookup by table ID
+    reversed_source_table_mapping = {v: k for k, v in source_table_mapping.items()}
+
+    for join in joins:
+        # Update "source-table"
+        if "source-table" in join:
+            source_table_id = join["source-table"]
+            logger.debug(f"Original source-table ID: {source_table_id}")
+
+            # Ensure `source_table_id` is an integer
+            if not isinstance(source_table_id, int):
+                logger.error(f"Invalid source-table ID: {source_table_id}")
+                continue
+
+            # Get source table name using the reversed mapping
+            source_table_name = reversed_source_table_mapping.get(source_table_id)
+            logger.debug(f"Source table name: {source_table_name}")
+
+            if source_table_name:
+                # Get target table ID using source table name
+                target_table_id = target_table_mapping.get(source_table_name.lower())
+                logger.debug(f"Target table ID: {target_table_id}")
+
+                if target_table_id:
+                    join["source-table"] = target_table_id
+                else:
+                    logger.warning(f"Target table ID not found for source table name: {source_table_name}")
+            else:
+                logger.warning(f"Source table name not found for source-table ID: {source_table_id}")
+
+        # Update "condition"
+        if "condition" in join:
+            join["condition"] = update_condition(join["condition"], source_field_mapping, target_field_mapping)
+
+def update_condition(condition, source_field_mapping, target_field_mapping):
+    """
+    Updates field references within a condition array.
+    """
+    if isinstance(condition, list):
+        for i, item in enumerate(condition):
+            if isinstance(item, list) and len(item) > 1:
+                # Check if this is a field reference
+                if item[0] == "field" and isinstance(item[1], int):  # If the second item is a field ID
+                    source_field_id = item[1]
+                    source_field_name = source_field_mapping.get(source_field_id, {}).get("name")
+                    if source_field_name:
+                        target_field_id = next(
+                            (field_id for field_id, field_data in target_field_mapping.items()
+                             if field_data["name"] == source_field_name),
+                            source_field_id  # Default to the original ID if no match
+                        )
+                        condition[i][1] = target_field_id  # Replace with target field ID
+                elif isinstance(item, list):  # Recurse into nested conditions
+                    condition[i] = update_condition(item, source_field_mapping, target_field_mapping)
+
+    return condition
+
+def map_field_id(source_field_id, source_field_mapping, target_field_mapping):
+    """
+    Map a source field ID to a target field ID using source and target field mappings.
+
+    :param source_field_id: The source field ID to map.
+    :param source_field_mapping: Dictionary of source field mappings.
+    :param target_field_mapping: Dictionary of target field mappings.
+    :return: Mapped target field ID or the original source field ID if no match is found.
+    """
+    source_field_name = source_field_mapping.get(source_field_id, {}).get("name")
+    source_table_name = source_field_mapping.get(source_field_id, {}).get("table_name")
+
+    if source_field_name and source_table_name:
+        # Map source field and table names to target field ID
+        target_field_id = next(
+            (
+                field_id for field_id, field_data in target_field_mapping.items()
+                if field_data["name"] == source_field_name and
+                   field_data.get("table_name", "").lower() == source_table_name.lower()
+            ),
+            source_field_id  # Default to original if no match
+        )
+        return target_field_id
+    else:
+        # Log a warning if the source field name or table name is missing
+        logger.warning(f"Field or table name missing for source field ID {source_field_id}.")
+        return source_field_id
+
+def update_aggregation_options(aggregation_options, source_field_mapping, target_field_mapping):
+    """
+    Update field references within aggregation-options, including "default" fields.
+    """
+    if isinstance(aggregation_options, list):
+        for i, option in enumerate(aggregation_options):
+            if isinstance(option, list):
+                # Recursively handle nested structures
+                update_aggregation_options(option, source_field_mapping, target_field_mapping)
+            elif option == "field" and i + 1 < len(aggregation_options):
+                # Map the field ID
+                if isinstance(aggregation_options[i + 1], int):
+                    source_field_id = aggregation_options[i + 1]
+                    aggregation_options[i + 1] = map_field_id(source_field_id, source_field_mapping, target_field_mapping)
+            elif isinstance(option, dict) and "default" in option:
+                # Handle "default" field
+                default_value = option["default"]
+                if isinstance(default_value, list) and default_value[0] == "field" and isinstance(default_value[1], int):
+                    source_field_id = default_value[1]
+                    option["default"][1] = map_field_id(source_field_id, source_field_mapping, target_field_mapping)
+
+def update_aggregations(aggregations, source_field_mapping, target_field_mapping):
+    """
+    Update field references within the aggregations array, including in aggregation-options.
+    """
+    for aggregation in aggregations:
+        if isinstance(aggregation, list):
+            for i, item in enumerate(aggregation):
+                if isinstance(item, list):
+                    # Handle nested structures or aggregation-options
+                    update_aggregations([item], source_field_mapping, target_field_mapping)
+                elif item == "field" and i + 1 < len(aggregation):
+                    # Map the field ID
+                    if isinstance(aggregation[i + 1], int):
+                        source_field_id = aggregation[i + 1]
+                        aggregation[i + 1] = map_field_id(source_field_id, source_field_mapping, target_field_mapping)
+                elif isinstance(item, dict) and "default" in item:
+                    # Handle "default" field in aggregation-options
+                    update_aggregation_options([item], source_field_mapping, target_field_mapping)
+
+def update_field_ref(field_ref, source_field_mapping, target_field_mapping):
+    if isinstance(field_ref, list):
+        if len(field_ref) > 1 and isinstance(field_ref[1], int):
+            # Look up the source field name using the field ID
+            field_ref[1]  = map_field_id(field_ref[1], source_field_mapping, target_field_mapping)
+    elif isinstance(field_ref, int):
+        # Handle cases where field_ref is a simple integer (field ID)
+        field_ref = map_field_id(field_ref, source_field_mapping, target_field_mapping)
+    return field_ref
+
+def update_query_recursively(query, source_field_mapping, target_field_mapping, source_tables, target_tables,
+                             source_table_mapping, target_table_mapping, is_top_level=True,):
+    if isinstance(query, dict):
+
+        if "aggregation" in query:
+            update_aggregations(query["aggregation"], source_field_mapping, target_field_mapping)
+
+        # Process "database" field inside dataset_query
+        if "database" in query:
+            if query["database"] == SOURCE_DATABASE_ID:
+                logger.debug(f"Updating dataset_query database ID from {query['database']} to {TARGET_DATABASE_ID}")
+                query["database"] = TARGET_DATABASE_ID
+
+        # Process "source-table"
+        if "source-table" in query:
+            source_table_name = next(
+                (table["name"] for table in source_tables if table["id"] == query["source-table"]), None
+            )
+            if source_table_name:
+                query["source-table"] = next(
+                    (table["id"] for table in target_tables if table["name"] == source_table_name),
+                    query["source-table"]
+                )
+
+        # Process "table_id"
+        if "table_id" in query:
+            source_table_name = next(
+                (table["name"] for table in source_tables if table["id"] == query["table_id"]), None
+            )
+            if source_table_name:
+                query["table_id"] = next(
+                    (table["id"] for table in target_tables if table["name"] == source_table_name),
+                    query["table_id"]
+                )
+
+        # Process "field_ref"
+        if "field_ref" in query:
+            query["field_ref"] = update_field_ref(
+                query["field_ref"], source_field_mapping, target_field_mapping
+            )
+
+        # Process "joins"
+        if "joins" in query:
+            update_joins(query["joins"], source_table_mapping, target_table_mapping, source_field_mapping,
+                         target_field_mapping)
+
+        # Process "breakout"
+        if "breakout" in query:
+            for breakout in query["breakout"]:
+                if isinstance(breakout, list) and len(breakout) > 1:
+                    if isinstance(breakout[1], int):  # Process field ID in breakout
+                        breakout[1] = map_field_id(breakout[1], source_field_mapping, target_field_mapping)
+                    elif isinstance(breakout[1], list):  # Handle nested field refs
+                        breakout[1] = update_field_ref(breakout[1], source_field_mapping, target_field_mapping)
+
+        # Process "condition"
+        if "condition" in query:
+            query["condition"] = update_condition(query["condition"], source_field_mapping, target_field_mapping)
+
+        # Process "aggregation"
+        if "aggregation" in query:
+            for aggregation in query["aggregation"]:
+                if isinstance(aggregation, list) and len(aggregation) > 1:
+                    aggregation[1] = update_field_ref(aggregation[1], source_field_mapping, target_field_mapping)
+
+        # If we are at the top level, process `dataset_query` specifically
+        if is_top_level and "dataset_query" in query:
+            query["dataset_query"] = update_query_recursively(query.get("dataset_query", {}), source_field_mapping,
+                                                                target_field_mapping, source_tables, target_tables,
+                                                              source_table_mapping, target_table_mapping,
+                                                              is_top_level=False)
+            return query
+
+        # Process "source-query"
+        if "source-query" in query:
+            query["source-query"] = update_query_recursively(query["source-query"], source_field_mapping,
+                                                             target_field_mapping, source_tables, target_tables,
+                                                             source_table_mapping, target_table_mapping,
+                                                             is_top_level=False)
+
+        # Process "query" (specific to dataset_query)
+        if "query" in query:
+            query["query"] = update_query_recursively(query["query"],source_field_mapping,
+                                                      target_field_mapping, source_tables, target_tables,
+                                                      source_table_mapping, target_table_mapping,
+                                                      is_top_level=False)
+
+    elif isinstance(query, list):
+        for i, item in enumerate(query):
+            query[i] = update_query_recursively(item, source_field_mapping,
+                                                target_field_mapping, source_tables, target_tables,
+                                                source_table_mapping, target_table_mapping,
+                                                is_top_level=False)
+
+    return query
+
+
 def migrate_cards(
         source_api_url, target_api_url, headers_source, headers_target,
         dashboard_id, source_tables, target_tables, source_field_mapping, target_field_mapping,
@@ -188,232 +425,11 @@ def migrate_cards(
         if SOURCE_DATABASE_ID != TARGET_DATABASE_ID:
             updated_card["database_id"] = TARGET_DATABASE_ID
 
-
-        def update_joins(joins, source_table_mapping, target_table_mapping, source_field_mapping, target_field_mapping):
-            """
-            Update the joins array to map source field IDs to target field IDs and source-table IDs to target-table IDs.
-            """
-            # Reverse the source table mapping for lookup by table ID
-            reversed_source_table_mapping = {v: k for k, v in source_table_mapping.items()}
-
-            for join in joins:
-                # Update "source-table"
-                if "source-table" in join:
-                    source_table_id = join["source-table"]
-                    logger.debug(f"Original source-table ID: {source_table_id}")
-
-                    # Ensure `source_table_id` is an integer
-                    if not isinstance(source_table_id, int):
-                        logger.error(f"Invalid source-table ID: {source_table_id}")
-                        continue
-
-                    # Get source table name using the reversed mapping
-                    source_table_name = reversed_source_table_mapping.get(source_table_id)
-                    logger.debug(f"Source table name: {source_table_name}")
-
-                    if source_table_name:
-                        # Get target table ID using source table name
-                        target_table_id = target_table_mapping.get(source_table_name.lower())
-                        logger.debug(f"Target table ID: {target_table_id}")
-
-                        if target_table_id:
-                            join["source-table"] = target_table_id
-                        else:
-                            logger.warning(f"Target table ID not found for source table name: {source_table_name}")
-                    else:
-                        logger.warning(f"Source table name not found for source-table ID: {source_table_id}")
-
-                # Update "condition"
-                if "condition" in join:
-                    join["condition"] = update_condition(join["condition"], source_field_mapping, target_field_mapping)
-
-        def update_condition(condition, source_field_mapping, target_field_mapping):
-            """
-            Updates field references within a condition array.
-            """
-            if isinstance(condition, list):
-                for i, item in enumerate(condition):
-                    if isinstance(item, list) and len(item) > 1:
-                        # Check if this is a field reference
-                        if item[0] == "field" and isinstance(item[1], int):  # If the second item is a field ID
-                            source_field_id = item[1]
-                            source_field_name = source_field_mapping.get(source_field_id, {}).get("name")
-                            if source_field_name:
-                                target_field_id = next(
-                                    (field_id for field_id, field_data in target_field_mapping.items()
-                                     if field_data["name"] == source_field_name),
-                                    source_field_id  # Default to the original ID if no match
-                                )
-                                condition[i][1] = target_field_id  # Replace with target field ID
-                        elif isinstance(item, list):  # Recurse into nested conditions
-                            condition[i] = update_condition(item, source_field_mapping, target_field_mapping)
-
-            return condition
-
-        def map_field_id(source_field_id, source_field_mapping, target_field_mapping):
-            """
-            Map a source field ID to a target field ID using source and target field mappings.
-
-            :param source_field_id: The source field ID to map.
-            :param source_field_mapping: Dictionary of source field mappings.
-            :param target_field_mapping: Dictionary of target field mappings.
-            :return: Mapped target field ID or the original source field ID if no match is found.
-            """
-            source_field_name = source_field_mapping.get(source_field_id, {}).get("name")
-            source_table_name = source_field_mapping.get(source_field_id, {}).get("table_name")
-
-            if source_field_name and source_table_name:
-                # Map source field and table names to target field ID
-                target_field_id = next(
-                    (
-                        field_id for field_id, field_data in target_field_mapping.items()
-                        if field_data["name"] == source_field_name and
-                           field_data.get("table_name", "").lower() == source_table_name.lower()
-                    ),
-                    source_field_id  # Default to original if no match
-                )
-                return target_field_id
-            else:
-                # Log a warning if the source field name or table name is missing
-                logger.warning(f"Field or table name missing for source field ID {source_field_id}.")
-                return source_field_id
-
-        def update_aggregation_options(aggregation_options, source_field_mapping, target_field_mapping):
-            """
-            Update field references within aggregation-options, including "default" fields.
-            """
-            if isinstance(aggregation_options, list):
-                for i, option in enumerate(aggregation_options):
-                    if isinstance(option, list):
-                        # Recursively handle nested structures
-                        update_aggregation_options(option, source_field_mapping, target_field_mapping)
-                    elif option == "field" and i + 1 < len(aggregation_options):
-                        # Map the field ID
-                        if isinstance(aggregation_options[i + 1], int):
-                            source_field_id = aggregation_options[i + 1]
-                            aggregation_options[i + 1] = map_field_id(source_field_id, source_field_mapping, target_field_mapping)
-                    elif isinstance(option, dict) and "default" in option:
-                        # Handle "default" field
-                        default_value = option["default"]
-                        if isinstance(default_value, list) and default_value[0] == "field" and isinstance(default_value[1], int):
-                            source_field_id = default_value[1]
-                            option["default"][1] = map_field_id(source_field_id, source_field_mapping, target_field_mapping)
-
-        def update_aggregations(aggregations, source_field_mapping, target_field_mapping):
-            """
-            Update field references within the aggregations array, including in aggregation-options.
-            """
-            for aggregation in aggregations:
-                if isinstance(aggregation, list):
-                    for i, item in enumerate(aggregation):
-                        if isinstance(item, list):
-                            # Handle nested structures or aggregation-options
-                            update_aggregations([item], source_field_mapping, target_field_mapping)
-                        elif item == "field" and i + 1 < len(aggregation):
-                            # Map the field ID
-                            if isinstance(aggregation[i + 1], int):
-                                source_field_id = aggregation[i + 1]
-                                aggregation[i + 1] = map_field_id(source_field_id, source_field_mapping, target_field_mapping)
-                        elif isinstance(item, dict) and "default" in item:
-                            # Handle "default" field in aggregation-options
-                            update_aggregation_options([item], source_field_mapping, target_field_mapping)
-
-        def update_field_ref(field_ref, source_field_mapping, target_field_mapping):
-            if isinstance(field_ref, list):
-                if len(field_ref) > 1 and isinstance(field_ref[1], int):
-                    # Look up the source field name using the field ID
-                    field_ref[1]  = map_field_id(field_ref[1], source_field_mapping, target_field_mapping)
-            elif isinstance(field_ref, int):
-                # Handle cases where field_ref is a simple integer (field ID)
-                field_ref = map_field_id(field_ref, source_field_mapping, target_field_mapping)
-            return field_ref
-
-        def update_query_recursively(query, is_top_level=True):
-            if isinstance(query, dict):
-
-                if "aggregation" in query:
-                    update_aggregations(query["aggregation"], source_field_mapping, target_field_mapping)
-
-                # Process "database" field inside dataset_query
-                if "database" in query:
-                    if query["database"] == SOURCE_DATABASE_ID:
-                        logger.debug(f"Updating dataset_query database ID from {query['database']} to {TARGET_DATABASE_ID}")
-                        query["database"] = TARGET_DATABASE_ID
-
-                # Process "source-table"
-                if "source-table" in query:
-                    source_table_name = next(
-                        (table["name"] for table in source_tables if table["id"] == query["source-table"]), None
-                    )
-                    if source_table_name:
-                        query["source-table"] = next(
-                            (table["id"] for table in target_tables if table["name"] == source_table_name),
-                            query["source-table"]
-                        )
-
-                # Process "table_id"
-                if "table_id" in query:
-                    source_table_name = next(
-                        (table["name"] for table in source_tables if table["id"] == query["table_id"]), None
-                    )
-                    if source_table_name:
-                        query["table_id"] = next(
-                            (table["id"] for table in target_tables if table["name"] == source_table_name),
-                            query["table_id"]
-                        )
-
-                # Process "field_ref"
-                if "field_ref" in query:
-                    query["field_ref"] = update_field_ref(
-                        query["field_ref"], source_field_mapping, target_field_mapping
-                    )
-
-                # Process "joins"
-                if "joins" in query:
-                    update_joins(query["joins"], source_table_mapping, target_table_mapping, source_field_mapping,
-                                 target_field_mapping)
-
-                # Process "breakout"
-                if "breakout" in query:
-                    for breakout in query["breakout"]:
-                        if isinstance(breakout, list) and len(breakout) > 1:
-                            if isinstance(breakout[1], int):  # Process field ID in breakout
-                                breakout[1] = map_field_id(breakout[1], source_field_mapping, target_field_mapping)
-                            elif isinstance(breakout[1], list):  # Handle nested field refs
-                                breakout[1] = update_field_ref(breakout[1], source_field_mapping, target_field_mapping)
-
-                # Process "condition"
-                if "condition" in query:
-                    query["condition"] = update_condition(query["condition"], source_field_mapping, target_field_mapping)
-
-                # Process "aggregation"
-                if "aggregation" in query:
-                    for aggregation in query["aggregation"]:
-                        if isinstance(aggregation, list) and len(aggregation) > 1:
-                            aggregation[1] = update_field_ref(aggregation[1], source_field_mapping, target_field_mapping)
-
-                # If we are at the top level, process `dataset_query` specifically
-                if is_top_level and "dataset_query" in query:
-                    query["dataset_query"] = update_query_recursively(query.get("dataset_query", {}),
-                                                                      is_top_level=False)
-                    return query
-
-                # Process "source-query"
-                if "source-query" in query:
-                    query["source-query"] = update_query_recursively(query["source-query"], is_top_level=False)
-
-                # Process "query" (specific to dataset_query)
-                if "query" in query:
-                    query["query"] = update_query_recursively(query["query"], is_top_level=False)
-
-            elif isinstance(query, list):
-                for i, item in enumerate(query):
-                    query[i] = update_query_recursively(item, is_top_level=False)
-
-            return query
-
         # Begin by updating the top-level source_card
-        dataset_query = update_query_recursively(source_card)
+        dataset_query = update_query_recursively(source_card, source_field_mapping,
+                                                 target_field_mapping, source_tables, target_tables,
+                                                 source_table_mapping, target_table_mapping)
+
         updated_card["dataset_query"] = dataset_query
 
         # Update table_id in the card metadata
@@ -488,8 +504,6 @@ def migrate_cards(
         updated_card["parameter_usage_count"] = source_card.get("parameter_usage_count", 0)
         updated_card["public_uuid"] = source_card.get("public_uuid", None)
 
-        json_payload = json.dumps(updated_card, indent=4)
-        logger.debug(f"Updated card JSON: {json_payload}")
         created_card = create_resource(target_api_url, "card", headers_target, updated_card)
         if created_card:
             card_mapping[source_card["id"]] = created_card["id"]
@@ -569,7 +583,10 @@ def main():
             )
 
             # Update dashboard with new cards
-            updated_dashboard = update_dashboard_with_cards(source_dashboard, card_mapping)
+            # updated_dashboard = update_dashboard_with_cards(source_dashboard, card_mapping)
+            updated_dashboard = update_query_recursively(source_dashboard, source_field_mapping,
+                                                     target_field_mapping, source_tables, target_tables,
+                                                     source_table_mapping, target_table_mapping)
             if not updated_dashboard:
                 logger.error(f"Failed to update dashboard ID {dashboard_id}. Skipping.")
                 continue
@@ -609,6 +626,9 @@ def main():
                 ("public_uuid", updated_dashboard.get("public_uuid", None)),
                 ("points_of_interest", updated_dashboard.get("points_of_interest", [])),
             ])
+
+            json_payload = json.dumps(dashboard_order_dict, indent=4)
+            logger.debug(f"Updated card JSON: {json_payload}")
             # Create the updated dashboard in the target
             create_resource(TARGET_API_URL, "dashboard", HEADERS_TARGET, dashboard_order_dict)
             logger.info(f"Dashboard ID {dashboard_id} migrated successfully.")
