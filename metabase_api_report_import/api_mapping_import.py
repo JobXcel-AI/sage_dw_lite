@@ -14,7 +14,7 @@ SOURCE_DATABASE_ID = 2 # Set the source database ID
 TARGET_DATABASE_ID = 5  # Set the target database ID
 
 # List of dashboards to migrate
-DASHBOARDS = [2]
+DASHBOARDS = [4]
 CARDS = []
 
 HEADERS_SOURCE = {
@@ -505,6 +505,9 @@ def migrate_cards(
         updated_card["public_uuid"] = source_card.get("public_uuid", None)
 
         created_card = create_resource(target_api_url, "card", headers_target, updated_card)
+
+        json_payload = json.dumps(updated_card, indent=4)
+        logger.debug(f"Updated card JSON: {json_payload}")
         if created_card:
             card_mapping[source_card["id"]] = created_card["id"]
             logger.info(f"Card '{updated_card.get('name', 'Unnamed')}, Source Card ID: {source_card['id']}, Target Card ID: {created_card['id']}: ' migrated successfully.")
@@ -627,8 +630,8 @@ def main():
                 ("points_of_interest", updated_dashboard.get("points_of_interest", [])),
             ])
 
-            json_payload = json.dumps(dashboard_order_dict, indent=4)
-            logger.debug(f"Updated card JSON: {json_payload}")
+            # json_payload = json.dumps(dashboard_order_dict, indent=4)
+            # logger.debug(f"Updated card JSON: {json_payload}")
             # Create the updated dashboard in the target
             create_resource(TARGET_API_URL, "dashboard", HEADERS_TARGET, dashboard_order_dict)
             logger.info(f"Dashboard ID {dashboard_id} migrated successfully.")

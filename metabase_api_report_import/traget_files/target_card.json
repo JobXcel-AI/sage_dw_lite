@@ -2,190 +2,124 @@
   "cache_invalidated_at": null,
   "description": null,
   "archived": false,
-  "view_count": 426,
+  "view_count": 118,
   "collection_position": null,
-  "table_id": 110,
+  "table_id": 109,
   "can_run_adhoc_query": true,
   "result_metadata": [
     {
-      "description": null,
-      "semantic_type": "type/Category",
-      "coercion_strategy": null,
-      "name": "job_number_job_name",
-      "settings": null,
-      "fk_target_field_id": null,
+      "display_name": "pivot-grouping",
       "field_ref": [
-        "field",
-        "job_number_job_name",
-        {
-          "base-type": "type/Text"
-        }
+        "expression",
+        "pivot-grouping"
       ],
+      "base_type": "type/Integer",
       "effective_type": "type/Text",
-      "id": 2926,
-      "visibility_type": "normal",
-      "display_name": "Job Number Job Name",
-      "fingerprint": {
-        "global": {
-          "distinct-count": 11,
-          "nil%": 0.0
-        },
-        "type": {
-          "type/Text": {
-            "percent-json": 0.0,
-            "percent-url": 0.0,
-            "percent-email": 0.0,
-            "percent-state": 0.0,
-            "average-length": 24.454545454545453
-          }
-        }
-      },
-      "base_type": "type/Text"
-    },
-    {
-      "description": null,
-      "semantic_type": "type/Category",
-      "coercion_strategy": null,
-      "name": "job_status",
-      "settings": null,
-      "fk_target_field_id": null,
-      "field_ref": [
-        "field",
-        "job_status",
-        {
-          "base-type": "type/Text"
-        }
-      ],
-      "effective_type": "type/Text",
-      "id": 3075,
-      "visibility_type": "normal",
-      "display_name": "Job Status",
-      "fingerprint": {
-        "global": {
-          "distinct-count": 2,
-          "nil%": 0.0
-        },
-        "type": {
-          "type/Text": {
-            "percent-json": 0.0,
-            "percent-url": 0.0,
-            "percent-email": 0.0,
-            "percent-state": 0.0,
-            "average-length": 7.090909090909091
-          }
-        }
-      },
-      "base_type": "type/Text"
-    },
-    {
-      "description": null,
+      "name": "Job Number",
       "semantic_type": null,
-      "coercion_strategy": null,
-      "unit": "day",
-      "name": "project_complete_date",
-      "settings": null,
-      "fk_target_field_id": null,
-      "field_ref": [
-        "field",
-        "project_complete_date",
-        {
-          "base-type": "type/Date",
-          "temporal-unit": "day"
-        }
-      ],
-      "effective_type": "type/Date",
-      "id": 2885,
-      "visibility_type": "normal",
-      "display_name": "Project Complete Date",
       "fingerprint": {
         "global": {
-          "distinct-count": 6,
-          "nil%": 0.5454545454545455
-        },
-        "type": {
-          "type/DateTime": {
-            "earliest": "2023-06-15",
-            "latest": "2023-12-20"
-          }
-        }
-      },
-      "base_type": "type/Date"
-    },
-    {
-      "description": null,
-      "semantic_type": "type/Quantity",
-      "coercion_strategy": null,
-      "name": "job_number",
-      "settings": null,
-      "fk_target_field_id": null,
-      "field_ref": [
-        "field",
-        "job_number",
-        {
-          "base-type": "type/BigInteger"
-        }
-      ],
-      "effective_type": "type/BigInteger",
-      "id": 3076,
-      "visibility_type": "normal",
-      "display_name": "Job Number",
-      "fingerprint": {
-        "global": {
-          "distinct-count": 11,
+          "distinct-count": 1,
           "nil%": 0.0
         },
         "type": {
           "type/Number": {
-            "min": 1.0,
-            "q1": 202.5,
-            "q3": 221.75,
-            "max": 224.0,
-            "sd": 65.10425206055007,
-            "avg": 194.1818181818182
+            "min": 7.0,
+            "q1": 7.0,
+            "q3": 7.0,
+            "max": 7.0,
+            "sd": null,
+            "avg": 7.0
           }
         }
-      },
-      "base_type": "type/BigInteger"
+      }
     },
     {
-      "description": null,
-      "semantic_type": "type/CreationDate",
-      "coercion_strategy": null,
-      "unit": "day",
-      "name": "project_start_date",
-      "settings": null,
-      "fk_target_field_id": null,
-      "field_ref": [
-        "field",
-        "project_start_date",
-        {
-          "base-type": "type/Date",
-          "temporal-unit": "day"
-        }
-      ],
-      "effective_type": "type/Date",
-      "id": 2913,
-      "visibility_type": "normal",
-      "display_name": "Project Start Date",
-      "fingerprint": {
-        "global": {
-          "distinct-count": 7,
-          "nil%": 0.3636363636363636
-        },
-        "type": {
-          "type/DateTime": {
-            "earliest": "2023-01-01",
-            "latest": "2023-07-01"
-          }
-        }
-      },
-      "base_type": "type/Date"
-    },
-    {
-      "display_name": "Sum of Max of Sum of Total Contract Amount",
+      "display_name": "Sum of Budget",
       "field_ref": [
         "aggregation",
         0
+      ],
+      "base_type": "type/Decimal",
+      "effective_type": "type/Text",
+      "name": "Cost Code",
+      "semantic_type": null,
+      "fingerprint": {
+        "global": {
+          "distinct-count": 1,
+          "nil%": 0.0
+        },
+        "type": {
+          "type/Number": {
+            "min": 2563209.61,
+            "q1": 2563209.61,
+            "q3": 2563209.61,
+            "max": 2563209.61,
+            "sd": null,
+            "avg": 2563209.61
+          }
+        }
+      }
+    },
+    {
+      "display_name": "Sum of Approved Change Amount",
+      "field_ref": [
+        "aggregation",
+        1
+      ],
+      "base_type": "type/Decimal",
+      "effective_type": "type/Text",
+      "name": "Cost Type",
+      "semantic_type": null,
+      "fingerprint": {
+        "global": {
+          "distinct-count": 1,
+          "nil%": 0.0
+        },
+        "type": {
+          "type/Number": {
+            "min": 74084.67,
+            "q1": 74084.67,
+            "q3": 74084.67,
+            "max": 74084.67,
+            "sd": null,
+            "avg": 74084.67
+          }
+        }
+      }
+    },
+    {
+      "display_name": "Sum of Revised Budget",
+      "field_ref": [
+        "aggregation",
+        2
+      ],
+      "base_type": "type/Decimal",
+      "effective_type": "type/Integer",
+      "name": "pivot-grouping",
+      "semantic_type": null,
+      "fingerprint": {
+        "global": {
+          "distinct-count": 1,
+          "nil%": 0.0
+        },
+        "type": {
+          "type/Number": {
+            "min": 2637294.28,
+            "q1": 2637294.28,
+            "q3": 2637294.28,
+            "max": 2637294.28,
+            "sd": null,
+            "avg": 2637294.28
+          }
+        }
+      }
+    },
+    {
+      "display_name": "Sum of Job Cost",
+      "field_ref": [
+        "aggregation",
+        3
       ],
       "base_type": "type/Decimal",
       "effective_type": "type/Decimal",
@@ -193,26 +127,26 @@
       "semantic_type": null,
       "fingerprint": {
         "global": {
-          "distinct-count": 356,
+          "distinct-count": 1,
           "nil%": 0.0
         },
         "type": {
           "type/Number": {
-            "min": 0.0,
-            "q1": 1401866.3408346092,
-            "q3": 3867512.297723551,
-            "max": 4975449.41,
-            "sd": 1430704.353476612,
-            "avg": 2610110.5615686276
+            "min": 2196944.83,
+            "q1": 2196944.83,
+            "q3": 2196944.83,
+            "max": 2196944.83,
+            "sd": null,
+            "avg": 2196944.83
           }
         }
       }
     },
     {
-      "display_name": "Sum of Max of Sum of Original Budget Amount",
+      "display_name": "Sum of Committed POs",
       "field_ref": [
         "aggregation",
-        1
+        4
       ],
       "base_type": "type/Decimal",
       "effective_type": "type/Decimal",
@@ -220,26 +154,26 @@
       "semantic_type": null,
       "fingerprint": {
         "global": {
-          "distinct-count": 357,
+          "distinct-count": 1,
           "nil%": 0.0
         },
         "type": {
           "type/Number": {
-            "min": 0.0,
-            "q1": 1201522.7682775764,
-            "q3": 3261960.8730000006,
-            "max": 4584438.29,
-            "sd": 1254895.5072387254,
-            "avg": 2280384.8771988796
+            "min": 189445.72,
+            "q1": 189445.72,
+            "q3": 189445.72,
+            "max": 189445.72,
+            "sd": null,
+            "avg": 189445.72
           }
         }
       }
     },
     {
-      "display_name": "Sum of Max of Sum of Estimated Gross Profit",
+      "display_name": "Sum of Committed Subcontracts",
       "field_ref": [
         "aggregation",
-        2
+        5
       ],
       "base_type": "type/Decimal",
       "effective_type": "type/Decimal",
@@ -247,260 +181,71 @@
       "semantic_type": null,
       "fingerprint": {
         "global": {
-          "distinct-count": 357,
-          "nil%": 0.0
-        },
-        "type": {
-          "type/Number": {
-            "min": -379155.62,
-            "q1": 148548.51749999996,
-            "q3": 456590.38750347315,
-            "max": 954675.96,
-            "sd": 224624.14088956363,
-            "avg": 326746.5823809523
-          }
-        }
-      }
-    },
-    {
-      "display_name": "Sum of Percent Complete",
-      "field_ref": [
-        "aggregation",
-        3
-      ],
-      "base_type": "type/Float",
-      "effective_type": "type/Float",
-      "name": "sum_4",
-      "semantic_type": null,
-      "fingerprint": {
-        "global": {
-          "distinct-count": 357,
-          "nil%": 0.002801120448179272
-        },
-        "type": {
-          "type/Number": {
-            "min": 0.03693316720172409,
-            "q1": 1.1621947358511897,
-            "q3": 1.2758850246797575,
-            "max": 1.329405609528941,
-            "sd": 0.13863965888764085,
-            "avg": 1.2025576915553637
-          }
-        }
-      }
-    },
-    {
-      "display_name": "Sum of Max of Sum of Invoice Billed",
-      "field_ref": [
-        "aggregation",
-        4
-      ],
-      "base_type": "type/Decimal",
-      "effective_type": "type/Decimal",
-      "name": "sum_5",
-      "semantic_type": null,
-      "fingerprint": {
-        "global": {
-          "distinct-count": 354,
+          "distinct-count": 1,
           "nil%": 0.0
         },
         "type": {
           "type/Number": {
             "min": 0.0,
-            "q1": 1114003.342685521,
-            "q3": 3358757.416018518,
-            "max": 6465473.0,
-            "sd": 1411475.0993258778,
-            "avg": 2307820.233165266
+            "q1": 0.0,
+            "q3": 0.0,
+            "max": 0.0,
+            "sd": null,
+            "avg": 0.0
           }
         }
       }
     },
     {
-      "display_name": "Sum of Sum of Job Cost - Job Number \u2192 Cost Amount",
-      "semantic_type": "type/Cost",
-      "field_ref": [
-        "aggregation",
-        5
-      ],
-      "base_type": "type/Decimal",
-      "effective_type": "type/Decimal",
-      "name": "sum_6",
-      "fingerprint": {
-        "global": {
-          "distinct-count": 357,
-          "nil%": 0.0
-        },
-        "type": {
-          "type/Number": {
-            "min": 293.19,
-            "q1": 1443571.9101493715,
-            "q3": 4093071.8329454893,
-            "max": 5341718.35,
-            "sd": 1534734.0876289506,
-            "avg": 2754834.404565826
-          }
-        }
-      }
-    },
-    {
-      "display_name": "Sum of Income",
+      "display_name": "Sum of Balance Remaining",
       "field_ref": [
         "aggregation",
         6
       ],
       "base_type": "type/Decimal",
       "effective_type": "type/Decimal",
-      "name": "sum_7",
+      "name": "sum_4",
       "semantic_type": null,
       "fingerprint": {
         "global": {
-          "distinct-count": 357,
+          "distinct-count": 1,
           "nil%": 0.0
         },
         "type": {
           "type/Number": {
-            "min": -2101899.68,
-            "q1": -823488.4020432212,
-            "q3": -50106.485314311474,
-            "max": 1384875.17,
-            "sd": 615675.5805272193,
-            "avg": -447014.17140056024
+            "min": 250903.73,
+            "q1": 250903.73,
+            "q3": 250903.73,
+            "max": 250903.73,
+            "sd": null,
+            "avg": 250903.73
           }
         }
       }
     },
     {
-      "display_name": "Sum of Overbilled",
+      "display_name": "Projected Costs",
       "field_ref": [
         "aggregation",
         7
       ],
-      "base_type": "type/Float",
-      "effective_type": "type/Float",
-      "name": "sum_8",
-      "semantic_type": null,
-      "fingerprint": {
-        "global": {
-          "distinct-count": 334,
-          "nil%": 0.0
-        },
-        "type": {
-          "type/Number": {
-            "min": 0.0,
-            "q1": 274863.7134327834,
-            "q3": 1338884.475469635,
-            "max": 2897381.432598487,
-            "sd": 719879.5127297183,
-            "avg": 863042.7395122421
-          }
-        }
-      }
-    },
-    {
-      "display_name": "Sum of Underbilled",
-      "field_ref": [
-        "aggregation",
-        8
-      ],
-      "base_type": "type/Float",
-      "effective_type": "type/Float",
-      "name": "sum_9",
-      "semantic_type": null,
-      "fingerprint": {
-        "global": {
-          "distinct-count": 24,
-          "nil%": 0.0
-        },
-        "type": {
-          "type/Number": {
-            "min": -577704.5063669244,
-            "q1": -1592.8107783038267,
-            "q3": 0.0,
-            "max": 0.0,
-            "sd": 56037.65928889941,
-            "avg": -10295.499291427283
-          }
-        }
-      }
-    },
-    {
-      "display_name": "Sum of Earned Revenue",
-      "field_ref": [
-        "aggregation",
-        9
-      ],
-      "base_type": "type/Float",
-      "effective_type": "type/Float",
-      "name": "sum_10",
-      "semantic_type": null,
-      "fingerprint": {
-        "global": {
-          "distinct-count": 357,
-          "nil%": 0.002801120448179272
-        },
-        "type": {
-          "type/Number": {
-            "min": 0.0,
-            "q1": 1645038.2549542151,
-            "q3": 4693672.409208836,
-            "max": 6613849.359204726,
-            "sd": 1766018.9948687607,
-            "avg": 3169445.471906828
-          }
-        }
-      }
-    },
-    {
-      "display_name": "Sum of Cost of Revenue",
-      "field_ref": [
-        "aggregation",
-        10
-      ],
-      "base_type": "type/Float",
-      "effective_type": "type/Float",
-      "name": "sum_11",
-      "semantic_type": null,
-      "fingerprint": {
-        "global": {
-          "distinct-count": 357,
-          "nil%": 0.002801120448179272
-        },
-        "type": {
-          "type/Number": {
-            "min": -262812.2419909225,
-            "q1": 1499727.8903967645,
-            "q3": 4229746.032817744,
-            "max": 5659173.399204726,
-            "sd": 1578803.0395066754,
-            "avg": 2841781.062047278
-          }
-        }
-      }
-    },
-    {
-      "display_name": "Sum of Max of Gross Profit",
-      "field_ref": [
-        "aggregation",
-        11
-      ],
       "base_type": "type/Decimal",
       "effective_type": "type/Decimal",
-      "name": "sum_12",
-      "semantic_type": null,
+      "name": "sum_5",
+      "semantic_type": "type/Cost",
       "fingerprint": {
         "global": {
-          "distinct-count": 357,
+          "distinct-count": 1,
           "nil%": 0.0
         },
         "type": {
           "type/Number": {
-            "min": -379155.62,
-            "q1": 148548.51749999996,
-            "q3": 456590.38750347315,
-            "max": 954675.96,
-            "sd": 224624.14088956363,
-            "avg": 326746.5823809523
+            "min": 2646468.31,
+            "q1": 2646468.31,
+            "q3": 2646468.31,
+            "max": 2646468.31,
+            "sd": null,
+            "avg": 2646468.31
           }
         }
       }
@@ -509,184 +254,30 @@
   "creator": {
     "email": "rfullmer@jobxcel.ai",
     "first_name": "Randy",
-    "last_login": "2025-01-16T20:18:23.995076Z",
+    "last_login": "2025-02-05T17:33:59.306782Z",
     "is_qbnewb": false,
     "is_superuser": true,
     "id": 3,
     "last_name": "Fullmer",
-    "date_joined": "2024-12-11T20:51:12.035536Z",
+    "date_joined": "2024-10-30T23:37:38.466509Z",
     "common_name": "Randy Fullmer"
   },
   "database_id": 5,
   "enable_embedding": false,
   "collection_id": null,
   "query_type": "query",
-  "name": "Over / Under Billings",
+  "name": "Jobs by Cost Code/Type",
   "type": "question",
   "dataset_query": {
-    "database": 2,
+    "database": 5,
     "type": "query",
     "query": {
-      "expressions": {
-        "Overbilled": [
-          "case",
-          [
-            [
-              [
-                ">",
-                [
-                  "-",
-                  [
-                    "field",
-                    "Earned Revenue",
-                    {
-                      "base-type": "type/Float"
-                    }
-                  ],
-                  [
-                    "field",
-                    "max_4",
-                    {
-                      "base-type": "type/Decimal"
-                    }
-                  ]
-                ],
-                0
-              ],
-              [
-                "-",
-                [
-                  "field",
-                  "Earned Revenue",
-                  {
-                    "base-type": "type/Float"
-                  }
-                ],
-                [
-                  "field",
-                  "max_4",
-                  {
-                    "base-type": "type/Decimal"
-                  }
-                ]
-              ]
-            ]
-          ],
-          {
-            "default": 0
-          }
-        ],
-        "Underbilled": [
-          "case",
-          [
-            [
-              [
-                "<",
-                [
-                  "-",
-                  [
-                    "field",
-                    "Earned Revenue",
-                    {
-                      "base-type": "type/Float"
-                    }
-                  ],
-                  [
-                    "field",
-                    "max_4",
-                    {
-                      "base-type": "type/Decimal"
-                    }
-                  ]
-                ],
-                0
-              ],
-              [
-                "-",
-                [
-                  "field",
-                  "Earned Revenue",
-                  {
-                    "base-type": "type/Float"
-                  }
-                ],
-                [
-                  "field",
-                  "max_4",
-                  {
-                    "base-type": "type/Decimal"
-                  }
-                ]
-              ]
-            ]
-          ],
-          {
-            "default": 0
-          }
-        ],
-        "Cost of Revenue": [
-          "-",
-          [
-            "field",
-            "Earned Revenue",
-            {
-              "base-type": "type/Float"
-            }
-          ],
-          [
-            "field",
-            "max_6",
-            {
-              "base-type": "type/Decimal"
-            }
-          ]
-        ]
-      },
-      "breakout": [
-        [
-          "field",
-          "job_number_job_name",
-          {
-            "base-type": "type/Text"
-          }
-        ],
-        [
-          "field",
-          "job_status",
-          {
-            "base-type": "type/Text"
-          }
-        ],
-        [
-          "field",
-          "project_complete_date",
-          {
-            "base-type": "type/Date",
-            "temporal-unit": "day"
-          }
-        ],
-        [
-          "field",
-          "job_number",
-          {
-            "base-type": "type/BigInteger"
-          }
-        ],
-        [
-          "field",
-          "project_start_date",
-          {
-            "base-type": "type/Date",
-            "temporal-unit": "day"
-          }
-        ]
-      ],
       "aggregation": [
         [
           "sum",
           [
             "field",
-            "max",
+            "Budget",
             {
               "base-type": "type/Decimal"
             }
@@ -696,7 +287,7 @@
           "sum",
           [
             "field",
-            "max_2",
+            "Approved Change Amount",
             {
               "base-type": "type/Decimal"
             }
@@ -706,7 +297,7 @@
           "sum",
           [
             "field",
-            "max_3",
+            "Revised Budget",
             {
               "base-type": "type/Decimal"
             }
@@ -716,17 +307,7 @@
           "sum",
           [
             "field",
-            "Percent Complete",
-            {
-              "base-type": "type/Float"
-            }
-          ]
-        ],
-        [
-          "sum",
-          [
-            "field",
-            "max_4",
+            "Job Cost",
             {
               "base-type": "type/Decimal"
             }
@@ -736,191 +317,377 @@
           "sum",
           [
             "field",
+            "Committed POs",
+            {
+              "base-type": "type/Decimal"
+            }
+          ]
+        ],
+        [
+          "sum",
+          [
+            "field",
+            "Committed Subcontracts",
+            {
+              "base-type": "type/Decimal"
+            }
+          ]
+        ],
+        [
+          "sum",
+          [
+            "field",
+            "Balance Remaining",
+            {
+              "base-type": "type/Decimal"
+            }
+          ]
+        ],
+        [
+          "aggregation-options",
+          [
             "sum",
-            {
-              "base-type": "type/Decimal"
-            }
-          ]
-        ],
-        [
-          "sum",
-          [
-            "field",
-            "Income",
-            {
-              "base-type": "type/Decimal"
-            }
-          ]
-        ],
-        [
-          "sum",
-          [
-            "expression",
-            "Overbilled",
-            {
-              "base-type": "type/Float"
-            }
-          ]
-        ],
-        [
-          "sum",
-          [
-            "expression",
-            "Underbilled",
-            {
-              "base-type": "type/Float"
-            }
-          ]
-        ],
-        [
-          "sum",
-          [
-            "field",
-            "Earned Revenue",
-            {
-              "base-type": "type/Float"
-            }
-          ]
-        ],
-        [
-          "sum",
-          [
-            "expression",
-            "Cost of Revenue",
-            {
-              "base-type": "type/Float"
-            }
-          ]
-        ],
-        [
-          "sum",
-          [
-            "field",
-            "max_6",
-            {
-              "base-type": "type/Decimal"
-            }
-          ]
-        ]
-      ],
-      "source-query": {
-        "joins": [
-          {
-            "strategy": "inner-join",
-            "alias": "Job Cost - Job Number",
-            "condition": [
-              "=",
+            [
+              "case",
               [
-                "field",
-                "job_number",
-                {
-                  "base-type": "type/BigInteger"
-                }
-              ],
-              [
-                "field",
-                3076,
-                {
-                  "base-type": "type/BigInteger",
-                  "join-alias": "Job Cost - Job Number"
-                }
-              ]
-            ],
-            "source-table": 115
-          }
-        ],
-        "aggregation": [
-          [
-            "max",
-            [
-              "field",
-              "sum",
-              {
-                "base-type": "type/Decimal"
-              }
-            ]
-          ],
-          [
-            "max",
-            [
-              "field",
-              "sum_3",
-              {
-                "base-type": "type/Decimal"
-              }
-            ]
-          ],
-          [
-            "max",
-            [
-              "field",
-              "sum_5",
-              {
-                "base-type": "type/Decimal"
-              }
-            ]
-          ],
-          [
-            "aggregation-options",
-            [
-              "/",
-              [
-                "sum",
                 [
-                  "field",
-                  3089,
-                  {
-                    "base-type": "type/Decimal",
-                    "join-alias": "Job Cost - Job Number"
-                  }
+                  [
+                    "<",
+                    [
+                      "field",
+                      "Balance Remaining",
+                      {
+                        "base-type": "type/Decimal"
+                      }
+                    ],
+                    0
+                  ],
+                  [
+                    "-",
+                    [
+                      "field",
+                      "Revised Budget",
+                      {
+                        "base-type": "type/Decimal"
+                      }
+                    ],
+                    [
+                      "field",
+                      "Balance Remaining",
+                      {
+                        "base-type": "type/Decimal"
+                      }
+                    ]
+                  ]
                 ]
               ],
-              [
-                "max",
-                [
+              {
+                "default": [
                   "field",
-                  "sum_3",
+                  "Revised Budget",
                   {
                     "base-type": "type/Decimal"
                   }
                 ]
-              ]
-            ],
+              }
+            ]
+          ],
+          {
+            "display-name": "Projected Costs",
+            "name": "Projected Costs"
+          }
+        ]
+      ],
+      "breakout": [
+        [
+          "field",
+          "Job Number",
+          {
+            "base-type": "type/Text"
+          }
+        ],
+        [
+          "field",
+          "Cost Code",
+          {
+            "base-type": "type/Text"
+          }
+        ],
+        [
+          "field",
+          "Cost Type",
+          {
+            "base-type": "type/Text"
+          }
+        ]
+      ],
+      "filter": [
+        "!=",
+        [
+          "+",
+          [
+            "field",
+            "Budget",
             {
-              "name": "Percent Complete",
-              "display-name": "Percent Complete"
+              "base-type": "type/Decimal"
             }
           ],
           [
-            "max",
-            [
-              "field",
-              "sum_2",
-              {
-                "base-type": "type/Decimal"
-              }
-            ]
+            "field",
+            "Revised Budget",
+            {
+              "base-type": "type/Decimal"
+            }
           ],
           [
-            "sum",
-            [
-              "field",
-              3089,
-              {
-                "base-type": "type/Decimal",
-                "join-alias": "Job Cost - Job Number"
-              }
-            ]
+            "field",
+            "Job Cost",
+            {
+              "base-type": "type/Decimal"
+            }
           ],
           [
-            "max",
+            "field",
+            "Committed POs",
+            {
+              "base-type": "type/Decimal"
+            }
+          ],
+          [
+            "field",
+            "Committed Subcontracts",
+            {
+              "base-type": "type/Decimal"
+            }
+          ]
+        ],
+        0
+      ],
+      "source-query": {
+        "aggregation": [
+          [
+            "aggregation-options",
             [
-              "field",
-              "sum_4",
-              {
-                "base-type": "type/Decimal"
-              }
-            ]
+              "max",
+              [
+                "case",
+                [
+                  [
+                    [
+                      "is-null",
+                      [
+                        "field",
+                        "Budget",
+                        {
+                          "base-type": "type/Decimal"
+                        }
+                      ]
+                    ],
+                    0
+                  ]
+                ],
+                {
+                  "default": [
+                    "field",
+                    "Budget",
+                    {
+                      "base-type": "type/Decimal"
+                    }
+                  ]
+                }
+              ]
+            ],
+            {
+              "display-name": "Budget",
+              "name": "Budget"
+            }
+          ],
+          [
+            "aggregation-options",
+            [
+              "max",
+              [
+                "case",
+                [
+                  [
+                    [
+                      "is-null",
+                      [
+                        "field",
+                        "Approved Change Amount",
+                        {
+                          "base-type": "type/Decimal"
+                        }
+                      ]
+                    ],
+                    0
+                  ]
+                ],
+                {
+                  "default": [
+                    "field",
+                    "Approved Change Amount",
+                    {
+                      "base-type": "type/Decimal"
+                    }
+                  ]
+                }
+              ]
+            ],
+            {
+              "display-name": "Approved Change Amount",
+              "name": "Approved Change Amount"
+            }
+          ],
+          [
+            "aggregation-options",
+            [
+              "max",
+              [
+                "case",
+                [
+                  [
+                    [
+                      "is-null",
+                      [
+                        "field",
+                        "Revised Budget",
+                        {
+                          "base-type": "type/Decimal"
+                        }
+                      ]
+                    ],
+                    0
+                  ]
+                ],
+                {
+                  "default": [
+                    "field",
+                    "Revised Budget",
+                    {
+                      "base-type": "type/Decimal"
+                    }
+                  ]
+                }
+              ]
+            ],
+            {
+              "display-name": "Revised Budget",
+              "name": "Revised Budget"
+            }
+          ],
+          [
+            "aggregation-options",
+            [
+              "max",
+              [
+                "case",
+                [
+                  [
+                    [
+                      "is-null",
+                      [
+                        "field",
+                        "Job Cost",
+                        {
+                          "base-type": "type/Decimal"
+                        }
+                      ]
+                    ],
+                    0
+                  ]
+                ],
+                {
+                  "default": [
+                    "field",
+                    "Job Cost",
+                    {
+                      "base-type": "type/Decimal"
+                    }
+                  ]
+                }
+              ]
+            ],
+            {
+              "display-name": "Job Cost",
+              "name": "Job Cost"
+            }
+          ],
+          [
+            "aggregation-options",
+            [
+              "max",
+              [
+                "case",
+                [
+                  [
+                    [
+                      "is-null",
+                      [
+                        "field",
+                        "Committed POs",
+                        {
+                          "base-type": "type/Decimal"
+                        }
+                      ]
+                    ],
+                    0
+                  ]
+                ],
+                {
+                  "default": [
+                    "field",
+                    "Committed POs",
+                    {
+                      "base-type": "type/Decimal"
+                    }
+                  ]
+                }
+              ]
+            ],
+            {
+              "display-name": "Committed POs",
+              "name": "Committed POs"
+            }
+          ],
+          [
+            "aggregation-options",
+            [
+              "sum",
+              [
+                "case",
+                [
+                  [
+                    [
+                      "is-null",
+                      [
+                        "field",
+                        3204,
+                        {
+                          "base-type": "type/Decimal",
+                          "join-alias": "Subcontract Lines - Job Number3"
+                        }
+                      ]
+                    ],
+                    0
+                  ]
+                ],
+                {
+                  "default": [
+                    "field",
+                    3204,
+                    {
+                      "base-type": "type/Decimal",
+                      "join-alias": "Subcontract Lines - Job Number3"
+                    }
+                  ]
+                }
+              ]
+            ],
+            {
+              "display-name": "Committed Subcontracts",
+              "name": "Committed Subcontracts"
+            }
           ],
           [
             "aggregation-options",
@@ -929,434 +696,1423 @@
               [
                 "max",
                 [
-                  "field",
-                  "sum_2",
+                  "case",
+                  [
+                    [
+                      [
+                        "is-null",
+                        [
+                          "field",
+                          "Revised Budget",
+                          {
+                            "base-type": "type/Decimal"
+                          }
+                        ]
+                      ],
+                      0
+                    ]
+                  ],
                   {
-                    "base-type": "type/Decimal"
+                    "default": [
+                      "field",
+                      "Revised Budget",
+                      {
+                        "base-type": "type/Decimal"
+                      }
+                    ]
+                  }
+                ]
+              ],
+              [
+                "max",
+                [
+                  "case",
+                  [
+                    [
+                      [
+                        "is-null",
+                        [
+                          "field",
+                          "Job Cost",
+                          {
+                            "base-type": "type/Decimal"
+                          }
+                        ]
+                      ],
+                      0
+                    ]
+                  ],
+                  {
+                    "default": [
+                      "field",
+                      "Job Cost",
+                      {
+                        "base-type": "type/Decimal"
+                      }
+                    ]
+                  }
+                ]
+              ],
+              [
+                "max",
+                [
+                  "case",
+                  [
+                    [
+                      [
+                        "is-null",
+                        [
+                          "field",
+                          "Committed POs",
+                          {
+                            "base-type": "type/Decimal"
+                          }
+                        ]
+                      ],
+                      0
+                    ]
+                  ],
+                  {
+                    "default": [
+                      "field",
+                      "Committed POs",
+                      {
+                        "base-type": "type/Decimal"
+                      }
+                    ]
                   }
                 ]
               ],
               [
                 "sum",
                 [
-                  "field",
-                  3089,
+                  "case",
+                  [
+                    [
+                      [
+                        "is-null",
+                        [
+                          "field",
+                          3204,
+                          {
+                            "base-type": "type/Decimal",
+                            "join-alias": "Subcontract Lines - Job Number3"
+                          }
+                        ]
+                      ],
+                      0
+                    ]
+                  ],
                   {
-                    "base-type": "type/Decimal",
-                    "join-alias": "Job Cost - Job Number"
+                    "default": [
+                      "field",
+                      3204,
+                      {
+                        "base-type": "type/Decimal",
+                        "join-alias": "Subcontract Lines - Job Number3"
+                      }
+                    ]
                   }
                 ]
               ]
             ],
             {
-              "name": "Income",
-              "display-name": "Income"
+              "display-name": "Balance Remaining",
+              "name": "Balance Remaining"
             }
-          ],
-          [
-            "aggregation-options",
-            [
-              "*",
-              [
-                "max",
-                [
-                  "field",
-                  "sum",
-                  {
-                    "base-type": "type/Decimal"
-                  }
-                ]
-              ],
-              [
-                "/",
-                [
-                  "sum",
-                  [
-                    "field",
-                    3089,
-                    {
-                      "base-type": "type/Decimal",
-                      "join-alias": "Job Cost - Job Number"
-                    }
-                  ]
-                ],
-                [
-                  "max",
-                  [
-                    "field",
-                    "sum_3",
-                    {
-                      "base-type": "type/Decimal"
-                    }
-                  ]
-                ]
-              ]
-            ],
-            {
-              "name": "Earned Revenue",
-              "display-name": "Earned Revenue"
-            }
-          ],
-          [
-            "max",
-            [
-              "field",
-              "Gross Profit",
-              {
-                "base-type": "type/Decimal"
-              }
-            ]
           ]
         ],
         "breakout": [
           [
-            "field",
-            "job_number_job_name",
+            "expression",
+            "Job Number",
             {
               "base-type": "type/Text"
             }
           ],
           [
-            "field",
-            "job_number",
-            {
-              "base-type": "type/BigInteger"
-            }
-          ],
-          [
-            "field",
-            "job_status",
+            "expression",
+            "Cost Code",
             {
               "base-type": "type/Text"
             }
           ],
           [
-            "field",
-            "project_complete_date",
+            "expression",
+            "Cost Type",
             {
-              "base-type": "type/Date",
-              "temporal-unit": "day"
-            }
-          ],
-          [
-            "field",
-            "project_start_date",
-            {
-              "base-type": "type/Date",
-              "temporal-unit": "day"
+              "base-type": "type/Text"
             }
           ]
         ],
+        "expressions": {
+          "Cost Code": [
+            "concat",
+            [
+              "coalesce",
+              [
+                "field",
+                "Cost Code3",
+                {
+                  "base-type": "type/Text"
+                }
+              ],
+              [
+                "field",
+                3205,
+                {
+                  "base-type": "type/Text",
+                  "join-alias": "Subcontract Lines - Job Number3"
+                }
+              ]
+            ],
+            " ",
+            [
+              "field",
+              "Cost Code Name2",
+              {
+                "base-type": "type/Text"
+              }
+            ]
+          ],
+          "Cost Type": [
+            "coalesce",
+            [
+              "field",
+              "Cost Type3",
+              {
+                "base-type": "type/Text"
+              }
+            ],
+            [
+              "field",
+              3214,
+              {
+                "base-type": "type/Text",
+                "join-alias": "Subcontract Lines - Job Number3"
+              }
+            ]
+          ],
+          "Job Number": [
+            "ltrim",
+            [
+              "coalesce",
+              [
+                "field",
+                "Job Number3",
+                {
+                  "base-type": "type/BigInteger"
+                }
+              ],
+              [
+                "field",
+                3207,
+                {
+                  "base-type": "type/BigInteger",
+                  "join-alias": "Subcontract Lines - Job Number3"
+                }
+              ]
+            ]
+          ]
+        },
+        "joins": [
+          {
+            "alias": "Subcontract Lines - Job Number3",
+            "strategy": "left-join",
+            "condition": [
+              "and",
+              [
+                "=",
+                [
+                  "field",
+                  "Job Number3",
+                  {
+                    "base-type": "type/BigInteger"
+                  }
+                ],
+                [
+                  "field",
+                  3076,
+                  {
+                    "base-type": "type/BigInteger",
+                    "join-alias": "Subcontract Lines - Job Number3"
+                  }
+                ]
+              ],
+              [
+                "=",
+                [
+                  "field",
+                  "Cost Code3",
+                  {
+                    "base-type": "type/Text"
+                  }
+                ],
+                [
+                  "field",
+                  3185,
+                  {
+                    "base-type": "type/Text",
+                    "join-alias": "Subcontract Lines - Job Number3"
+                  }
+                ]
+              ],
+              [
+                "=",
+                [
+                  "field",
+                  "Cost Type3",
+                  {
+                    "base-type": "type/Text"
+                  }
+                ],
+                [
+                  "field",
+                  3188,
+                  {
+                    "base-type": "type/Text",
+                    "join-alias": "Subcontract Lines - Job Number3"
+                  }
+                ]
+              ]
+            ],
+            "source-table": 119
+          }
+        ],
         "source-query": {
-          "source-table": 110,
+          "aggregation": [
+            [
+              "aggregation-options",
+              [
+                "max",
+                [
+                  "case",
+                  [
+                    [
+                      [
+                        "is-null",
+                        [
+                          "field",
+                          "Budget",
+                          {
+                            "base-type": "type/Decimal"
+                          }
+                        ]
+                      ],
+                      0
+                    ]
+                  ],
+                  {
+                    "default": [
+                      "field",
+                      "Budget",
+                      {
+                        "base-type": "type/Decimal"
+                      }
+                    ]
+                  }
+                ]
+              ],
+              {
+                "display-name": "Budget",
+                "name": "Budget"
+              }
+            ],
+            [
+              "aggregation-options",
+              [
+                "max",
+                [
+                  "case",
+                  [
+                    [
+                      [
+                        "is-null",
+                        [
+                          "field",
+                          "Approved Change Amount",
+                          {
+                            "base-type": "type/Decimal"
+                          }
+                        ]
+                      ],
+                      0
+                    ]
+                  ],
+                  {
+                    "default": [
+                      "field",
+                      "Approved Change Amount",
+                      {
+                        "base-type": "type/Decimal"
+                      }
+                    ]
+                  }
+                ]
+              ],
+              {
+                "display-name": "Approved Change Amount",
+                "name": "Approved Change Amount"
+              }
+            ],
+            [
+              "aggregation-options",
+              [
+                "max",
+                [
+                  "case",
+                  [
+                    [
+                      [
+                        "is-null",
+                        [
+                          "field",
+                          "Revised Budget",
+                          {
+                            "base-type": "type/Decimal"
+                          }
+                        ]
+                      ],
+                      0
+                    ]
+                  ],
+                  {
+                    "default": [
+                      "field",
+                      "Revised Budget",
+                      {
+                        "base-type": "type/Decimal"
+                      }
+                    ]
+                  }
+                ]
+              ],
+              {
+                "display-name": "Revised Budget",
+                "name": "Revised Budget"
+              }
+            ],
+            [
+              "aggregation-options",
+              [
+                "max",
+                [
+                  "case",
+                  [
+                    [
+                      [
+                        "is-null",
+                        [
+                          "field",
+                          "Job Cost",
+                          {
+                            "base-type": "type/Decimal"
+                          }
+                        ]
+                      ],
+                      0
+                    ]
+                  ],
+                  {
+                    "default": [
+                      "field",
+                      "Job Cost",
+                      {
+                        "base-type": "type/Decimal"
+                      }
+                    ]
+                  }
+                ]
+              ],
+              {
+                "display-name": "Job Cost",
+                "name": "Job Cost"
+              }
+            ],
+            [
+              "aggregation-options",
+              [
+                "sum",
+                [
+                  "case",
+                  [
+                    [
+                      [
+                        "is-null",
+                        [
+                          "field",
+                          3387,
+                          {
+                            "base-type": "type/Decimal",
+                            "join-alias": "Purchase Order Lines - Job Number2"
+                          }
+                        ]
+                      ],
+                      0
+                    ]
+                  ],
+                  {
+                    "default": [
+                      "field",
+                      3387,
+                      {
+                        "base-type": "type/Decimal",
+                        "join-alias": "Purchase Order Lines - Job Number2"
+                      }
+                    ]
+                  }
+                ]
+              ],
+              {
+                "display-name": "Committed POs",
+                "name": "Committed POs"
+              }
+            ]
+          ],
           "breakout": [
             [
-              "field",
-              2926,
-              {
-                "base-type": "type/Text"
-              }
-            ],
-            [
-              "field",
-              2922,
-              {
-                "base-type": "type/Text"
-              }
-            ],
-            [
-              "field",
-              2867,
+              "expression",
+              "Job Number3",
               {
                 "base-type": "type/BigInteger"
               }
             ],
             [
-              "field",
-              2885,
+              "expression",
+              "Cost Code3",
               {
-                "base-type": "type/Date",
-                "temporal-unit": "day"
+                "base-type": "type/Text"
+              }
+            ],
+            [
+              "expression",
+              "Cost Type3",
+              {
+                "base-type": "type/Text"
               }
             ],
             [
               "field",
-              2913,
+              "Cost Code Name2",
               {
-                "base-type": "type/Date",
-                "temporal-unit": "day"
+                "base-type": "type/Text"
               }
             ]
           ],
-          "aggregation": [
-            [
-              "sum",
+          "expressions": {
+            "Cost Code3": [
+              "coalesce",
               [
                 "field",
-                2911,
+                "Cost Code2",
                 {
-                  "base-type": "type/Decimal"
+                  "base-type": "type/Text"
+                }
+              ],
+              [
+                "field",
+                3396,
+                {
+                  "base-type": "type/Text",
+                  "join-alias": "Purchase Order Lines - Job Number2"
                 }
               ]
             ],
-            [
-              "sum",
+            "Cost Type3": [
+              "coalesce",
               [
                 "field",
-                2893,
+                "Cost Type2",
                 {
-                  "base-type": "type/Decimal"
+                  "base-type": "type/Text"
+                }
+              ],
+              [
+                "field",
+                3403,
+                {
+                  "base-type": "type/Text",
+                  "join-alias": "Purchase Order Lines - Job Number2"
                 }
               ]
             ],
-            [
-              "sum",
+            "Job Number3": [
+              "coalesce",
               [
                 "field",
-                2884,
+                "Job Number2",
                 {
-                  "base-type": "type/Decimal"
+                  "base-type": "type/BigInteger"
                 }
-              ]
-            ],
-            [
-              "sum",
+              ],
               [
                 "field",
-                2879,
+                3376,
                 {
-                  "base-type": "type/Decimal"
+                  "base-type": "type/BigInteger",
+                  "join-alias": "Purchase Order Lines - Job Number2"
                 }
               ]
-            ],
-            [
-              "sum",
-              [
-                "field",
-                2877,
-                {
-                  "base-type": "type/Decimal"
-                }
-              ]
-            ],
-            [
-              "aggregation-options",
-              [
-                "-",
+            ]
+          },
+          "joins": [
+            {
+              "alias": "Purchase Order Lines - Job Number2",
+              "strategy": "full-join",
+              "condition": [
+                "and",
                 [
-                  "sum",
+                  "=",
                   [
                     "field",
-                    2911,
+                    "Job Number2",
                     {
-                      "base-type": "type/Decimal"
+                      "base-type": "type/BigInteger"
+                    }
+                  ],
+                  [
+                    "field",
+                    3076,
+                    {
+                      "base-type": "type/BigInteger",
+                      "join-alias": "Purchase Order Lines - Job Number2"
                     }
                   ]
                 ],
                 [
-                  "sum",
+                  "=",
                   [
                     "field",
-                    2879,
+                    "Cost Type2",
                     {
-                      "base-type": "type/Decimal"
+                      "base-type": "type/Text"
+                    }
+                  ],
+                  [
+                    "field",
+                    3188,
+                    {
+                      "base-type": "type/Text",
+                      "join-alias": "Purchase Order Lines - Job Number2"
+                    }
+                  ]
+                ],
+                [
+                  "=",
+                  [
+                    "field",
+                    "Cost Code2",
+                    {
+                      "base-type": "type/Text"
+                    }
+                  ],
+                  [
+                    "field",
+                    3185,
+                    {
+                      "base-type": "type/Text",
+                      "join-alias": "Purchase Order Lines - Job Number2"
                     }
                   ]
                 ]
               ],
+              "source-table": 124
+            }
+          ],
+          "source-query": {
+            "aggregation": [
+              [
+                "aggregation-options",
+                [
+                  "max",
+                  [
+                    "case",
+                    [
+                      [
+                        [
+                          "is-null",
+                          [
+                            "field",
+                            "Budget",
+                            {
+                              "base-type": "type/Decimal"
+                            }
+                          ]
+                        ],
+                        0
+                      ]
+                    ],
+                    {
+                      "default": [
+                        "field",
+                        "Budget",
+                        {
+                          "base-type": "type/Decimal"
+                        }
+                      ]
+                    }
+                  ]
+                ],
+                {
+                  "display-name": "Budget",
+                  "name": "Budget"
+                }
+              ],
+              [
+                "aggregation-options",
+                [
+                  "max",
+                  [
+                    "case",
+                    [
+                      [
+                        [
+                          "is-null",
+                          [
+                            "field",
+                            "Approved Change Amount",
+                            {
+                              "base-type": "type/Decimal"
+                            }
+                          ]
+                        ],
+                        0
+                      ]
+                    ],
+                    {
+                      "default": [
+                        "field",
+                        "Approved Change Amount",
+                        {
+                          "base-type": "type/Decimal"
+                        }
+                      ]
+                    }
+                  ]
+                ],
+                {
+                  "display-name": "Approved Change Amount",
+                  "name": "Approved Change Amount"
+                }
+              ],
+              [
+                "aggregation-options",
+                [
+                  "max",
+                  [
+                    "case",
+                    [
+                      [
+                        [
+                          "is-null",
+                          [
+                            "field",
+                            "Revised Budget",
+                            {
+                              "base-type": "type/Decimal"
+                            }
+                          ]
+                        ],
+                        0
+                      ]
+                    ],
+                    {
+                      "default": [
+                        "field",
+                        "Revised Budget",
+                        {
+                          "base-type": "type/Decimal"
+                        }
+                      ]
+                    }
+                  ]
+                ],
+                {
+                  "display-name": "Revised Budget",
+                  "name": "Revised Budget"
+                }
+              ],
+              [
+                "aggregation-options",
+                [
+                  "sum",
+                  [
+                    "case",
+                    [
+                      [
+                        [
+                          "is-null",
+                          [
+                            "field",
+                            3089,
+                            {
+                              "base-type": "type/Decimal",
+                              "join-alias": "Job Cost - Job Number1"
+                            }
+                          ]
+                        ],
+                        0
+                      ]
+                    ],
+                    {
+                      "default": [
+                        "field",
+                        3089,
+                        {
+                          "base-type": "type/Decimal",
+                          "join-alias": "Job Cost - Job Number1"
+                        }
+                      ]
+                    }
+                  ]
+                ],
+                {
+                  "display-name": "Job Cost",
+                  "name": "Job Cost"
+                }
+              ]
+            ],
+            "breakout": [
+              [
+                "expression",
+                "Job Number2",
+                {
+                  "base-type": "type/BigInteger"
+                }
+              ],
+              [
+                "expression",
+                "Cost Code2",
+                {
+                  "base-type": "type/Text"
+                }
+              ],
+              [
+                "expression",
+                "Cost Type2",
+                {
+                  "base-type": "type/Text"
+                }
+              ],
+              [
+                "expression",
+                "Cost Code Name2",
+                {
+                  "base-type": "type/Text"
+                }
+              ]
+            ],
+            "expressions": {
+              "Cost Code Name2": [
+                "coalesce",
+                [
+                  "field",
+                  "Cost Code Name1",
+                  {
+                    "base-type": "type/Text"
+                  }
+                ],
+                [
+                  "field",
+                  3086,
+                  {
+                    "base-type": "type/Text",
+                    "join-alias": "Job Cost - Job Number1"
+                  }
+                ]
+              ],
+              "Cost Code2": [
+                "coalesce",
+                [
+                  "field",
+                  "Cost Code1",
+                  {
+                    "base-type": "type/Text"
+                  }
+                ],
+                [
+                  "field",
+                  3091,
+                  {
+                    "base-type": "type/Text",
+                    "join-alias": "Job Cost - Job Number1"
+                  }
+                ]
+              ],
+              "Cost Type2": [
+                "coalesce",
+                [
+                  "field",
+                  "Cost Type1",
+                  {
+                    "base-type": "type/Text"
+                  }
+                ],
+                [
+                  "field",
+                  3090,
+                  {
+                    "base-type": "type/Text",
+                    "join-alias": "Job Cost - Job Number1"
+                  }
+                ]
+              ],
+              "Job Number2": [
+                "coalesce",
+                [
+                  "field",
+                  "Job Number1",
+                  {
+                    "base-type": "type/BigInteger"
+                  }
+                ],
+                [
+                  "field",
+                  3095,
+                  {
+                    "base-type": "type/BigInteger",
+                    "join-alias": "Job Cost - Job Number1"
+                  }
+                ]
+              ]
+            },
+            "joins": [
               {
-                "name": "Gross Profit",
-                "display-name": "Gross Profit"
+                "alias": "Job Cost - Job Number1",
+                "fields": "all",
+                "strategy": "full-join",
+                "condition": [
+                  "and",
+                  [
+                    "=",
+                    [
+                      "field",
+                      "Job Number1",
+                      {
+                        "base-type": "type/BigInteger"
+                      }
+                    ],
+                    [
+                      "field",
+                      3076,
+                      {
+                        "base-type": "type/BigInteger",
+                        "join-alias": "Job Cost - Job Number1"
+                      }
+                    ]
+                  ],
+                  [
+                    "=",
+                    [
+                      "field",
+                      "Cost Code1",
+                      {
+                        "base-type": "type/Text"
+                      }
+                    ],
+                    [
+                      "field",
+                      3091,
+                      {
+                        "base-type": "type/Text",
+                        "join-alias": "Job Cost - Job Number1"
+                      }
+                    ]
+                  ],
+                  [
+                    "=",
+                    [
+                      "field",
+                      "Cost Type1",
+                      {
+                        "base-type": "type/Text"
+                      }
+                    ],
+                    [
+                      "field",
+                      3188,
+                      {
+                        "base-type": "type/Text",
+                        "join-alias": "Job Cost - Job Number1"
+                      }
+                    ]
+                  ]
+                ],
+                "source-table": 115
               }
-            ]
-          ]
+            ],
+            "source-query": {
+              "aggregation": [
+                [
+                  "aggregation-options",
+                  [
+                    "sum",
+                    [
+                      "case",
+                      [
+                        [
+                          [
+                            "is-null",
+                            [
+                              "field",
+                              3193,
+                              {
+                                "base-type": "type/Decimal",
+                                "join-alias": "Change Order Lines - Job Number"
+                              }
+                            ]
+                          ],
+                          0
+                        ]
+                      ],
+                      {
+                        "default": [
+                          "field",
+                          3193,
+                          {
+                            "base-type": "type/Decimal",
+                            "join-alias": "Change Order Lines - Job Number"
+                          }
+                        ]
+                      }
+                    ]
+                  ],
+                  {
+                    "display-name": "Approved Change Amount",
+                    "name": "Approved Change Amount"
+                  }
+                ],
+                [
+                  "aggregation-options",
+                  [
+                    "max",
+                    [
+                      "case",
+                      [
+                        [
+                          [
+                            "is-null",
+                            [
+                              "field",
+                              2863,
+                              {
+                                "base-type": "type/Decimal"
+                              }
+                            ]
+                          ],
+                          0
+                        ]
+                      ],
+                      {
+                        "default": [
+                          "field",
+                          2863,
+                          {
+                            "base-type": "type/Decimal"
+                          }
+                        ]
+                      }
+                    ]
+                  ],
+                  {
+                    "display-name": "Budget",
+                    "name": "Budget"
+                  }
+                ],
+                [
+                  "aggregation-options",
+                  [
+                    "+",
+                    [
+                      "max",
+                      [
+                        "case",
+                        [
+                          [
+                            [
+                              "is-null",
+                              [
+                                "field",
+                                2863,
+                                {
+                                  "base-type": "type/Decimal"
+                                }
+                              ]
+                            ],
+                            0
+                          ]
+                        ],
+                        {
+                          "default": [
+                            "field",
+                            2863,
+                            {
+                              "base-type": "type/Decimal"
+                            }
+                          ]
+                        }
+                      ]
+                    ],
+                    [
+                      "sum",
+                      [
+                        "case",
+                        [
+                          [
+                            [
+                              "is-null",
+                              [
+                                "field",
+                                3193,
+                                {
+                                  "base-type": "type/Decimal",
+                                  "join-alias": "Change Order Lines - Job Number"
+                                }
+                              ]
+                            ],
+                            0
+                          ]
+                        ],
+                        {
+                          "default": [
+                            "field",
+                            3193,
+                            {
+                              "base-type": "type/Decimal",
+                              "join-alias": "Change Order Lines - Job Number"
+                            }
+                          ]
+                        }
+                      ]
+                    ]
+                  ],
+                  {
+                    "display-name": "Revised Budget",
+                    "name": "Revised Budget"
+                  }
+                ]
+              ],
+              "breakout": [
+                [
+                  "expression",
+                  "Job Number1",
+                  {
+                    "base-type": "type/BigInteger"
+                  }
+                ],
+                [
+                  "expression",
+                  "Cost Code1",
+                  {
+                    "base-type": "type/Text"
+                  }
+                ],
+                [
+                  "expression",
+                  "Cost Code Name1",
+                  {
+                    "base-type": "type/Text"
+                  }
+                ],
+                [
+                  "expression",
+                  "Cost Type1",
+                  {
+                    "base-type": "type/Text"
+                  }
+                ]
+              ],
+              "expressions": {
+                "Cost Code Name1": [
+                  "coalesce",
+                  [
+                    "field",
+                    2861,
+                    {
+                      "base-type": "type/Text"
+                    }
+                  ],
+                  [
+                    "field",
+                    3186,
+                    {
+                      "base-type": "type/Text",
+                      "join-alias": "Change Order Lines - Job Number"
+                    }
+                  ]
+                ],
+                "Cost Code1": [
+                  "coalesce",
+                  [
+                    "field",
+                    2860,
+                    {
+                      "base-type": "type/Text"
+                    }
+                  ],
+                  [
+                    "field",
+                    3185,
+                    {
+                      "base-type": "type/Text",
+                      "join-alias": "Change Order Lines - Job Number"
+                    }
+                  ]
+                ],
+                "Cost Type1": [
+                  "coalesce",
+                  [
+                    "field",
+                    2862,
+                    {
+                      "base-type": "type/Text"
+                    }
+                  ],
+                  [
+                    "field",
+                    3188,
+                    {
+                      "base-type": "type/Text",
+                      "join-alias": "Change Order Lines - Job Number"
+                    }
+                  ]
+                ],
+                "Job Number1": [
+                  "coalesce",
+                  [
+                    "field",
+                    3196,
+                    {
+                      "base-type": "type/BigInteger",
+                      "join-alias": "Change Order Lines - Job Number"
+                    }
+                  ],
+                  [
+                    "field",
+                    2864,
+                    {
+                      "base-type": "type/BigInteger"
+                    }
+                  ]
+                ]
+              },
+              "joins": [
+                {
+                  "alias": "Change Order Lines - Job Number",
+                  "strategy": "full-join",
+                  "condition": [
+                    "and",
+                    [
+                      "=",
+                      [
+                        "field",
+                        3076,
+                        {
+                          "base-type": "type/BigInteger"
+                        }
+                      ],
+                      [
+                        "field",
+                        3076,
+                        {
+                          "base-type": "type/BigInteger",
+                          "join-alias": "Change Order Lines - Job Number"
+                        }
+                      ]
+                    ],
+                    [
+                      "=",
+                      [
+                        "field",
+                        3185,
+                        {
+                          "base-type": "type/Text"
+                        }
+                      ],
+                      [
+                        "field",
+                        3185,
+                        {
+                          "base-type": "type/Text",
+                          "join-alias": "Change Order Lines - Job Number"
+                        }
+                      ]
+                    ],
+                    [
+                      "=",
+                      [
+                        "field",
+                        3188,
+                        {
+                          "base-type": "type/Text"
+                        }
+                      ],
+                      [
+                        "field",
+                        3188,
+                        {
+                          "base-type": "type/Text",
+                          "join-alias": "Change Order Lines - Job Number"
+                        }
+                      ]
+                    ]
+                  ],
+                  "source-table": 118
+                }
+              ],
+              "source-table": 109
+            }
+          }
         }
       }
     }
   },
   "visualization_settings": {
-    "table.column_formatting": [
-      {
-        "columns": [
-          "sum_9"
+    "pivot_table.column_split": {
+      "columns": [],
+      "rows": [
+        [
+          "field",
+          "Job Number",
+          {
+            "base-type": "type/Text"
+          }
         ],
-        "type": "single",
-        "operator": "<",
-        "value": 0,
-        "color": "#F7C4C4",
-        "highlight_row": true,
-        "id": 0
-      }
-    ],
-    "table.pivot_column": "job_number_job_name",
+        [
+          "field",
+          "Cost Code",
+          {
+            "base-type": "type/Text"
+          }
+        ],
+        [
+          "field",
+          "Cost Type",
+          {
+            "base-type": "type/Text"
+          }
+        ]
+      ],
+      "values": [
+        [
+          "aggregation",
+          0
+        ],
+        [
+          "aggregation",
+          1
+        ],
+        [
+          "aggregation",
+          2
+        ],
+        [
+          "aggregation",
+          3
+        ],
+        [
+          "aggregation",
+          4
+        ],
+        [
+          "aggregation",
+          5
+        ],
+        [
+          "aggregation",
+          6
+        ],
+        [
+          "aggregation",
+          7
+        ]
+      ]
+    },
+    "pivot_table.column_widths": {
+      "leftHeaderWidths": [
+        106,
+        240,
+        93
+      ],
+      "totalLeftHeaderWidths": 439,
+      "valueHeaderWidths": {}
+    },
+    "pivot.show_row_totals": false,
     "table.cell_column": "sum",
-    "table.columns": [
-      {
-        "name": "job_number_job_name",
-        "enabled": true
-      },
-      {
-        "name": "job_status",
-        "enabled": false
-      },
-      {
-        "name": "project_complete_date",
-        "enabled": false
-      },
-      {
-        "name": "sum",
-        "enabled": true
-      },
-      {
-        "name": "sum_2",
-        "enabled": true
-      },
-      {
-        "name": "sum_3",
-        "enabled": true
-      },
-      {
-        "name": "sum_4",
-        "enabled": true
-      },
-      {
-        "name": "sum_5",
-        "enabled": true
-      },
-      {
-        "name": "sum_6",
-        "enabled": true
-      },
-      {
-        "name": "sum_7",
-        "enabled": true
-      },
-      {
-        "name": "sum_8",
-        "enabled": true
-      },
-      {
-        "name": "sum_9",
-        "enabled": true
-      },
-      {
-        "name": "sum_10",
-        "enabled": true
-      },
-      {
-        "name": "sum_11",
-        "enabled": true
-      },
-      {
-        "name": "sum_12",
-        "enabled": true
-      },
-      {
-        "name": "job_number",
-        "enabled": false
-      },
-      {
-        "name": "project_start_date",
-        "enabled": false
-      }
-    ],
+    "table.pivot_column": "cost_type",
     "column_settings": {
-      "[\"name\",\"sum_11\"]": {
-        "column_title": "Cost of Revenue",
-        "number_style": "currency",
-        "currency_in_header": false,
-        "decimals": 0
-      },
       "[\"name\",\"sum\"]": {
-        "column_title": "Total Contract",
-        "number_style": "currency",
-        "currency_in_header": false,
-        "decimals": 0
-      },
-      "[\"name\",\"sum_9\"]": {
-        "column_title": "Underbilled",
-        "number_style": "currency",
-        "currency_in_header": false,
-        "decimals": 0
+        "column_title": "",
+        "number_style": "currency"
       },
       "[\"name\",\"sum_5\"]": {
-        "column_title": "Billed",
-        "number_style": "currency",
-        "currency_in_header": false,
-        "decimals": 0
+        "column_title": "",
+        "number_style": "currency"
+      },
+      "[\"name\",\"max_2\"]": {
+        "column_title": ""
+      },
+      "[\"name\",\"Revised Budget\"]": {
+        "number_style": "currency"
+      },
+      "[\"name\",\"max_3\"]": {
+        "column_title": ""
       },
       "[\"name\",\"sum_4\"]": {
-        "column_title": "Percent Complete",
-        "number_style": "percent",
-        "decimals": 0
+        "column_title": "",
+        "number_style": "currency"
+      },
+      "[\"name\",\"max\"]": {
+        "column_title": ""
+      },
+      "[\"name\",\"Balance Remaining\"]": {
+        "number_style": "currency"
       },
       "[\"name\",\"sum_3\"]": {
-        "column_title": "Estimated Gross Profit",
-        "number_style": "currency",
-        "currency_in_header": false,
-        "decimals": 0
-      },
-      "[\"name\",\"sum_12\"]": {
-        "column_title": "Gross Profit",
-        "number_style": "currency",
-        "currency_in_header": false,
-        "decimals": 0
+        "column_title": "",
+        "number_style": "currency"
       },
       "[\"name\",\"sum_7\"]": {
-        "column_title": "Income",
-        "number_style": "currency",
-        "currency_in_header": false,
-        "decimals": 0
-      },
-      "[\"name\",\"sum_8\"]": {
-        "column_title": "Overbilled",
-        "number_style": "currency",
-        "currency_in_header": false,
-        "decimals": 0
+        "column_title": "",
+        "number_style": "currency"
       },
       "[\"name\",\"sum_6\"]": {
-        "column_title": "Costs",
-        "decimals": 0,
-        "currency_in_header": false
+        "column_title": "",
+        "number_style": "currency"
+      },
+      "[\"name\",\"Projected Costs\"]": {
+        "number_style": "currency"
       },
       "[\"name\",\"sum_2\"]": {
-        "column_title": "Est. Cost at Completion",
-        "number_style": "currency",
-        "currency_in_header": false,
-        "decimals": 0
-      },
-      "[\"name\",\"sum_10\"]": {
-        "column_title": "Earned Revenue",
-        "number_style": "currency",
-        "currency_in_header": false,
-        "decimals": 0
+        "column_title": "",
+        "number_style": "currency"
       }
     }
   },
-  "last_query_start": "2025-02-13T17:19:04.050978Z",
-  "last_used_at": "2025-02-13T17:19:07.547939Z",
-  "created_at": "2025-01-02T00:47:41.562649Z",
-  "updated_at": "2025-01-02T14:48:44.138545Z",
-  "id": 40,
+  "last_query_start": "2025-02-07T17:42:01.097331Z",
+  "last_used_at": "2025-02-07T17:42:07.004016Z",
+  "created_at": "2024-11-07T04:50:37.931895Z",
+  "updated_at": "2024-11-08T02:38:18.622713Z",
+  "id": 35,
   "initially_published_at": null,
   "can_write": true,
-  "dashboard_count": 4,
-  "average_query_time": 1383.9070512820513,
+  "dashboard_count": 1,
+  "average_query_time": 13976.31330472103,
   "creator_id": 3,
   "moderation_reviews": [],
   "made_public_by_id": null,
   "embedding_params": null,
   "cache_ttl": null,
   "parameter_mappings": [],
-  "display": "table",
-  "entity_id": "kqpJurAbRQLnbkC31SZB3",
+  "display": "pivot",
+  "entity_id": "IiB-QeZQA30cHKVF50h1X",
   "collection_preview": true,
   "last-edit-info": {
     "id": 3,
     "email": "rfullmer@jobxcel.ai",
     "first_name": "Randy",
     "last_name": "Fullmer",
-    "timestamp": "2025-01-02T14:48:44.15565Z"
+    "timestamp": "2024-11-08T02:38:19.550146Z"
   },
   "collection": {
     "metabase.models.collection.root/is-root?": true,
