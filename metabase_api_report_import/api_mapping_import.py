@@ -11,7 +11,7 @@ TARGET_API_URL = "https://sagexcel.jobxcel.report/api"
 SOURCE_API_KEY = "mb_vsr+JXyizthuSTeWiVzf5BZu1lXc1gS5hUsExbEsvyI="
 TARGET_API_KEY = "mb_blLUnFYZ+diBCC1OY8zBmLXRkKZiRy5f+iFHf1Cj+9E=" # Set the target to SageXcel Demo
 SOURCE_DATABASE_ID = 2 # Set the source database ID
-TARGET_DATABASE_ID = 5  # Set the target database ID
+TARGET_DATABASE_ID = 2  # Set the target database ID
 COLLECTION_ID = 9
 
 # List of dashboards to migrate
@@ -294,6 +294,30 @@ def update_field_ref(field_ref, source_field_mapping, target_field_mapping):
         field_ref = map_field_id(field_ref, source_field_mapping, target_field_mapping)
     return field_ref
 
+def update_expressions(expressions, source_field_mapping, target_field_mapping):
+    """
+    Update field references within expressions.
+    """
+    if isinstance(expressions, dict):
+        for key, expression in expressions.items():
+            expressions[key] = update_expression_fields(expression, source_field_mapping, target_field_mapping)
+    return expressions
+
+def update_expression_fields(expression, source_field_mapping, target_field_mapping):
+    """
+    Recursively update field IDs within an expression.
+    """
+    if isinstance(expression, list):
+        for i, item in enumerate(expression):
+            if isinstance(item, list) and len(item) > 1:
+                if item[0] == "field" and isinstance(item[1], int):  # If it's a field ID
+                    source_field_id = item[1]
+                    target_field_id = map_field_id(source_field_id, source_field_mapping, target_field_mapping)
+                    expression[i][1] = target_field_id  # Replace with target field ID
+                else:  # Recurse into nested structures
+                    expression[i] = update_expression_fields(item, source_field_mapping, target_field_mapping)
+    return expression
+
 def update_query_recursively(query, source_field_mapping, target_field_mapping, source_tables, target_tables,
                              source_table_mapping, target_table_mapping, is_top_level=True,):
     if isinstance(query, dict):
@@ -352,6 +376,10 @@ def update_query_recursively(query, source_field_mapping, target_field_mapping, 
         # Process "condition"
         if "condition" in query:
             query["condition"] = update_condition(query["condition"], source_field_mapping, target_field_mapping)
+
+        # Process "expressions" (NEW ADDITION)
+        if "expressions" in query:
+            query["expressions"] = update_expressions(query["expressions"], source_field_mapping, target_field_mapping)
 
         # Process "aggregation"
         if "aggregation" in query:
@@ -564,6 +592,8 @@ def main():
 
     source_tables = source_metadata.get("tables", [])
     target_tables = target_metadata.get("tables", [])
+    logger.debug(f"Target Tables: {target_tables}")
+    logger.debug(f"Source Tables: {source_tables}")
 
     source_table_mapping, source_field_mapping = build_table_field_mapping(source_tables)
     target_table_mapping, target_field_mapping = build_table_field_mapping(target_tables)

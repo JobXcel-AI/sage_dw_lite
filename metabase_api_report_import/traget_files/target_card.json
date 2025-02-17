@@ -2,9 +2,9 @@
   "cache_invalidated_at": null,
   "description": null,
   "archived": false,
-  "view_count": 118,
+  "view_count": 126,
   "collection_position": null,
-  "table_id": 109,
+  "table_id": 1073,
   "can_run_adhoc_query": true,
   "result_metadata": [
     {
@@ -262,14 +262,14 @@
     "date_joined": "2024-10-30T23:37:38.466509Z",
     "common_name": "Randy Fullmer"
   },
-  "database_id": 5,
+  "database_id": 2,
   "enable_embedding": false,
-  "collection_id": null,
+  "collection_id": 9,
   "query_type": "query",
   "name": "Jobs by Cost Code/Type",
   "type": "question",
   "dataset_query": {
-    "database": 5,
+    "database": 2,
     "type": "query",
     "query": {
       "aggregation": [
@@ -662,7 +662,7 @@
                       "is-null",
                       [
                         "field",
-                        3204,
+                        23966,
                         {
                           "base-type": "type/Decimal",
                           "join-alias": "Subcontract Lines - Job Number3"
@@ -675,7 +675,7 @@
                 {
                   "default": [
                     "field",
-                    3204,
+                    23966,
                     {
                       "base-type": "type/Decimal",
                       "join-alias": "Subcontract Lines - Job Number3"
@@ -793,7 +793,7 @@
                         "is-null",
                         [
                           "field",
-                          3204,
+                          23966,
                           {
                             "base-type": "type/Decimal",
                             "join-alias": "Subcontract Lines - Job Number3"
@@ -806,7 +806,7 @@
                   {
                     "default": [
                       "field",
-                      3204,
+                      23966,
                       {
                         "base-type": "type/Decimal",
                         "join-alias": "Subcontract Lines - Job Number3"
@@ -859,7 +859,7 @@
               ],
               [
                 "field",
-                3205,
+                23967,
                 {
                   "base-type": "type/Text",
                   "join-alias": "Subcontract Lines - Job Number3"
@@ -886,7 +886,7 @@
             ],
             [
               "field",
-              3214,
+              23976,
               {
                 "base-type": "type/Text",
                 "join-alias": "Subcontract Lines - Job Number3"
@@ -906,7 +906,7 @@
               ],
               [
                 "field",
-                3207,
+                23969,
                 {
                   "base-type": "type/BigInteger",
                   "join-alias": "Subcontract Lines - Job Number3"
@@ -932,7 +932,7 @@
                 ],
                 [
                   "field",
-                  3076,
+                  23880,
                   {
                     "base-type": "type/BigInteger",
                     "join-alias": "Subcontract Lines - Job Number3"
@@ -950,7 +950,7 @@
                 ],
                 [
                   "field",
-                  3185,
+                  23947,
                   {
                     "base-type": "type/Text",
                     "join-alias": "Subcontract Lines - Job Number3"
@@ -968,7 +968,7 @@
                 ],
                 [
                   "field",
-                  3188,
+                  23950,
                   {
                     "base-type": "type/Text",
                     "join-alias": "Subcontract Lines - Job Number3"
@@ -976,7 +976,7 @@
                 ]
               ]
             ],
-            "source-table": 119
+            "source-table": 1080
           }
         ],
         "source-query": {
@@ -1141,7 +1141,7 @@
                         "is-null",
                         [
                           "field",
-                          3387,
+                          24083,
                           {
                             "base-type": "type/Decimal",
                             "join-alias": "Purchase Order Lines - Job Number2"
@@ -1154,7 +1154,7 @@
                   {
                     "default": [
                       "field",
-                      3387,
+                      24083,
                       {
                         "base-type": "type/Decimal",
                         "join-alias": "Purchase Order Lines - Job Number2"
@@ -1211,7 +1211,7 @@
               ],
               [
                 "field",
-                3396,
+                24092,
                 {
                   "base-type": "type/Text",
                   "join-alias": "Purchase Order Lines - Job Number2"
@@ -1229,7 +1229,7 @@
               ],
               [
                 "field",
-                3403,
+                24099,
                 {
                   "base-type": "type/Text",
                   "join-alias": "Purchase Order Lines - Job Number2"
@@ -1247,7 +1247,7 @@
               ],
               [
                 "field",
-                3376,
+                24072,
                 {
                   "base-type": "type/BigInteger",
                   "join-alias": "Purchase Order Lines - Job Number2"
@@ -1272,7 +1272,7 @@
                   ],
                   [
                     "field",
-                    3076,
+                    23880,
                     {
                       "base-type": "type/BigInteger",
                       "join-alias": "Purchase Order Lines - Job Number2"
@@ -1290,7 +1290,7 @@
                   ],
                   [
                     "field",
-                    3188,
+                    23950,
                     {
                       "base-type": "type/Text",
                       "join-alias": "Purchase Order Lines - Job Number2"
@@ -1308,7 +1308,7 @@
                   ],
                   [
                     "field",
-                    3185,
+                    23947,
                     {
                       "base-type": "type/Text",
                       "join-alias": "Purchase Order Lines - Job Number2"
@@ -1316,7 +1316,7 @@
                   ]
                 ]
               ],
-              "source-table": 124
+              "source-table": 1084
             }
           ],
           "source-query": {
@@ -1444,7 +1444,7 @@
                           "is-null",
                           [
                             "field",
-                            3089,
+                            23893,
                             {
                               "base-type": "type/Decimal",
                               "join-alias": "Job Cost - Job Number1"
@@ -1457,7 +1457,7 @@
                     {
                       "default": [
                         "field",
-                        3089,
+                        23893,
                         {
                           "base-type": "type/Decimal",
                           "join-alias": "Job Cost - Job Number1"
@@ -1514,7 +1514,7 @@
                 ],
                 [
                   "field",
-                  3086,
+                  23890,
                   {
                     "base-type": "type/Text",
                     "join-alias": "Job Cost - Job Number1"
@@ -1532,7 +1532,7 @@
                 ],
                 [
                   "field",
-                  3091,
+                  23895,
                   {
                     "base-type": "type/Text",
                     "join-alias": "Job Cost - Job Number1"
@@ -1550,7 +1550,7 @@
                 ],
                 [
                   "field",
-                  3090,
+                  23894,
                   {
                     "base-type": "type/Text",
                     "join-alias": "Job Cost - Job Number1"
@@ -1568,7 +1568,7 @@
                 ],
                 [
                   "field",
-                  3095,
+                  23899,
                   {
                     "base-type": "type/BigInteger",
                     "join-alias": "Job Cost - Job Number1"
@@ -1594,7 +1594,7 @@
                     ],
                     [
                       "field",
-                      3076,
+                      23880,
                       {
                         "base-type": "type/BigInteger",
                         "join-alias": "Job Cost - Job Number1"
@@ -1612,7 +1612,7 @@
                     ],
                     [
                       "field",
-                      3091,
+                      23895,
                       {
                         "base-type": "type/Text",
                         "join-alias": "Job Cost - Job Number1"
@@ -1630,7 +1630,7 @@
                     ],
                     [
                       "field",
-                      3188,
+                      23950,
                       {
                         "base-type": "type/Text",
                         "join-alias": "Job Cost - Job Number1"
@@ -1638,7 +1638,7 @@
                     ]
                   ]
                 ],
-                "source-table": 115
+                "source-table": 1077
               }
             ],
             "source-query": {
@@ -1655,7 +1655,7 @@
                             "is-null",
                             [
                               "field",
-                              3193,
+                              23955,
                               {
                                 "base-type": "type/Decimal",
                                 "join-alias": "Change Order Lines - Job Number"
@@ -1668,7 +1668,7 @@
                       {
                         "default": [
                           "field",
-                          3193,
+                          23955,
                           {
                             "base-type": "type/Decimal",
                             "join-alias": "Change Order Lines - Job Number"
@@ -1694,7 +1694,7 @@
                             "is-null",
                             [
                               "field",
-                              2863,
+                              23775,
                               {
                                 "base-type": "type/Decimal"
                               }
@@ -1706,7 +1706,7 @@
                       {
                         "default": [
                           "field",
-                          2863,
+                          23775,
                           {
                             "base-type": "type/Decimal"
                           }
@@ -1733,7 +1733,7 @@
                               "is-null",
                               [
                                 "field",
-                                2863,
+                                23775,
                                 {
                                   "base-type": "type/Decimal"
                                 }
@@ -1745,7 +1745,7 @@
                         {
                           "default": [
                             "field",
-                            2863,
+                            23775,
                             {
                               "base-type": "type/Decimal"
                             }
@@ -1763,7 +1763,7 @@
                               "is-null",
                               [
                                 "field",
-                                3193,
+                                23955,
                                 {
                                   "base-type": "type/Decimal",
                                   "join-alias": "Change Order Lines - Job Number"
@@ -1776,7 +1776,7 @@
                         {
                           "default": [
                             "field",
-                            3193,
+                            23955,
                             {
                               "base-type": "type/Decimal",
                               "join-alias": "Change Order Lines - Job Number"
@@ -1827,14 +1827,14 @@
                   "coalesce",
                   [
                     "field",
-                    2861,
+                    23773,
                     {
                       "base-type": "type/Text"
                     }
                   ],
                   [
                     "field",
-                    3186,
+                    23948,
                     {
                       "base-type": "type/Text",
                       "join-alias": "Change Order Lines - Job Number"
@@ -1845,14 +1845,14 @@
                   "coalesce",
                   [
                     "field",
-                    2860,
+                    23772,
                     {
                       "base-type": "type/Text"
                     }
                   ],
                   [
                     "field",
-                    3185,
+                    23947,
                     {
                       "base-type": "type/Text",
                       "join-alias": "Change Order Lines - Job Number"
@@ -1863,14 +1863,14 @@
                   "coalesce",
                   [
                     "field",
-                    2862,
+                    23774,
                     {
                       "base-type": "type/Text"
                     }
                   ],
                   [
                     "field",
-                    3188,
+                    23950,
                     {
                       "base-type": "type/Text",
                       "join-alias": "Change Order Lines - Job Number"
@@ -1881,7 +1881,7 @@
                   "coalesce",
                   [
                     "field",
-                    3196,
+                    23958,
                     {
                       "base-type": "type/BigInteger",
                       "join-alias": "Change Order Lines - Job Number"
@@ -1889,7 +1889,7 @@
                   ],
                   [
                     "field",
-                    2864,
+                    23776,
                     {
                       "base-type": "type/BigInteger"
                     }
@@ -1906,14 +1906,14 @@
                       "=",
                       [
                         "field",
-                        3076,
+                        23880,
                         {
                           "base-type": "type/BigInteger"
                         }
                       ],
                       [
                         "field",
-                        3076,
+                        23880,
                         {
                           "base-type": "type/BigInteger",
                           "join-alias": "Change Order Lines - Job Number"
@@ -1924,14 +1924,14 @@
                       "=",
                       [
                         "field",
-                        3185,
+                        23947,
                         {
                           "base-type": "type/Text"
                         }
                       ],
                       [
                         "field",
-                        3185,
+                        23947,
                         {
                           "base-type": "type/Text",
                           "join-alias": "Change Order Lines - Job Number"
@@ -1942,14 +1942,14 @@
                       "=",
                       [
                         "field",
-                        3188,
+                        23950,
                         {
                           "base-type": "type/Text"
                         }
                       ],
                       [
                         "field",
-                        3188,
+                        23950,
                         {
                           "base-type": "type/Text",
                           "join-alias": "Change Order Lines - Job Number"
@@ -1957,10 +1957,10 @@
                       ]
                     ]
                   ],
-                  "source-table": 118
+                  "source-table": 1079
                 }
               ],
-              "source-table": 109
+              "source-table": 1073
             }
           }
         }
