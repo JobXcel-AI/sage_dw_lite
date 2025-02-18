@@ -8,10 +8,12 @@ SQL_SERVER = "nvisionglass.servernova.net"
 SQL_PORT = "50366"
 SQL_USERNAME = "jobxcel"
 SQL_PASSWORD = "bH2RqTYVPgtF4bH9LTD!"
+USE_SSH_TUNNEL = False
+SQL_FILENAME = "Update All Reporting Tables.sql"
 
 # Path to the centralized script
 base_dir = os.path.dirname(os.path.dirname(__file__))  # Move up to the base directory
-central_script_path = os.path.join(base_dir, "metabase_update_scripts", "update_table_script.py")
+central_script_path = os.path.join(base_dir, "metabase_update_scripts", "update_sql_script.py")
 
 # Command to execute the centralized script with connection details
 command = [
@@ -22,7 +24,9 @@ command = [
     SQL_SERVER,
     SQL_PORT,
     SQL_USERNAME,
-    SQL_PASSWORD
+    SQL_PASSWORD,
+    USE_SSH_TUNNEL,
+    SQL_FILENAME
 ]
 
 # Execute the script

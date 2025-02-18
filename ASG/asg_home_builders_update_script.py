@@ -11,7 +11,7 @@ SQL_PASSWORD = "*Fr33B1rd77$Y@nk33*"
 
 # Path to the centralized script
 base_dir = os.path.dirname(os.path.dirname(__file__))  # Move up to the base directory
-central_script_path = os.path.join(base_dir, "metabase_update_scripts", "update_table_script.py")
+central_script_path = os.path.join(base_dir, "metabase_update_scripts", "update_sql_script.py")
 
 # Command to execute the centralized script with connection details
 command = [
