@@ -2,12 +2,14 @@ import os
 import subprocess
 
 # Customer-specific variables
-CUSTOMER_NAME = "ASG - JS-Ultimate"
-CUSTOMER_DB_NAME = "JS-Ultimate Demonstration Data"
-SQL_SERVER = "asgdemo.servernova.net"
-SQL_PORT = "65288"
-SQL_USERNAME = "jobxcel"
-SQL_PASSWORD = "*Fr33B1rd77$Y@nk33*"
+CUSTOMER_NAME = "Brekhus"
+CUSTOMER_DB_NAME = "Brekhus Marble & Granite"
+SQL_SERVER = "50.169.189.130"
+SQL_PORT = "1433"
+SQL_USERNAME = "sagexcel"
+SQL_PASSWORD = "qkJt>X@%iLtrR"
+USE_SSH_TUNNEL = True
+SQL_FILENAME = "Weekly Snapshot.sql"
 
 # Path to the centralized script
 base_dir = os.path.dirname(os.path.dirname(__file__))  # Move up to the base directory
@@ -22,7 +24,10 @@ command = [
     SQL_SERVER,
     SQL_PORT,
     SQL_USERNAME,
-    SQL_PASSWORD
+    SQL_PASSWORD,
+    USE_SSH_TUNNEL,
+
+    SQL_FILENAME,
 ]
 
 # Execute the script

@@ -3,9 +3,10 @@ import logging
 from logging.handlers import TimedRotatingFileHandler
 import os
 import sys
+import paramiko
 
 # Configure rolling log file with a retention of 5 days
-log_file_path = os.path.join(os.path.dirname(__file__), "monthly_snapshot_script.log")
+log_file_path = os.path.join(os.path.dirname(__file__), "update_table_script.log")
 file_handler = TimedRotatingFileHandler(
     log_file_path, when="midnight", interval=1, backupCount=5
 )
@@ -23,8 +24,8 @@ console_handler.setFormatter(formatter)
 logger.addHandler(console_handler)
 
 # Ensure required arguments are passed
-if len(sys.argv) < 7:
-    logger.error("Usage: python update_table_script.py <CUSTOMER_NAME> <CUSTOMER_DB_NAME> <SQL_SERVER> <SQL_PORT> <SQL_USERNAME> <SQL_PASSWORD>")
+if len(sys.argv) < 9:
+    logger.error("Usage: python update_sql_script.py <CUSTOMER_NAME> <CUSTOMER_DB_NAME> <SQL_SERVER> <SQL_PORT> <SQL_USERNAME> <SQL_PASSWORD> <USE_SSH_TUNNEL> <SQL_FILENAME>")
     sys.exit(1)
 
 # Extract arguments
@@ -34,17 +35,37 @@ SQL_SERVER = sys.argv[3]
 SQL_PORT = sys.argv[4]
 SQL_USERNAME = sys.argv[5]
 SQL_PASSWORD = sys.argv[6]
+USE_SSH_TUNNEL = sys.argv[7]
+SQL_FILENAME = sys.argv[8]
 
 # Debug: Log extracted arguments
-logger.info(f"Extracted arguments: CUSTOMER_NAME={CUSTOMER_NAME}, CUSTOMER_DB_NAME={CUSTOMER_DB_NAME}, SQL_SERVER={SQL_SERVER}, SQL_PORT={SQL_PORT}, SQL_USERNAME={SQL_USERNAME}")
+logger.error(f"Extracted arguments: CUSTOMER_NAME={CUSTOMER_NAME}, CUSTOMER_DB_NAME={CUSTOMER_DB_NAME}, SQL_SERVER={SQL_SERVER}, SQL_PORT={SQL_PORT}, SQL_USERNAME={SQL_USERNAME}, USE_SSH_TUNNEL={USE_SSH_TUNNEL}, SQL_FILENAME={SQL_FILENAME}")
+
+# Establish SSH Tunnel if required
+ssh_tunnel = None
+if USE_SSH_TUNNEL == "True":
+    try:
+        logger.info("Establishing SSH tunnel...")
+        ssh_client = paramiko.SSHClient()
+        ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        ssh_client.connect(SQL_SERVER, username=SQL_USERNAME, password=SQL_PASSWORD)
+
+        tunnel = ssh_client.get_transport().open_channel(
+            "direct-tcpip", (SQL_SERVER, int(SQL_PORT)), ("127.0.0.1", 0)
+        )
+        SQL_SERVER = "127.0.0.1"  # Redirect to localhost
+        logger.info("SSH tunnel established successfully.")
+    except Exception as e:
+        logger.error(f"Failed to establish SSH tunnel: {e}")
+        sys.exit(1)
 
 # Paths to the SQL files
 base_dir = os.path.dirname(os.path.dirname(__file__))  # Move up to the base directory
 sql_file_path = os.path.join(
-    base_dir, "SQL Tables", "Update Tables", "Monthly Snapshot.sql"
+    base_dir, "SQL Tables", "Update Tables", SQL_FILENAME
 )
 modified_sql_file_path = os.path.join(
-    base_dir, "SQL Tables", "Update Tables", "temp_Monthly_Snapshot.sql"
+    base_dir, "SQL Tables", "Update Tables", "temp_update_sql.sql"
 )
 
 # Placeholder replacements
@@ -70,9 +91,17 @@ try:
 
     logger.info(f"SQL script modified for customer: {CUSTOMER_NAME}")
 
+    sqlcmd_path = "/opt/homebrew/bin/sqlcmd"  # Default path
+
+    # Try to locate sqlcmd dynamically
+    try:
+        sqlcmd_path = subprocess.check_output(["which", "sqlcmd"], text=True).strip()
+    except subprocess.CalledProcessError:
+        logger.error("sqlcmd not found. Please ensure it's installed and accessible in PATH.")
+        sys.exit(1)
     # Command to run sqlcmd
     command = [
-        "/opt/mssql-tools/bin/sqlcmd",  # Full path to sqlcmd
+        sqlcmd_path,  # Full path to sqlcmd
         "-S", f"{SQL_SERVER},{SQL_PORT}",  # Server and port
         "-U", SQL_USERNAME,               # Username
         "-P", SQL_PASSWORD,               # Password
@@ -104,3 +133,8 @@ finally:
     if os.path.exists(modified_sql_file_path):
         os.remove(modified_sql_file_path)
         logger.info(f"Temporary modified SQL file removed for customer: {CUSTOMER_NAME}")
+
+    # Close the SSH tunnel if it was opened
+    if USE_SSH_TUNNEL == "True":
+        ssh_client.close()
+        logger.info("SSH tunnel closed.")
