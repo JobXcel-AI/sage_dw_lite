@@ -5,6 +5,7 @@ import subprocess
 CUSTOMER_NAME = "Nvision"
 CUSTOMER_DB_NAME = "Nvision"
 SQL_SERVER = "nvisionglass.servernova.net"
+SQL_INSTANCE = "SN-30427"
 SQL_PORT = "50366"
 SQL_USERNAME = "jobxcel"
 SQL_PASSWORD = "bH2RqTYVPgtF4bH9LTD!"
@@ -22,6 +23,7 @@ command = [
     CUSTOMER_NAME,
     CUSTOMER_DB_NAME,
     SQL_SERVER,
+    SQL_INSTANCE,
     SQL_PORT,
     SQL_USERNAME,
     SQL_PASSWORD,

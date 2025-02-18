@@ -5,6 +5,7 @@ import subprocess
 CUSTOMER_NAME = "Brekhus"
 CUSTOMER_DB_NAME = "Brekhus Marble & Granite"
 SQL_SERVER = "50.169.189.130"
+SQL_INSTANCE = "BTSSRV"
 SQL_PORT = "1433"
 SQL_USERNAME = "sagexcel"
 SQL_PASSWORD = "qkJt>X@%iLtrR"
@@ -22,6 +23,7 @@ command = [
     CUSTOMER_NAME,
     CUSTOMER_DB_NAME,
     SQL_SERVER,
+    SQL_INSTANCE,
     SQL_PORT,
     SQL_USERNAME,
     SQL_PASSWORD,

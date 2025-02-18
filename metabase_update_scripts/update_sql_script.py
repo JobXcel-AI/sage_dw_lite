@@ -25,21 +25,22 @@ logger.addHandler(console_handler)
 
 # Ensure required arguments are passed
 if len(sys.argv) < 9:
-    logger.error("Usage: python update_sql_script.py <CUSTOMER_NAME> <CUSTOMER_DB_NAME> <SQL_SERVER> <SQL_PORT> <SQL_USERNAME> <SQL_PASSWORD> <USE_SSH_TUNNEL> <SQL_FILENAME>")
+    logger.error("Usage: python update_sql_script.py <CUSTOMER_NAME> <CUSTOMER_DB_NAME> <SQL_SERVER> <SQL_INSTANCE> <SQL_PORT> <SQL_USERNAME> <SQL_PASSWORD> <USE_SSH_TUNNEL> <SQL_FILENAME>")
     sys.exit(1)
 
 # Extract arguments
 CUSTOMER_NAME = sys.argv[1]
 CUSTOMER_DB_NAME = sys.argv[2]
 SQL_SERVER = sys.argv[3]
-SQL_PORT = sys.argv[4]
-SQL_USERNAME = sys.argv[5]
-SQL_PASSWORD = sys.argv[6]
-USE_SSH_TUNNEL = sys.argv[7]
-SQL_FILENAME = sys.argv[8]
+SQL_INSTANCE = sys.argv[4]
+SQL_PORT = sys.argv[5]
+SQL_USERNAME = sys.argv[6]
+SQL_PASSWORD = sys.argv[7]
+USE_SSH_TUNNEL = sys.argv[8]
+SQL_FILENAME = sys.argv[9]
 
 # Debug: Log extracted arguments
-logger.info(f"Extracted arguments: CUSTOMER_NAME={CUSTOMER_NAME}, CUSTOMER_DB_NAME={CUSTOMER_DB_NAME}, SQL_SERVER={SQL_SERVER}, SQL_PORT={SQL_PORT}, SQL_USERNAME={SQL_USERNAME}, USE_SSH_TUNNEL={USE_SSH_TUNNEL}, SQL_FILENAME={SQL_FILENAME}")
+logger.info(f"Extracted arguments: CUSTOMER_NAME={CUSTOMER_NAME}, CUSTOMER_DB_NAME={CUSTOMER_DB_NAME}, SQL_SERVER={SQL_SERVER}, SQL_INSTANCE={SQL_INSTANCE}, SQL_PORT={SQL_PORT}, SQL_USERNAME={SQL_USERNAME}, USE_SSH_TUNNEL={USE_SSH_TUNNEL}, SQL_FILENAME={SQL_FILENAME}")
 
 # Establish SSH Tunnel if required
 ssh_tunnel = None
@@ -99,7 +100,11 @@ try:
     except subprocess.CalledProcessError:
         logger.error("sqlcmd not found. Please ensure it's installed and accessible in PATH.")
         sys.exit(1)
-    # Command to run sqlcmd
+
+    # Append instance name if provided
+    if SQL_INSTANCE:
+        SQL_SERVER = f"{SQL_SERVER}\\{SQL_INSTANCE}"
+
     command = [
         sqlcmd_path,  # Full path to sqlcmd
         "-S", f"{SQL_SERVER},{SQL_PORT}",  # Server and port
@@ -107,7 +112,6 @@ try:
         "-P", SQL_PASSWORD,               # Password
         "-i", modified_sql_file_path      # Input file
     ]
-
     logger.info("Executing SQL script using sqlcmd...")
     # Run the command and capture output
     process = subprocess.run(

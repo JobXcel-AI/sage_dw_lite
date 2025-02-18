@@ -4,7 +4,8 @@ import subprocess
 # Customer-specific variables
 CUSTOMER_NAME = "Vertex"
 CUSTOMER_DB_NAME = "Vertex Coatings"
-SQL_SERVER = "vertexcoatings.servernova.net\\SN-30147"
+SQL_SERVER = "vertexcoatings.servernova.net"
+SQL_INSTANCE = "SN-30147"
 SQL_PORT = "50285"
 SQL_USERNAME = "jobxcel"
 SQL_PASSWORD = "qn_uJYszjd4NCJuBcwFB"
@@ -22,6 +23,7 @@ command = [
     CUSTOMER_NAME,
     CUSTOMER_DB_NAME,
     SQL_SERVER,
+    SQL_INSTANCE,
     SQL_PORT,
     SQL_USERNAME,
     SQL_PASSWORD,
