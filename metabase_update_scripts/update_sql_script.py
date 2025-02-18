@@ -4,6 +4,7 @@ from logging.handlers import TimedRotatingFileHandler
 import os
 import sys
 import paramiko
+import time
 
 # Configure rolling log file with a retention of 5 days
 log_file_path = os.path.join(os.path.dirname(__file__), "update_table_script.log")
@@ -43,7 +44,7 @@ SQL_FILENAME = sys.argv[9]
 logger.info(f"Extracted arguments: CUSTOMER_NAME={CUSTOMER_NAME}, CUSTOMER_DB_NAME={CUSTOMER_DB_NAME}, SQL_SERVER={SQL_SERVER}, SQL_INSTANCE={SQL_INSTANCE}, SQL_PORT={SQL_PORT}, SQL_USERNAME={SQL_USERNAME}, USE_SSH_TUNNEL={USE_SSH_TUNNEL}, SQL_FILENAME={SQL_FILENAME}")
 
 # Establish SSH Tunnel if required
-ssh_tunnel = None
+ssh_client = None
 if USE_SSH_TUNNEL == "True":
     try:
         logger.info("Establishing SSH tunnel...")
@@ -56,18 +57,20 @@ if USE_SSH_TUNNEL == "True":
         )
         SQL_SERVER = "127.0.0.1"  # Redirect to localhost
         logger.info("SSH tunnel established successfully.")
+
+        # Sleep for a moment to ensure tunnel setup
+        time.sleep(2)
+        logger.info("Checking active connections...")
+        result = subprocess.run(["netstat", "-an"], text=True, capture_output=True)
+        logger.info(f"Active connections:\n{result.stdout}")
     except Exception as e:
         logger.error(f"Failed to establish SSH tunnel: {e}")
         sys.exit(1)
 
 # Paths to the SQL files
 base_dir = os.path.dirname(os.path.dirname(__file__))  # Move up to the base directory
-sql_file_path = os.path.join(
-    base_dir, "SQL Tables", "Update Tables", SQL_FILENAME
-)
-modified_sql_file_path = os.path.join(
-    base_dir, "SQL Tables", "Update Tables", "temp_update_sql.sql"
-)
+sql_file_path = os.path.join(base_dir, "SQL Tables", "Update Tables", SQL_FILENAME)
+modified_sql_file_path = os.path.join(base_dir, "SQL Tables", "Update Tables", "temp_update_sql.sql")
 
 # Placeholder replacements
 client_db_placeholder = "[CLIENT_DB_NAME]"
@@ -106,13 +109,14 @@ try:
         SQL_SERVER = f"{SQL_SERVER}\\{SQL_INSTANCE}"
 
     command = [
-        sqlcmd_path,  # Full path to sqlcmd
-        "-S", f"{SQL_SERVER},{SQL_PORT}",  # Server and port
-        "-U", SQL_USERNAME,               # Username
-        "-P", SQL_PASSWORD,               # Password
-        "-i", modified_sql_file_path      # Input file
+        sqlcmd_path,
+        "-S", f"{SQL_SERVER},{SQL_PORT}",
+        "-U", SQL_USERNAME,
+        "-P", SQL_PASSWORD,
+        "-i", modified_sql_file_path
     ]
-    logger.info("Executing SQL script using sqlcmd...")
+    logger.info(f"Executing SQL script with command: {' '.join(command)}")
+
     # Run the command and capture output
     process = subprocess.run(
         command,
@@ -122,12 +126,13 @@ try:
     )
 
     # Log the output and errors
-    if process.returncode == 0:
-        logger.info("SQL script executed successfully.")
-        logger.info(f"Output:\n{process.stdout}")
-    else:
+    logger.info(f"Process Return Code: {process.returncode}")
+    logger.info(f"Process STDOUT:\n{process.stdout}")
+    if process.returncode != 0:
         logger.error("SQL script execution failed.")
         logger.error(f"Error Output:\n{process.stderr}")
+    else:
+        logger.info("SQL script executed successfully.")
 
 except Exception as e:
     logger.error(f"Error occurred while running the SQL script: {e}")
@@ -139,6 +144,6 @@ finally:
         logger.info(f"Temporary modified SQL file removed for customer: {CUSTOMER_NAME}")
 
     # Close the SSH tunnel if it was opened
-    if USE_SSH_TUNNEL == "True":
+    if ssh_client:
         ssh_client.close()
         logger.info("SSH tunnel closed.")
