@@ -25,8 +25,7 @@ command = [
     SQL_PORT,
     SQL_USERNAME,
     SQL_PASSWORD,
-    USE_SSH_TUNNEL,
-
+    str(USE_SSH_TUNNEL),
     SQL_FILENAME,
 ]
 
