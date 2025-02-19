@@ -3,6 +3,7 @@ import logging
 from logging.handlers import TimedRotatingFileHandler
 import os
 import sys
+import paramiko
 import time
 
 # Configure rolling log file with a retention of 5 days
@@ -39,27 +40,29 @@ SQL_PASSWORD = sys.argv[7]
 USE_SSH_TUNNEL = sys.argv[8]
 SQL_FILENAME = sys.argv[9]
 
+# Debug: Log extracted arguments
 logger.info(f"Extracted arguments: CUSTOMER_NAME={CUSTOMER_NAME}, CUSTOMER_DB_NAME={CUSTOMER_DB_NAME}, SQL_SERVER={SQL_SERVER}, SQL_INSTANCE={SQL_INSTANCE}, SQL_PORT={SQL_PORT}, SQL_USERNAME={SQL_USERNAME}, USE_SSH_TUNNEL={USE_SSH_TUNNEL}, SQL_FILENAME={SQL_FILENAME}")
 
 # Establish SSH Tunnel if required
-ssh_tunnel_process = None
-local_sql_port = "50005"
-
+ssh_client = None
 if USE_SSH_TUNNEL == "True":
     try:
-        logger.info("Starting SSH tunnel...")
-        ssh_command = [
-            "ssh", "-L", f"{local_sql_port}:127.0.0.1:{SQL_PORT}", "-N", "-C", "-q",
-            "-o", "ExitOnForwardFailure=yes", f"{SQL_USERNAME}@{SQL_SERVER}"
-        ]
-        ssh_tunnel_process = subprocess.Popen(ssh_command, stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        logger.info("Establishing SSH tunnel...")
+        ssh_client = paramiko.SSHClient()
+        ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        ssh_client.connect(SQL_SERVER, username=SQL_USERNAME, password=SQL_PASSWORD)
 
-        # Give SSH tunnel time to establish
-        time.sleep(2)
+        tunnel = ssh_client.get_transport().open_channel(
+            "direct-tcpip", (SQL_SERVER, int(SQL_PORT)), ("127.0.0.1", 0)
+        )
+        SQL_SERVER = "127.0.0.1"  # Redirect to localhost
         logger.info("SSH tunnel established successfully.")
-        SQL_SERVER = "127.0.0.1"
-        SQL_PORT = local_sql_port
 
+        # Sleep for a moment to ensure tunnel setup
+        time.sleep(2)
+        logger.info("Checking active connections...")
+        result = subprocess.run(["netstat", "-an"], text=True, capture_output=True)
+        logger.info(f"Active connections:\n{result.stdout}")
     except Exception as e:
         logger.error(f"Failed to establish SSH tunnel: {e}")
         sys.exit(1)
@@ -140,7 +143,7 @@ finally:
         os.remove(modified_sql_file_path)
         logger.info(f"Temporary modified SQL file removed for customer: {CUSTOMER_NAME}")
 
-    # Terminate the SSH tunnel if it was opened
-    if ssh_tunnel_process:
-        ssh_tunnel_process.terminate()
+    # Close the SSH tunnel if it was opened
+    if ssh_client:
+        ssh_client.close()
         logger.info("SSH tunnel closed.")
