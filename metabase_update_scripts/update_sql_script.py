@@ -49,16 +49,14 @@ if USE_SSH_TUNNEL == "True":
     try:
         logger.info("Starting SSH tunnel...")
         ssh_command = [
-            "ssh", "-L", f"{local_sql_port}:{SQL_SERVER}:{SQL_PORT}", "-N", "-C", "-q",
+            "ssh", "-L", f"{local_sql_port}:127.0.0.1:{SQL_PORT}", "-N", "-C", "-q",
             "-o", "ExitOnForwardFailure=yes", f"{SQL_USERNAME}@{SQL_SERVER}"
         ]
         ssh_tunnel_process = subprocess.Popen(ssh_command, stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
-        # Wait to ensure SSH tunnel is established
-        time.sleep(5)
+        # Give SSH tunnel time to establish
+        time.sleep(2)
         logger.info("SSH tunnel established successfully.")
-
-        # Modify the SQL connection to use the tunnel
         SQL_SERVER = "127.0.0.1"
         SQL_PORT = local_sql_port
 
