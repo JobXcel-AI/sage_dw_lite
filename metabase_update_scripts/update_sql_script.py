@@ -3,10 +3,9 @@ import logging
 from logging.handlers import TimedRotatingFileHandler
 import os
 import sys
-import paramiko
 import time
 
-# Configure rolling log file with a retention of 5 days
+# Configure rolling log file
 log_file_path = os.path.join(os.path.dirname(__file__), "update_table_script.log")
 file_handler = TimedRotatingFileHandler(
     log_file_path, when="midnight", interval=1, backupCount=5
@@ -19,7 +18,7 @@ logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 logger.addHandler(file_handler)
 
-# Also log to console
+# Log to console as well
 console_handler = logging.StreamHandler()
 console_handler.setFormatter(formatter)
 logger.addHandler(console_handler)
@@ -40,35 +39,40 @@ SQL_PASSWORD = sys.argv[7]
 USE_SSH_TUNNEL = sys.argv[8]
 SQL_FILENAME = sys.argv[9]
 
-# Debug: Log extracted arguments
-logger.info(f"Extracted arguments: CUSTOMER_NAME={CUSTOMER_NAME}, CUSTOMER_DB_NAME={CUSTOMER_DB_NAME}, SQL_SERVER={SQL_SERVER}, SQL_INSTANCE={SQL_INSTANCE}, SQL_PORT={SQL_PORT}, SQL_USERNAME={SQL_USERNAME}, USE_SSH_TUNNEL={USE_SSH_TUNNEL}, SQL_FILENAME={SQL_FILENAME}")
+# Debugging log
+logger.info(f"Extracted arguments: CUSTOMER_NAME={CUSTOMER_NAME}, SQL_SERVER={SQL_SERVER}, SQL_PORT={SQL_PORT}, SQL_USERNAME={SQL_USERNAME}, USE_SSH_TUNNEL={USE_SSH_TUNNEL}, SQL_FILENAME={SQL_FILENAME}")
 
-# Establish SSH Tunnel if required
-ssh_client = None
-if USE_SSH_TUNNEL == "True":
+# Set up SSH Tunnel if needed
+tunnel_process = None
+TUNNEL_PORT = 50005
+REMOTE_SQL_HOST = SQL_SERVER
+
+if USE_SSH_TUNNEL.lower() == "true":
     try:
-        logger.info("Establishing SSH tunnel...")
-        ssh_client = paramiko.SSHClient()
-        ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        ssh_client.connect(SQL_SERVER, username=SQL_USERNAME, password=SQL_PASSWORD)
+        logger.info("Starting SSH tunnel...")
+        ssh_command = [
+            "ssh",
+            "-L", f"{TUNNEL_PORT}:{REMOTE_SQL_HOST}:{SQL_PORT}",
+            "-N", "-C", "-q",
+            "-o", "ExitOnForwardFailure=yes",
+            f"{SQL_USERNAME}@{REMOTE_SQL_HOST}"
+        ]
 
-        tunnel = ssh_client.get_transport().open_channel(
-            "direct-tcpip", (SQL_SERVER, int(SQL_PORT)), ("127.0.0.1", 0)
-        )
-        SQL_SERVER = "127.0.0.1"  # Redirect to localhost
+        tunnel_process = subprocess.Popen(ssh_command, stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        time.sleep(3)  # Give time for the tunnel to establish
+
+        # Change SQL_SERVER to localhost
+        SQL_SERVER = "127.0.0.1"
+        SQL_PORT = str(TUNNEL_PORT)
+
         logger.info("SSH tunnel established successfully.")
 
-        # Sleep for a moment to ensure tunnel setup
-        time.sleep(2)
-        logger.info("Checking active connections...")
-        result = subprocess.run(["netstat", "-an"], text=True, capture_output=True)
-        logger.info(f"Active connections:\n{result.stdout}")
     except Exception as e:
         logger.error(f"Failed to establish SSH tunnel: {e}")
         sys.exit(1)
 
 # Paths to the SQL files
-base_dir = os.path.dirname(os.path.dirname(__file__))  # Move up to the base directory
+base_dir = os.path.dirname(os.path.dirname(__file__))  # Move up to base directory
 sql_file_path = os.path.join(base_dir, "SQL Tables", "Update Tables", SQL_FILENAME)
 modified_sql_file_path = os.path.join(base_dir, "SQL Tables", "Update Tables", "temp_update_sql.sql")
 
@@ -95,13 +99,11 @@ try:
 
     logger.info(f"SQL script modified for customer: {CUSTOMER_NAME}")
 
-    sqlcmd_path = "/opt/homebrew/bin/sqlcmd"  # Default path
-
-    # Try to locate sqlcmd dynamically
+    # Locate sqlcmd
     try:
         sqlcmd_path = subprocess.check_output(["which", "sqlcmd"], text=True).strip()
     except subprocess.CalledProcessError:
-        logger.error("sqlcmd not found. Please ensure it's installed and accessible in PATH.")
+        logger.error("sqlcmd not found. Ensure it's installed and in PATH.")
         sys.exit(1)
 
     # Append instance name if provided
@@ -125,7 +127,7 @@ try:
         text=True
     )
 
-    # Log the output and errors
+    # Log output and errors
     logger.info(f"Process Return Code: {process.returncode}")
     logger.info(f"Process STDOUT:\n{process.stdout}")
     if process.returncode != 0:
@@ -138,12 +140,12 @@ except Exception as e:
     logger.error(f"Error occurred while running the SQL script: {e}")
 
 finally:
-    # Clean up the temporary modified file
+    # Clean up temp SQL file
     if os.path.exists(modified_sql_file_path):
         os.remove(modified_sql_file_path)
         logger.info(f"Temporary modified SQL file removed for customer: {CUSTOMER_NAME}")
 
-    # Close the SSH tunnel if it was opened
-    if ssh_client:
-        ssh_client.close()
+    # Close SSH tunnel
+    if tunnel_process:
+        tunnel_process.terminate()
         logger.info("SSH tunnel closed.")
