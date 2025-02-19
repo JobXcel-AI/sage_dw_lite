@@ -43,7 +43,7 @@ logger.info(f"Extracted arguments: CUSTOMER_NAME={CUSTOMER_NAME}, CUSTOMER_DB_NA
 
 # Establish SSH Tunnel if required
 ssh_tunnel_process = None
-local_sql_port = "14330"
+local_sql_port = "50005"
 
 if USE_SSH_TUNNEL == "True":
     try:
