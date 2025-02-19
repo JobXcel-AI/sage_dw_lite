@@ -60,7 +60,6 @@ if USE_SSH_TUNNEL == "True":
 
         # Modify the SQL connection to use the tunnel
         SQL_SERVER = "127.0.0.1"
-        SQL_INSTANCE = ""  # Remove instance name to use direct port
         SQL_PORT = local_sql_port
 
     except Exception as e:
