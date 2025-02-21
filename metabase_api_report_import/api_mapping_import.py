@@ -6,17 +6,17 @@ from tabulate import tabulate
 from collections import OrderedDict
 
 # Metabase API credentials and endpoints
-SOURCE_API_URL = "https://castle.jobxcel.report/api"
-TARGET_API_URL = "https://sagexcel.jobxcel.report/api"
-SOURCE_API_KEY = "mb_vsr+JXyizthuSTeWiVzf5BZu1lXc1gS5hUsExbEsvyI="
-TARGET_API_KEY = "mb_blLUnFYZ+diBCC1OY8zBmLXRkKZiRy5f+iFHf1Cj+9E=" # Set the target to SageXcel Demo
+SOURCE_API_URL = "https://sagexcel.jobxcel.report/api"
+TARGET_API_URL = "https://burbach.xcel.report/api"
+SOURCE_API_KEY = "mb_blLUnFYZ+diBCC1OY8zBmLXRkKZiRy5f+iFHf1Cj+9E="
+TARGET_API_KEY = "mb_QIilGcjthGEaQckq2ZAy6FyJgRwcLcgtvD9JxhduhqA=" # Set the target to burbach
 SOURCE_DATABASE_ID = 2 # Set the source database ID
 TARGET_DATABASE_ID = 2  # Set the target database ID
-COLLECTION_ID = 9
+COLLECTION_ID = None
 
 # List of dashboards to migrate
-DASHBOARDS = [4]
-CARDS = []
+DASHBOARDS = []
+CARDS = [31,34,35,40,41,43]
 
 HEADERS_SOURCE = {
     "x-api-key": SOURCE_API_KEY,
