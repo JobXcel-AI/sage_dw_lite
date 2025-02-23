@@ -8,7 +8,7 @@ SQL_SERVER = "mike.servernova.net"
 SQL_INSTANCE = "SN-33307"
 SQL_PORT = "49732"
 SQL_USERNAME = "jobxcel"
-SQL_PASSWORD = "wKif7qZiTxmsWXw.ebL9!"
+SQL_PASSWORD = "wKif7qZiTxmsWXw.ebL9"
 USE_SSH_TUNNEL = False
 SQL_FILENAME = "Update All Reporting Tables.sql"
 
