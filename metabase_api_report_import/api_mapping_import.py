@@ -16,7 +16,7 @@ COLLECTION_ID = None
 
 # List of dashboards to migrate
 DASHBOARDS = []
-CARDS = [31,34,35,40,41,43]
+CARDS = [31]
 
 HEADERS_SOURCE = {
     "x-api-key": SOURCE_API_KEY,
@@ -535,8 +535,8 @@ def migrate_cards(
 
         created_card = create_resource(target_api_url, "card", headers_target, updated_card)
 
-        json_payload = json.dumps(updated_card, indent=4)
-        logger.debug(f"Updated card JSON: {json_payload}")
+        # json_payload = json.dumps(updated_card, indent=4)
+        # logger.debug(f"Updated card JSON: {json_payload}")
         if created_card:
             card_mapping[source_card["id"]] = created_card["id"]
             logger.info(f"Card '{updated_card.get('name', 'Unnamed')}, Source Card ID: {source_card['id']}, Target Card ID: {created_card['id']}: ' migrated successfully.")
