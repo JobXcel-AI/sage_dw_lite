@@ -3,14 +3,14 @@ import subprocess
 
 # Customer-specific variables
 CUSTOMER_NAME = "Brekhus"
-CUSTOMER_DB_NAMES = "Brekhus Marble & Granite"
+CUSTOMER_DB_NAMES = "Brekhus Marble & Granite,Brekhus Marble & Granite"
 SQL_SERVER = "50.169.189.130"
 SQL_INSTANCE = "BTSSRV"
 SQL_PORT = "1433"
 SQL_USERNAME = "sagexcel"
 SQL_PASSWORD = "qkJt>X@%iLtrR"
 USE_SSH_TUNNEL = True
-SQL_FILENAME = "Monthly Snapshot.sql"
+SQL_FILENAME = "Weekly Snapshot.sql"
 
 # Path to the centralized script
 base_dir = os.path.dirname(os.path.dirname(__file__))  # Move up to the base directory
@@ -28,7 +28,7 @@ command = [
     SQL_USERNAME,
     SQL_PASSWORD,
     str(USE_SSH_TUNNEL),
-    SQL_FILENAME
+    SQL_FILENAME,
 ]
 
 # Execute the script
