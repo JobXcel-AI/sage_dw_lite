@@ -22,9 +22,12 @@ command = [
     CUSTOMER_NAME,
     CUSTOMER_DB_NAMES,
     SQL_SERVER,
+    SQL_INSTANCE,
     SQL_PORT,
     SQL_USERNAME,
-    SQL_PASSWORD
+    SQL_PASSWORD,
+    str(USE_SSH_TUNNEL),
+    SQL_FILENAME
 ]
 
 # Execute the script
