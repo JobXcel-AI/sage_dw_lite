@@ -5,9 +5,12 @@ import subprocess
 CUSTOMER_NAME = "ASG - Andy"
 CUSTOMER_DB_NAMES = "Andy - S100 Ultimate 1"
 SQL_SERVER = "asgdemo.servernova.net"
+SQL_INSTANCE= "SN-20202"
 SQL_PORT = "65288"
 SQL_USERNAME = "jobxcel"
 SQL_PASSWORD = "*Fr33B1rd77$Y@nk33*"
+USE_SSH_TUNNEL = False
+SQL_FILENAME = "Update All Reporting Tables.sql"
 
 # Path to the centralized script
 base_dir = os.path.dirname(os.path.dirname(__file__))  # Move up to the base directory

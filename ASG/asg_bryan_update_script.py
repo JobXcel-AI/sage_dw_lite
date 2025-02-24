@@ -1,13 +1,18 @@
 import os
 import subprocess
 
+from Brekhus.brekhus_update_snapshot_weekly_MG import SQL_INSTANCE
+
 # Customer-specific variables
 CUSTOMER_NAME = "ASG - Bryan"
 CUSTOMER_DB_NAMES = "Bryan - S100 Ultimate"
 SQL_SERVER = "asgdemo.servernova.net"
+SQL_INSTANCE= "SN-20202"
 SQL_PORT = "65288"
 SQL_USERNAME = "jobxcel"
 SQL_PASSWORD = "*Fr33B1rd77$Y@nk33*"
+USE_SSH_TUNNEL = False
+SQL_FILENAME = "Update All Reporting Tables.sql"
 
 # Path to the centralized script
 base_dir = os.path.dirname(os.path.dirname(__file__))  # Move up to the base directory
