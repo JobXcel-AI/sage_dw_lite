@@ -3,7 +3,7 @@ import subprocess
 
 # Customer-specific variables
 CUSTOMER_NAME = "ASG - JS-Ultimate"
-CUSTOMER_DB_NAME = "JS-Ultimate Demonstration Data"
+CUSTOMER_DB_NAMES = "JS-Ultimate Demonstration Data"
 SQL_SERVER = "asgdemo.servernova.net"
 SQL_PORT = "65288"
 SQL_USERNAME = "jobxcel"
@@ -18,7 +18,7 @@ command = [
     "python3", 
     central_script_path,
     CUSTOMER_NAME,
-    CUSTOMER_DB_NAME,
+    CUSTOMER_DB_NAMES,
     SQL_SERVER,
     SQL_PORT,
     SQL_USERNAME,

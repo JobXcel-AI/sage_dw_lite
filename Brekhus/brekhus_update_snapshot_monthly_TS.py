@@ -3,7 +3,7 @@ import subprocess
 
 # Customer-specific variables
 CUSTOMER_NAME = "Brekhus"
-CUSTOMER_DB_NAME = "Brekhus Marble & Granite"
+CUSTOMER_DB_NAMES = "Brekhus Marble & Granite"
 SQL_SERVER = "50.169.189.130"
 SQL_INSTANCE = "BTSSRV"
 SQL_PORT = "1433"
@@ -21,7 +21,7 @@ command = [
     "python3", 
     central_script_path,
     CUSTOMER_NAME,
-    CUSTOMER_DB_NAME,
+    CUSTOMER_DB_NAMES,
     SQL_SERVER,
     SQL_INSTANCE,
     SQL_PORT,

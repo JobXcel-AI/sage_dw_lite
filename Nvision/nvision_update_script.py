@@ -3,7 +3,7 @@ import subprocess
 
 # Customer-specific variables
 CUSTOMER_NAME = "Nvision"
-CUSTOMER_DB_NAME = "Nvision"
+CUSTOMER_DB_NAMES = "Nvision"
 SQL_SERVER = "nvisionglass.servernova.net"
 SQL_INSTANCE = "SN-30427"
 SQL_PORT = "50366"
@@ -21,7 +21,7 @@ command = [
     "python3", 
     central_script_path,
     CUSTOMER_NAME,
-    CUSTOMER_DB_NAME,
+    CUSTOMER_DB_NAMES,
     SQL_SERVER,
     SQL_INSTANCE,
     SQL_PORT,

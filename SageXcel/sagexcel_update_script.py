@@ -3,7 +3,7 @@ import subprocess
 
 # Customer-specific variables
 CUSTOMER_NAME = "SageXcel"
-CUSTOMER_DB_NAME = "SageXcel Demo"
+CUSTOMER_DB_NAMES = "SageXcel Demo"
 SQL_SERVER = "mike.servernova.net"
 SQL_INSTANCE = "SN-33307"
 SQL_PORT = "49732"
@@ -21,7 +21,7 @@ command = [
     "python3", 
     central_script_path,
     CUSTOMER_NAME,
-    CUSTOMER_DB_NAME,
+    CUSTOMER_DB_NAMES,
     SQL_SERVER,
     SQL_INSTANCE,
     SQL_PORT,

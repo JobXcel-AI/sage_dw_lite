@@ -25,12 +25,12 @@ logger.addHandler(console_handler)
 
 # Ensure required arguments are passed
 if len(sys.argv) < 9:
-    logger.error("Usage: python update_sql_script.py <CUSTOMER_NAME> <CUSTOMER_DB_NAME> <SQL_SERVER> <SQL_INSTANCE> <SQL_PORT> <SQL_USERNAME> <SQL_PASSWORD> <USE_SSH_TUNNEL> <SQL_FILENAME>")
+    logger.error("Usage: python update_sql_script.py <CUSTOMER_NAME> <CUSTOMER_DB_NAMES> <SQL_SERVER> <SQL_INSTANCE> <SQL_PORT> <SQL_USERNAME> <SQL_PASSWORD> <USE_SSH_TUNNEL> <SQL_FILENAME>")
     sys.exit(1)
 
 # Extract arguments
 CUSTOMER_NAME = sys.argv[1]
-CUSTOMER_DB_NAME = sys.argv[2]
+CUSTOMER_DB_NAMES = sys.argv[2].split(",")  # Convert comma-separated list to array
 SQL_SERVER = sys.argv[3]
 SQL_INSTANCE = sys.argv[4]
 SQL_PORT = sys.argv[5]
@@ -41,6 +41,7 @@ SQL_FILENAME = sys.argv[9]
 
 # Debugging log
 logger.info(f"Extracted arguments: CUSTOMER_NAME={CUSTOMER_NAME}, SQL_SERVER={SQL_SERVER}, SQL_PORT={SQL_PORT}, SQL_USERNAME={SQL_USERNAME}, USE_SSH_TUNNEL={USE_SSH_TUNNEL}, SQL_FILENAME={SQL_FILENAME}")
+logger.info(f"Databases to update: {', '.join(CUSTOMER_DB_NAMES)}")
 
 # Set up SSH Tunnel if needed
 tunnel_process = None
@@ -80,8 +81,7 @@ modified_sql_file_path = os.path.join(base_dir, "SQL Tables", "Update Tables", "
 client_db_placeholder = "[CLIENT_DB_NAME]"
 
 try:
-    # Read and modify the SQL file
-    logger.info(f"Processing SQL script for customer: {CUSTOMER_NAME}")
+    # Read the SQL file
     with open(sql_file_path, "r") as file:
         sql_content = file.read()
 
@@ -89,15 +89,6 @@ try:
     if client_db_placeholder not in sql_content:
         logger.error(f"Placeholder {client_db_placeholder} not found in {sql_file_path}.")
         sys.exit(1)
-
-    # Replace placeholders with actual values
-    modified_sql_content = sql_content.replace(client_db_placeholder, f"'{CUSTOMER_DB_NAME}'")
-
-    # Save the modified SQL file
-    with open(modified_sql_file_path, "w") as file:
-        file.write(modified_sql_content)
-
-    logger.info(f"SQL script modified for customer: {CUSTOMER_NAME}")
 
     # Locate sqlcmd
     try:
@@ -110,31 +101,44 @@ try:
     if SQL_INSTANCE:
         SQL_SERVER = f"{SQL_SERVER}\\{SQL_INSTANCE}"
 
-    command = [
-        sqlcmd_path,
-        "-S", f"{SQL_SERVER},{SQL_PORT}",
-        "-U", SQL_USERNAME,
-        "-P", SQL_PASSWORD,
-        "-i", modified_sql_file_path
-    ]
-    logger.info(f"Executing SQL script with command: {' '.join(command)}")
+    # Execute for each database
+    for db_name in CUSTOMER_DB_NAMES:
+        logger.info(f"Processing SQL script for database: {db_name}")
 
-    # Run the command and capture output
-    process = subprocess.run(
-        command,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        text=True
-    )
+        # Replace placeholders with actual database name
+        modified_sql_content = sql_content.replace(client_db_placeholder, f"'{db_name}'")
 
-    # Log output and errors
-    logger.info(f"Process Return Code: {process.returncode}")
-    logger.info(f"Process STDOUT:\n{process.stdout}")
-    if process.returncode != 0:
-        logger.error("SQL script execution failed.")
-        logger.error(f"Error Output:\n{process.stderr}")
-    else:
-        logger.info("SQL script executed successfully.")
+        # Save the modified SQL file
+        with open(modified_sql_file_path, "w") as file:
+            file.write(modified_sql_content)
+
+        logger.info(f"SQL script modified for database: {db_name}")
+
+        command = [
+            sqlcmd_path,
+            "-S", f"{SQL_SERVER},{SQL_PORT}",
+            "-U", SQL_USERNAME,
+            "-P", SQL_PASSWORD,
+            "-i", modified_sql_file_path
+        ]
+        logger.info(f"Executing SQL script for database {db_name} with command: {' '.join(command)}")
+
+        # Run the command and capture output
+        process = subprocess.run(
+            command,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True
+        )
+
+        # Log output and errors
+        logger.info(f"Process Return Code: {process.returncode}")
+        logger.info(f"Process STDOUT:\n{process.stdout}")
+        if process.returncode != 0:
+            logger.error(f"SQL script execution failed for database: {db_name}")
+            logger.error(f"Error Output:\n{process.stderr}")
+        else:
+            logger.info(f"SQL script executed successfully for database: {db_name}")
 
 except Exception as e:
     logger.error(f"Error occurred while running the SQL script: {e}")
@@ -143,7 +147,7 @@ finally:
     # Clean up temp SQL file
     if os.path.exists(modified_sql_file_path):
         os.remove(modified_sql_file_path)
-        logger.info(f"Temporary modified SQL file removed for customer: {CUSTOMER_NAME}")
+        logger.info("Temporary modified SQL file removed.")
 
     # Close SSH tunnel
     if tunnel_process:
