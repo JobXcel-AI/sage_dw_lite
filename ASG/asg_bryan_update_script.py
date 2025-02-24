@@ -1,8 +1,5 @@
 import os
 import subprocess
-
-from Brekhus.brekhus_update_snapshot_weekly_MG import SQL_INSTANCE
-
 # Customer-specific variables
 CUSTOMER_NAME = "ASG - Bryan"
 CUSTOMER_DB_NAMES = "Bryan - S100 Ultimate"
