@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="SqlDialectMappings">
+    <file url="file://$PROJECT_DIR$/SQL Tables/Create Database.sql" dialect="TSQL" />
+    <file url="file://$PROJECT_DIR$/SQL Tables/Create Tables/Create All Reporting Tables.sql" dialect="TSQL" />
+    <file url="file://$PROJECT_DIR$/SQL Tables/Update Tables/Update All Reporting Tables.sql" dialect="TSQL" />
     <file url="PROJECT" dialect="TSQL" />
   </component>
 </project>
