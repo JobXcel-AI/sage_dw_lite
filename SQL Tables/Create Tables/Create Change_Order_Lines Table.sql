@@ -24,7 +24,7 @@ CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Change_Order_Lines'), '(
 	purchase_order_number NVARCHAR(30),
 	cost_code NVARCHAR(50),
 	cost_code_name NVARCHAR(50),
-	cost_type NVARCHAR(15),
+	cost_type NVARCHAR(30),
 	approved_change_amount DECIMAL(12,2),
 	change_amount DECIMAL(12,2),
 	created_date DATETIME,

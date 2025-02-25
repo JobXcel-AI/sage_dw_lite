@@ -10,7 +10,7 @@ CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Job_Budget_Lines'), '(
 	job_number BIGINT,
 	cost_code NVARCHAR(50),
 	cost_code_name NVARCHAR(50),
-	cost_type NVARCHAR(15),
+	cost_type NVARCHAR(30),
 	budget DECIMAL(12,2)
 )')
 

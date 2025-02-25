@@ -25,7 +25,7 @@ CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Payroll_Records'), '(
 	comp_wage DECIMAL(9,2) DEFAULT 0,
 	comp_gross DECIMAL(9,2) DEFAULT 0,
 	comp_code BIGINT,
-	comp_type NVARCHAR(30),
+	comp_type NVARCHAR(50),
 	payroll_type NVARCHAR(13),
 	payroll_status NVARCHAR(8),
 	regular_pay DECIMAL(9,2) DEFAULT 0,

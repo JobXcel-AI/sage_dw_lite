@@ -17,7 +17,7 @@ CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Subcontract_Lines'), '(
 	subcontract_status NVARCHAR(8),
 	job_number BIGINT,
 	cost_code NVARCHAR(50),
-	cost_type NVARCHAR(15),
+	cost_type NVARCHAR(30),
 	committed_amount DECIMAL(12,2),
 	remaining_amount DECIMAL(12,2),
 	hot_list BIT,
