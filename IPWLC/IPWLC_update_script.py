@@ -16,9 +16,13 @@ SQL_FILENAME = "Update All Reporting Tables.sql"
 base_dir = os.path.dirname(os.path.dirname(__file__))  # Move up to the base directory
 central_script_path = os.path.join(base_dir, "metabase_update_scripts", "update_sql_script.py")
 
+# Validate file path
+if not os.path.exists(central_script_path):
+    raise FileNotFoundError(f"Script not found: {central_script_path}")
+
 # Command to execute the centralized script with connection details
 command = [
-    "python3", 
+    "python3",
     central_script_path,
     CUSTOMER_NAME,
     CUSTOMER_DB_NAMES,
@@ -33,7 +37,7 @@ command = [
 
 # Execute the script
 try:
-    result = subprocess.run(command, text=True)
+    result = subprocess.run(command, text=True, capture_output=True, timeout=600)  # Timeout after 10 minutes
 
     # Log output or errors
     if result.returncode == 0:
@@ -44,5 +48,9 @@ try:
         print("Standard Output:", result.stdout)
         print("Standard Error:", result.stderr)
 
+except subprocess.TimeoutExpired:
+    print("Error: Script execution timed out.")
+except FileNotFoundError as fnf_error:
+    print(f"Error: {fnf_error}")
 except Exception as e:
     print(f"Error occurred while running the script: {e}")
