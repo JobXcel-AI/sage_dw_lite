@@ -1,7 +1,7 @@
 -- Specify Rollup DB Name
 DECLARE @Reporting_DB_Name NVARCHAR(50) = QUOTENAME('SageXcel Rollup Reporting');
 -- Define Save Path for Database
-DECLARE @Reporting_DB_Path NVARCHAR(100) = CONCAT('C:\Sage100Con\Company\SageXcel Rollup Reporting', @Client_DB_Name);
+DECLARE @Reporting_DB_Path NVARCHAR(100) = 'C:\Sage100Con\Company\SageXcel Rollup Reporting';
 
 -- Create DB SQL Command
 DECLARE @SqlCommand NVARCHAR(MAX);
