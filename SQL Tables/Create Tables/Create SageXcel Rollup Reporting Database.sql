@@ -1,18 +1,16 @@
 -- Specify Rollup DB Name
-DECLARE @Reporting_DB_Name NVARCHAR(50) = QUOTENAME('SageXcel Rollup Reporting');
--- Define Save Path for Database
-DECLARE @Reporting_DB_Path NVARCHAR(100) = 'C:\Sage100Con\Company\SageXcel Rollup Reporting';
+DECLARE @Reporting_DB_Name NVARCHAR(50) = 'SageXcel Rollup Reporting';
 
 -- Create DB SQL Command
 DECLARE @SqlCommand NVARCHAR(MAX);
 SET @SqlCommand = CONCAT(
-  N'CREATE DATABASE ', QUOTENAME(@Reporting_DB_Name), ' ON
-  (NAME = ', QUOTENAME(CONCAT(@Reporting_DB_Name, '_dat')), ',
-  FILENAME = ''', @Reporting_DB_Path, '\', @Reporting_DB_Name, '_dat.mdf'')
-  LOG ON
-  (NAME = ', QUOTENAME(CONCAT(@Reporting_DB_Name, '_log')), ',
-  FILENAME = ''', @Reporting_DB_Path, '\', @Reporting_DB_Name, '_log.ldf'');',
-  'ALTER DATABASE ', QUOTENAME(@Reporting_DB_Name), ' SET AUTO_SHRINK ON;'
+        N'CREATE DATABASE ', QUOTENAME(@Reporting_DB_Name), ';',
+
+    -- Ensure AUTO_SHRINK is enabled
+        'ALTER DATABASE ', QUOTENAME(@Reporting_DB_Name), ' SET AUTO_SHRINK ON;',
+
+    -- Ensure database recovery model is FULL (to enable transaction logging)
+        'ALTER DATABASE ', QUOTENAME(@Reporting_DB_Name), ' SET RECOVERY FULL;'
 );
 
 -- Execute the SQL Command
