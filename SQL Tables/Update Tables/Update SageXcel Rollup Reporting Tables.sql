@@ -1,5 +1,5 @@
 --Specify Client DB Name
-DECLARE @Client_DB_Name NVARCHAR(50) = QUOTENAME('[CLIENT_DB_NAME]' + ' Reporting';  
+DECLARE @Client_DB_Name NVARCHAR(50) = QUOTENAME('[CLIENT_DB_NAME]' + ' Reporting');
 --Specify Reporting DB Name
 DECLARE @Reporting_DB_Name NVARCHAR(50) = QUOTENAME('SageXcel Rollup Reporting');
 --Initial variable declaration
@@ -32,8 +32,8 @@ EXECUTE sp_executesql @SqlInsertQuery
 
 --Update Employees
 SET @SqlInsertQuery = CONCAT(N'
-INSERT INTO ',@Reporting_DB_Name,N'.dbo.Employee
-SELECT ''[CLIENT_DB_NAME]'' as db_source, * FROM ',@Client_DB_Name,N'.dbo.Employee')
+INSERT INTO ',@Reporting_DB_Name,N'.dbo.Employees
+SELECT ''[CLIENT_DB_NAME]'' as db_source, * FROM ',@Client_DB_Name,N'.dbo.Employees')
 EXECUTE sp_executesql @SqlInsertQuery
 
 --Update Inventory
