@@ -1,0 +1,43 @@
+~
+"/tmp/crontab.DKdU8R/crontab" 41L, 3805B                                                                                                                                        1,1           All
+#
+# Eac
+# indicating with different fields when the task will be run
+# and what command to run for the task
+#
+# To define the time you can provide concrete values for
+# minute (m), hour (h), day of month (dom), month (mon),
+# and day of week (dow) or use '*' in these fields (for 'any').
+#
+# Notice that tasks will be started based on the cron's system
+# daemon's notion of time and timezones.
+#
+# Output of the crontab jobs (including errors) is sent through
+# email to the user the crontab file belongs to (unless redirected).
+#
+# For example, you can run a backup of all your user accounts
+# at 5 a.m every week with:
+# 0 5 * * 1 tar -zcf /var/backups/home.tgz /home/
+#
+# For more information see the manual pages of crontab(5) and cron(8)
+#
+# m h  dom mon dow   command
+30 14 * * * /usr/bin/python3 /home/mike/dev/sage_dw_lite/Vertex/vertex_update_script.py >> /home/mike/dev/sage_dw_lite/Vertex/cron_output.log 2>&1
+15 14 * * * /usr/bin/python3 /home/mike/dev/sage_dw_lite/Nvision/nvision_update_script.py >> /home/mike/dev/sage_dw_lite/Nvision/cron_output.log 2>&1
+0 14 * * * /usr/bin/python3 /home/mike/dev/sage_dw_lite/Burbach/burbach_update_script.py >> /home/mike/dev/sage_dw_lite/Burbach/cron_output.log 2>&1
+45 13 * * * /usr/bin/python3 /home/mike/dev/sage_dw_lite/Brekhus/brekhus_update_script.py >> /home/mike/dev/sage_dw_lite/Brekhus/cron_output.log 2>&1
+40 12 * * * /usr/bin/python3 /home/mike/dev/sage_dw_lite/IPWLC/IPWLC_update_script.py >> /home/mike/dev/sage_dw_lite/IPWLC/cron_output.log 2>&1
+0 13 * * * /usr/bin/python3 /home/mike/dev/sage_dw_lite/SageXcel/sagexcel_update_script.py >> /home/mike/dev/sage_dw_lite/SageXcel/cron_output.log 2>&1
+0 3 * * * /usr/bin/python3 /home/mike/dev/sage_dw_lite/schedule_git_pull/git_pull.py >> /home/mike/dev/sage_dw_lite/schedule_git_pull/cron_output.log 2>&1
+15 4 * * 0 /usr/bin/python3 /home/mike/dev/sage_dw_lite/Vertex/vertex_update_snapshot_weekly.py >> /home/mike/dev/sage_dw_lite/Vertex/cron_output_weekly.log 2>&1
+0 4 * * 0 /usr/bin/python3 /home/mike/dev/sage_dw_lite/Nvision/nvision_update_snapshot_weekly.py >> /home/mike/dev/sage_dw_lite/Nvision/cron_output_weekly.log 2>&1
+0 5 * * 0 /usr/bin/python3 /home/mike/dev/sage_dw_lite/Burbach/burbach_update_snapshot_weekly.py >> /home/mike/dev/sage_dw_lite/Burbach/cron_output_weekly.log 2>&1
+45 5 * * 0 /usr/bin/python3 /home/mike/dev/sage_dw_lite/Brekhus/brekhus_update_snapshot_weekly.py >> /home/mike/dev/sage_dw_lite/Brekhus/cron_output_weekly.log 2>&1
+30 5 * * 0 /usr/bin/python3 /home/mike/dev/sage_dw_lite/IPWLC/IPWLC_update_snapshot_weekly.py >> /home/mike/dev/sage_dw_lite/IPWLC/cron_output_weekly.log 2>&1
+0 2 * * 0 /usr/bin/python3 /home/mike/dev/sage_dw_lite/SageXcel/sagexcel_update_snapshot_weekly.py >> /home/mike/dev/sage_dw_lite/SageXcel/cron_output_weekly.log 2>&1
+15 7 1 * * /usr/bin/python3 /home/mike/dev/sage_dw_lite/Nvision/nvision_update_snapshot_monthly.py >> /home/mike/dev/sage_dw_lite/Nvision/cron_output_monthly.log 2>&1
+30 7 1 * * /usr/bin/python3 /home/mike/dev/sage_dw_lite/Vertex/vertex_update_snapshot_monthly.py >> /home/mike/dev/sage_dw_lite/Vertex/cron_output_monthly.log 2>&1
+45 6 1 * * /usr/bin/python3 /home/mike/dev/sage_dw_lite/Burbach/burbach_update_snapshot_monthly.py >> /home/mike/dev/sage_dw_lite/Burbach/cron_output_monthly.log 2>&1
+30 6 1 * * /usr/bin/python3 /home/mike/dev/sage_dw_lite/Brekhus/brekhus_update_snapshot_monthly.py >> /home/mike/dev/sage_dw_lite/Brekhus/cron_output_monthly.log 2>&1
+15 6 1 * * /usr/bin/python3 /home/mike/dev/sage_dw_lite/IPWLC/IPWLC_update_snapshot_monthly.py >> /home/mike/dev/sage_dw_lite/IPWLC/cron_output_monthly.log 2>&1
+0 3 1 * * /usr/bin/python3 /home/mike/dev/sage_dw_lite/SageXcel/sagexcel_update_snapshot_monthly.py >> /home/mike/dev/sage_dw_lite/SageXcel/cron_output_monthly.log 2>&1i

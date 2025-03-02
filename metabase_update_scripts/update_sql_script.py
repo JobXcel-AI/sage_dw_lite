@@ -92,7 +92,7 @@ try:
 
     # Locate sqlcmd
     try:
-        sqlcmd_path = subprocess.check_output(["which", "sqlcmd"], text=True).strip()
+        sqlcmd_path = "/opt/mssql-tools/bin/sqlcmd"
     except subprocess.CalledProcessError:
         logger.error("sqlcmd not found. Ensure it's installed and in PATH.")
         sys.exit(1)
