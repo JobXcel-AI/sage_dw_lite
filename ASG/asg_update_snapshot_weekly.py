@@ -20,6 +20,7 @@ central_script_path = os.path.join(base_dir, "metabase_update_scripts", "update_
 command = [
     "python3", 
     central_script_path,
+    CUSTOMER_NAME,
     CUSTOMER_DB_NAMES,
     SQL_SERVER,
     SQL_INSTANCE,
