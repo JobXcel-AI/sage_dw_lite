@@ -19,52 +19,53 @@ EXEC sp_executesql @SqlCommand;
 
 
 
---Sql Create Table Command
+-- Sql Create Table Command
 DECLARE @SqlCreateTableCommand NVARCHAR(MAX);
+
 SET @SqlCreateTableCommand = CONCAT(N'
-CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('AR_Invoices'), '(
-	db_source NVARCHAR(100),
-	job_number BIGINT,
-	job_name NVARCHAR(75),
-	job_phone_number NVARCHAR(14),
-	job_notes NVARCHAR(MAX),
-	job_address1 NVARCHAR(50),
-	job_address2 NVARCHAR(50),
-	job_city NVARCHAR(50),
-	job_state NVARCHAR(2),
-	job_zip_code NVARCHAR(10),
-	job_tax_district NVARCHAR(50),
-	job_type NVARCHAR(50),
-	job_status NVARCHAR(10),
-	ar_invoice_id BIGINT,
-	ar_invoice_date DATE,
-	ar_invoice_description NVARCHAR(50),
-	ar_invoice_number NVARCHAR(20),
-	ar_invoice_status NVARCHAR(8),
-	ar_invoice_tax_district NVARCHAR(50),
-	tax_entity1 NVARCHAR(50),
-	tax_entity1_rate DECIMAL(8,4),
-	tax_entity2 NVARCHAR(50),
-	tax_entity2_rate DECIMAL(8,4),
-	ar_invoice_due_date DATE,
-	ar_invoice_total DECIMAL(12,2),
-	ar_invoice_sales_tax DECIMAL(12,2),
-	ar_invoice_amount_paid DECIMAL(12,2),
-	ar_invoice_balance DECIMAL(14,2),
-	ar_invoice_retention DECIMAL(14,2),
-	ar_invoice_type NVARCHAR(8),
-	client_name NVARCHAR(75),
-	job_supervisor NVARCHAR(50),
-	job_salesperson NVARCHAR(50),
-	ar_invoice_payments_payment_amount DECIMAL(14,2),
-	ar_invoice_payments_discount_taken DECIMAL(14,2),
-	ar_invoice_payments_credit_taken DECIMAL(14,2),
-	last_payment_received_date DATE,
-	last_date_worked DATE,
-	created_date DATETIME,
-	last_updated_date DATETIME,
-	is_deleted BIT DEFAULT 0,
-	deleted_date DATETIME
+CREATE TABLE ', QUOTENAME(@Reporting_DB_Name), '.dbo.', QUOTENAME('AR_Invoices'), '(
+    db_source NVARCHAR(100),
+    job_number BIGINT,
+    job_name NVARCHAR(75),
+    job_phone_number NVARCHAR(14),
+    job_notes NVARCHAR(MAX),
+    job_address1 NVARCHAR(50),
+    job_address2 NVARCHAR(50),
+    job_city NVARCHAR(50),
+    job_state NVARCHAR(2),
+    job_zip_code NVARCHAR(10),
+    job_tax_district NVARCHAR(50),
+    job_type NVARCHAR(50),
+    job_status NVARCHAR(10),
+    ar_invoice_id BIGINT,
+    ar_invoice_date DATE,
+    ar_invoice_description NVARCHAR(50),
+    ar_invoice_number NVARCHAR(20),
+    ar_invoice_status NVARCHAR(8),
+    ar_invoice_tax_district NVARCHAR(50),
+    tax_entity1 NVARCHAR(50),
+    tax_entity1_rate DECIMAL(8,4),
+    tax_entity2 NVARCHAR(50),
+    tax_entity2_rate DECIMAL(8,4),
+    ar_invoice_due_date DATE,
+    ar_invoice_total DECIMAL(12,2),
+    ar_invoice_sales_tax DECIMAL(12,2),
+    ar_invoice_amount_paid DECIMAL(12,2),
+    ar_invoice_balance DECIMAL(14,2),
+    ar_invoice_retention DECIMAL(14,2),
+    ar_invoice_type NVARCHAR(8),
+    client_name NVARCHAR(75),
+    job_supervisor NVARCHAR(50),
+    job_salesperson NVARCHAR(50),
+    ar_invoice_payments_payment_amount DECIMAL(14,2),
+    ar_invoice_payments_discount_taken DECIMAL(14,2),
+    ar_invoice_payments_credit_taken DECIMAL(14,2),
+    last_payment_received_date DATE,
+    last_date_worked DATE,
+    created_date DATETIME,
+    last_updated_date DATETIME,
+    is_deleted BIT DEFAULT 0,
+    deleted_date DATETIME
 )')
 
 EXECUTE sp_executesql @SqlCreateTableCommand
@@ -72,7 +73,7 @@ EXECUTE sp_executesql @SqlCreateTableCommand
 
 
 SET @SqlCreateTableCommand = CONCAT(N'
-CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Change_Orders'), '(
+CREATE TABLE ', QUOTENAME(@Reporting_DB_Name),'.dbo.',QUOTENAME('Change_Orders'), '(
 	db_source NVARCHAR(100),
 	change_order_id BIGINT,
 	change_order_number NVARCHAR(20),
@@ -100,7 +101,7 @@ CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Change_Orders'), '(
 
 EXECUTE sp_executesql @SqlCreateTableCommand
 SET @SqlCreateTableCommand = CONCAT(N'
-CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Employees'), '(
+CREATE TABLE ', QUOTENAME(@Reporting_DB_Name),'.dbo.',QUOTENAME('Employees'), '(
 	db_source NVARCHAR(100),
 	employee_id BIGINT,
 	last_name NVARCHAR(50),
@@ -128,7 +129,7 @@ EXECUTE sp_executesql @SqlCreateTableCommand
 
 
 SET @SqlCreateTableCommand = CONCAT(N'
-CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Inventory'), '(
+CREATE TABLE ', QUOTENAME(@Reporting_DB_Name),'.dbo.',QUOTENAME('Inventory'), '(
 	db_source NVARCHAR(100),
 	part_number BIGINT,
 	location NVARCHAR(50),
@@ -157,7 +158,7 @@ EXECUTE sp_executesql @SqlCreateTableCommand
 
 
 SET @SqlCreateTableCommand = CONCAT(N'
-CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Job_Cost'), '(
+CREATE TABLE ', QUOTENAME(@Reporting_DB_Name),'.dbo.',QUOTENAME('Job_Cost'), '(
 	db_source NVARCHAR(100),
 	job_cost_id BIGINT,
 	job_number BIGINT,
@@ -193,7 +194,7 @@ EXECUTE sp_executesql @SqlCreateTableCommand
 
 
 SET @SqlCreateTableCommand = CONCAT(N'
-CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Ledger_Accounts'), '(
+CREATE TABLE ', QUOTENAME(@Reporting_DB_Name),'.dbo.',QUOTENAME('Ledger_Accounts'), '(
 	db_source NVARCHAR(100),
 	ledger_account_id BIGINT,
 	ledger_account NVARCHAR(50),
@@ -262,7 +263,7 @@ EXECUTE sp_executesql @SqlCreateTableCommand
 
 
 SET @SqlCreateTableCommand = CONCAT(N'
-CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Purchase_Orders'), '(
+CREATE TABLE ', QUOTENAME(@Reporting_DB_Name),'.dbo.',QUOTENAME('Purchase_Orders'), '(
 	db_source NVARCHAR(100),
 	purchase_order_id BIGINT,
 	purchase_order_number NVARCHAR(20),
@@ -298,7 +299,7 @@ EXECUTE sp_executesql @SqlCreateTableCommand
 
 
 SET @SqlCreateTableCommand = CONCAT(N'
-CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Vendor_Contacts'), '(
+CREATE TABLE ', QUOTENAME(@Reporting_DB_Name),'.dbo.',QUOTENAME('Vendor_Contacts'), '(
 	db_source NVARCHAR(100),
 	vendor_contact_id NVARCHAR(20),
 	contact_name NVARCHAR(50),
@@ -328,7 +329,7 @@ EXECUTE sp_executesql @SqlCreateTableCommand
 
 
 SET @SqlCreateTableCommand = CONCAT(N'
-CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Jobs'), '(
+CREATE TABLE ', QUOTENAME(@Reporting_DB_Name),'.dbo.',QUOTENAME('Jobs'), '(
 	db_source NVARCHAR(100),
 	job_number BIGINT,	
 	job_name NVARCHAR(75),
@@ -402,7 +403,7 @@ EXECUTE sp_executesql @SqlCreateTableCommand
 
 
 SET @SqlCreateTableCommand = CONCAT(N'
-CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Job_Cost_Waterfall'), '(
+CREATE TABLE ', QUOTENAME(@Reporting_DB_Name),'.dbo.',QUOTENAME('Job_Cost_Waterfall'), '(
 	db_source NVARCHAR(100),
 	job_number BIGINT,	
 	waterfall_category NVARCHAR(50),
@@ -413,7 +414,7 @@ EXECUTE sp_executesql @SqlCreateTableCommand
 
 
 SET @SqlCreateTableCommand = CONCAT(N'
-CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Ledger_Transaction_Lines'), '(
+CREATE TABLE ', QUOTENAME(@Reporting_DB_Name),'.dbo.',QUOTENAME('Ledger_Transaction_Lines'), '(
 	db_source NVARCHAR(100),
 	ledger_transaction_description NVARCHAR(50),
 	ledger_account_id BIGINT,
@@ -444,7 +445,7 @@ CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Ledger_Transaction_Lines'),
 EXECUTE sp_executesql @SqlCreateTableCommand
 
 SET @SqlCreateTableCommand = CONCAT(N'
-CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Payroll_Records'), '(
+CREATE TABLE ', QUOTENAME(@Reporting_DB_Name),'.dbo.',QUOTENAME('Payroll_Records'), '(
 	db_source NVARCHAR(100),
 	payroll_record_id BIGINT,
 	employee_id BIGINT,
@@ -492,7 +493,7 @@ CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Payroll_Records'), '(
 EXECUTE sp_executesql @SqlCreateTableCommand
 
 SET @SqlCreateTableCommand = CONCAT(N'
-CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Job_Status_History'), '(
+CREATE TABLE ', QUOTENAME(@Reporting_DB_Name),'.dbo.',QUOTENAME('Job_Status_History'), '(
 	db_source NVARCHAR(100),
 	job_number BIGINT,
 	job_status_number INT,
@@ -506,7 +507,7 @@ EXECUTE sp_executesql @SqlCreateTableCommand
 
 
 SET @SqlCreateTableCommand = CONCAT(N'
-CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Jobs_Active_History'), '(
+CREATE TABLE ', QUOTENAME(@Reporting_DB_Name),'.dbo.',QUOTENAME('Jobs_Active_History'), '(
 	db_source NVARCHAR(100),
 	job_active_date DATETIME,
 	job_number BIGINT
@@ -518,7 +519,7 @@ EXECUTE sp_executesql @SqlCreateTableCommand
 
 --Sql Create Table Command
 SET @SqlCreateTableCommand = CONCAT(N'
-CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Change_Order_History'), '(
+CREATE TABLE ', QUOTENAME(@Reporting_DB_Name),'.dbo.',QUOTENAME('Change_Order_History'), '(
 	db_source NVARCHAR(100),
 	record_number BIGINT,
 	job_number BIGINT,
@@ -533,7 +534,7 @@ EXECUTE sp_executesql @SqlCreateTableCommand
 
 
 SET @SqlCreateTableCommand = CONCAT(N'
-CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Change_Order_Open_History'), '(
+CREATE TABLE ', QUOTENAME(@Reporting_DB_Name),'.dbo.',QUOTENAME('Change_Order_Open_History'), '(
 	db_source NVARCHAR(100),
 	change_order_open_date DATETIME,
 	record_number BIGINT,
@@ -544,7 +545,7 @@ EXECUTE sp_executesql @SqlCreateTableCommand
 
 
 SET @SqlCreateTableCommand = CONCAT(N'
-CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Purchase_Order_Lines'), '(
+CREATE TABLE ', QUOTENAME(@Reporting_DB_Name),'.dbo.',QUOTENAME('Purchase_Order_Lines'), '(
 	db_source NVARCHAR(100),
 	purchase_order_id BIGINT,
 	purchase_order_line_number INT,
@@ -582,7 +583,7 @@ EXECUTE sp_executesql @SqlCreateTableCommand
 
 
 SET @SqlCreateTableCommand = CONCAT(N'
-CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Change_Order_Lines'), '(
+CREATE TABLE ', QUOTENAME(@Reporting_DB_Name),'.dbo.',QUOTENAME('Change_Order_Lines'), '(
 	db_source NVARCHAR(100),
 	change_order_id BIGINT,
 	change_order_number NVARCHAR(20),
@@ -615,7 +616,7 @@ EXECUTE sp_executesql @SqlCreateTableCommand
 
 
 SET @SqlCreateTableCommand = CONCAT(N'
-CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Subcontract_Lines'), '(
+CREATE TABLE ', QUOTENAME(@Reporting_DB_Name),'.dbo.',QUOTENAME('Subcontract_Lines'), '(
 	db_source NVARCHAR(100),
 	subcontract_id BIGINT,
 	subcontract_number NVARCHAR(20),
@@ -647,7 +648,7 @@ EXECUTE sp_executesql @SqlCreateTableCommand
 
 
 SET @SqlCreateTableCommand = CONCAT(N'
-CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Job_Budget_Lines'), '(
+CREATE TABLE ', QUOTENAME(@Reporting_DB_Name),'.dbo.',QUOTENAME('Job_Budget_Lines'), '(
 	db_source NVARCHAR(100),
 	job_number BIGINT,
 	cost_code NVARCHAR(50),
@@ -660,7 +661,7 @@ EXECUTE sp_executesql @SqlCreateTableCommand
 
 
 SET @SqlCreateTableCommand = CONCAT(N'
-CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Timecards'), '(
+CREATE TABLE ', QUOTENAME(@Reporting_DB_Name),'.dbo.',QUOTENAME('Timecards'), '(
 	db_source NVARCHAR(100),
 	payroll_record_id BIGINT,
 	timecard_line_number BIGINT,
