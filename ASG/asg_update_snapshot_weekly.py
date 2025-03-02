@@ -10,7 +10,7 @@ SQL_PORT = "65288"
 SQL_USERNAME = "jobxcel"
 SQL_PASSWORD = "jobxcel"
 USE_SSH_TUNNEL = False
-SQL_FILENAME = "Update All Reporting Tables.sql"
+SQL_FILENAME = "Weekly Snapshot.sql"
 
 # Path to the centralized script
 base_dir = os.path.dirname(os.path.dirname(__file__))  # Move up to the base directory
