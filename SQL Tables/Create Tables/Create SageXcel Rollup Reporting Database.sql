@@ -707,82 +707,87 @@ CREATE TABLE ', QUOTENAME(@Reporting_DB_Name),'.dbo.',QUOTENAME('Timecards'), '(
 EXECUTE sp_executesql @SqlCreateTableCommand
 
 
-SET @SqlCreateTableCommand = CONCAT(N'
-SELECT * INTO ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Weekly_Snapshot_Jobs'),'  
-FROM ',@Reporting_DB_Name,'.dbo.Jobs;
-DELETE FROM ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Weekly_Snapshot_Jobs'),';
-ALTER TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Weekly_Snapshot_Jobs'),'
-ADD snapshot_date DATETIME;
-')
+SET @SqlCreateTableCommand =
+        N'USE ' + QUOTENAME(@Reporting_DB_Name) + N';
+SELECT * INTO dbo.Weekly_Snapshot_Jobs FROM dbo.Jobs;
+DELETE FROM dbo.Weekly_Snapshot_Jobs;
+ALTER TABLE dbo.Weekly_Snapshot_Jobs ADD snapshot_date DATETIME;';
 
 EXECUTE sp_executesql @SqlCreateTableCommand
 
-SET @SqlCreateTableCommand = CONCAT(N'
-SELECT * INTO ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Weekly_Snapshot_AR_Invoices'),'  
-FROM ',@Reporting_DB_Name,'.dbo.',QUOTENAME('AR_Invoices'),';
-DELETE FROM ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Weekly_Snapshot_AR_Invoices'),';
-ALTER TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Weekly_Snapshot_AR_Invoices'),'
-ADD snapshot_date DATETIME;
-')
+-- Build the dynamic SQL string
+SET @SqlCreateTableCommand =
+        N'USE ' + QUOTENAME(@Reporting_DB_Name) + N'; ' + -- Switch to the target DB
+        N'SELECT * INTO dbo.' + QUOTENAME('Weekly_Snapshot_AR_Invoices') + N'
+FROM dbo.' + QUOTENAME('AR_Invoices') + N'; ' +
+        N'DELETE FROM dbo.' + QUOTENAME('Weekly_Snapshot_AR_Invoices') + N'; ' +
+        N'ALTER TABLE dbo.' + QUOTENAME('Weekly_Snapshot_AR_Invoices') + N'
+ADD snapshot_date DATETIME;';
 
 EXECUTE sp_executesql @SqlCreateTableCommand
 
-SET @SqlCreateTableCommand = CONCAT(N'
-SELECT * INTO ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Weekly_Snapshot_Job_Cost'),'  
-FROM ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Job_Cost'),';
-DELETE FROM ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Weekly_Snapshot_Job_Cost'),';
-ALTER TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Weekly_Snapshot_Job_Cost'),'
-ADD snapshot_date DATETIME;
-')
+-- Build the SQL command dynamically
+SET @SqlCreateTableCommand =
+        N'USE ' + QUOTENAME(@Reporting_DB_Name) + N'; ' +  -- Switch to the correct database
+        N'SELECT * INTO dbo.' + QUOTENAME('Weekly_Snapshot_Job_Cost') + N'
+FROM dbo.' + QUOTENAME('Job_Cost') + N'; ' +
+        N'DELETE FROM dbo.' + QUOTENAME('Weekly_Snapshot_Job_Cost') + N'; ' +
+        N'ALTER TABLE dbo.' + QUOTENAME('Weekly_Snapshot_Job_Cost') + N'
+ADD snapshot_date DATETIME;';
 
 EXECUTE sp_executesql @SqlCreateTableCommand
 
-SET @SqlCreateTableCommand = CONCAT(N'
-SELECT * INTO ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Weekly_Snapshot_Change_Orders'),'  
-FROM ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Change_Orders'),';
-DELETE FROM ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Weekly_Snapshot_Change_Orders'),';
-ALTER TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Weekly_Snapshot_Change_Orders'),'
-ADD snapshot_date DATETIME;
-')
+-- Process Weekly_Snapshot_Change_Orders
+SET @SqlCreateTableCommand =
+        N'USE ' + QUOTENAME(@Reporting_DB_Name) + N'; ' +
+        N'SELECT * INTO dbo.' + QUOTENAME('Weekly_Snapshot_Change_Orders') + N'
+FROM dbo.' + QUOTENAME('Change_Orders') + N'; ' +
+        N'DELETE FROM dbo.' + QUOTENAME('Weekly_Snapshot_Change_Orders') + N'; ' +
+        N'ALTER TABLE dbo.' + QUOTENAME('Weekly_Snapshot_Change_Orders') + N'
+ADD snapshot_date DATETIME;';
 
-EXECUTE sp_executesql @SqlCreateTableCommand
+EXEC sp_executesql @SqlCreateTableCommand;
 
-SET @SqlCreateTableCommand = CONCAT(N'
-SELECT * INTO ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Monthly_Snapshot_Jobs'),'  
-FROM ',@Reporting_DB_Name,'.dbo.Jobs;
-DELETE FROM ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Monthly_Snapshot_Jobs'),';
-ALTER TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Monthly_Snapshot_Jobs'),'
-ADD snapshot_date DATETIME;
-')
+-- Process Monthly_Snapshot_Jobs
+SET @SqlCreateTableCommand =
+        N'USE ' + QUOTENAME(@Reporting_DB_Name) + N'; ' +
+        N'SELECT * INTO dbo.' + QUOTENAME('Monthly_Snapshot_Jobs') + N'
+FROM dbo.Jobs; ' +
+        N'DELETE FROM dbo.' + QUOTENAME('Monthly_Snapshot_Jobs') + N'; ' +
+        N'ALTER TABLE dbo.' + QUOTENAME('Monthly_Snapshot_Jobs') + N'
+ADD snapshot_date DATETIME;';
 
-EXECUTE sp_executesql @SqlCreateTableCommand
+EXEC sp_executesql @SqlCreateTableCommand;
 
-SET @SqlCreateTableCommand = CONCAT(N'
-SELECT * INTO ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Monthly_Snapshot_AR_Invoices'),'  
-FROM ',@Reporting_DB_Name,'.dbo.',QUOTENAME('AR_Invoices'),';
-DELETE FROM ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Monthly_Snapshot_AR_Invoices'),';
-ALTER TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Monthly_Snapshot_AR_Invoices'),'
-ADD snapshot_date DATETIME;
-')
+-- Process Monthly_Snapshot_AR_Invoices
+SET @SqlCreateTableCommand =
+        N'USE ' + QUOTENAME(@Reporting_DB_Name) + N'; ' +
+        N'SELECT * INTO dbo.' + QUOTENAME('Monthly_Snapshot_AR_Invoices') + N'
+FROM dbo.' + QUOTENAME('AR_Invoices') + N'; ' +
+        N'DELETE FROM dbo.' + QUOTENAME('Monthly_Snapshot_AR_Invoices') + N'; ' +
+        N'ALTER TABLE dbo.' + QUOTENAME('Monthly_Snapshot_AR_Invoices') + N'
+ADD snapshot_date DATETIME;';
 
-EXECUTE sp_executesql @SqlCreateTableCommand
+EXEC sp_executesql @SqlCreateTableCommand;
 
-SET @SqlCreateTableCommand = CONCAT(N'
-SELECT * INTO ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Monthly_Snapshot_Job_Cost'),'  
-FROM ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Job_Cost'),';
-DELETE FROM ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Monthly_Snapshot_Job_Cost'),';
-ALTER TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Monthly_Snapshot_Job_Cost'),'
-ADD snapshot_date DATETIME;
-')
+-- Process Monthly_Snapshot_Job_Cost
+SET @SqlCreateTableCommand =
+        N'USE ' + QUOTENAME(@Reporting_DB_Name) + N'; ' +
+        N'SELECT * INTO dbo.' + QUOTENAME('Monthly_Snapshot_Job_Cost') + N'
+FROM dbo.' + QUOTENAME('Job_Cost') + N'; ' +
+        N'DELETE FROM dbo.' + QUOTENAME('Monthly_Snapshot_Job_Cost') + N'; ' +
+        N'ALTER TABLE dbo.' + QUOTENAME('Monthly_Snapshot_Job_Cost') + N'
+ADD snapshot_date DATETIME;';
 
-EXECUTE sp_executesql @SqlCreateTableCommand
+EXEC sp_executesql @SqlCreateTableCommand;
 
-SET @SqlCreateTableCommand = CONCAT(N'
-SELECT * INTO ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Monthly_Snapshot_Change_Orders'),'  
-FROM ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Change_Orders'),';
-DELETE FROM ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Monthly_Snapshot_Change_Orders'),';
-ALTER TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Monthly_Snapshot_Change_Orders'),'
-ADD snapshot_date DATETIME;
-')
+-- Process Monthly_Snapshot_Change_Orders
+SET @SqlCreateTableCommand =
+        N'USE ' + QUOTENAME(@Reporting_DB_Name) + N'; ' +
+        N'SELECT * INTO dbo.' + QUOTENAME('Monthly_Snapshot_Change_Orders') + N'
+FROM dbo.' + QUOTENAME('Change_Orders') + N'; ' +
+        N'DELETE FROM dbo.' + QUOTENAME('Monthly_Snapshot_Change_Orders') + N'; ' +
+        N'ALTER TABLE dbo.' + QUOTENAME('Monthly_Snapshot_Change_Orders') + N'
+ADD snapshot_date DATETIME;';
 
-EXECUTE sp_executesql @SqlCreateTableCommand
+EXEC sp_executesql @SqlCreateTableCommand;
