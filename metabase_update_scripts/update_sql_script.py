@@ -106,7 +106,7 @@ try:
         logger.info(f"Processing SQL script for database: {db_name}")
 
         # Replace placeholders with actual database name
-        modified_sql_content = sql_content.replace(client_db_placeholder, f"'{db_name}'")
+        modified_sql_content = sql_content.replace(client_db_placeholder, db_name)
 
         # Save the modified SQL file
         with open(modified_sql_file_path, "w") as file:
