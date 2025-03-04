@@ -118,7 +118,7 @@ try:
             sqlcmd_path,
             "-S", f"{SQL_SERVER},{SQL_PORT}",
             "-U", SQL_USERNAME,
-            "-P", SQL_PASSWORD,
+            "-P", f'"{SQL_PASSWORD}"',
             "-i", modified_sql_file_path
         ]
         logger.info(f"Executing SQL script for database {db_name} with command: {' '.join(command)}")
