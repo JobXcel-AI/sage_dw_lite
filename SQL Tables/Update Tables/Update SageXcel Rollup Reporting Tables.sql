@@ -128,6 +128,6 @@ EXECUTE sp_executesql @SqlInsertQuery
 
 --Update Timecard Table
 SET @SqlInsertQuery = CONCAT(N'
-INSERT INTO ',@Reporting_DB_Name,N'.dbo.Job_Budget_Lines
+INSERT INTO ',@Reporting_DB_Name,N'.dbo.Timecards
 SELECT ''[CLIENT_DB_NAME]'' as db_source, * FROM ',@Client_DB_Name,N'.dbo.Timecards')
 EXECUTE sp_executesql @SqlInsertQuery
