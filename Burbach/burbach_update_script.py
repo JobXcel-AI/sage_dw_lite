@@ -16,13 +16,16 @@ SQL_FILENAME = "Update All Reporting Tables.sql"
 base_dir = os.path.dirname(os.path.dirname(__file__))  # Move up to the base directory
 central_script_path = os.path.join(base_dir, "metabase_update_scripts", "update_sql_script.py")
 
+# Ensure central_script_path is a string
+central_script_path = str(central_script_path)
+
 # Convert CUSTOMER_DB_NAMES list to a single string with properly quoted names
 formatted_db_names = ",".join(CUSTOMER_DB_NAMES)  # Convert list to comma-separated string
 
 # Command to execute the centralized script with connection details
 command = [
-    "python3", 
-    central_script_path,
+    "python3",
+    central_script_path,  # Ensure this is a string
     CUSTOMER_NAME,
     formatted_db_names,
     SQL_SERVER,
@@ -36,7 +39,7 @@ command = [
 
 # Execute the script
 try:
-    result = subprocess.run(command, text=True)
+    result = subprocess.run(command, text=True, capture_output=True)
 
     # Log output or errors
     if result.returncode == 0:
