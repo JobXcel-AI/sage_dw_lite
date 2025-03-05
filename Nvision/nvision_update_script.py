@@ -3,7 +3,7 @@ import subprocess
 
 # Customer-specific variables
 CUSTOMER_NAME = "Nvision"
-CUSTOMER_DB_NAMES = "Nvision"
+CUSTOMER_DB_NAMES = ["Nvision"]  # Now an array
 SQL_SERVER = "nvisionglass.servernova.net"
 SQL_INSTANCE = "SN-30427"
 SQL_PORT = "50366"
@@ -16,12 +16,18 @@ SQL_FILENAME = "Update All Reporting Tables.sql"
 base_dir = os.path.dirname(os.path.dirname(__file__))  # Move up to the base directory
 central_script_path = os.path.join(base_dir, "metabase_update_scripts", "update_sql_script.py")
 
+# Ensure central_script_path is a string
+central_script_path = str(central_script_path)
+
+# Convert CUSTOMER_DB_NAMES list to a single string with properly quoted names
+formatted_db_names = ",".join(CUSTOMER_DB_NAMES)  # Convert list to comma-separated string
+
 # Command to execute the centralized script with connection details
 command = [
-    "python3", 
+    "python3",
     central_script_path,
     CUSTOMER_NAME,
-    CUSTOMER_DB_NAMES,
+    formatted_db_names,  # Pass as a string instead of a list
     SQL_SERVER,
     SQL_INSTANCE,
     SQL_PORT,

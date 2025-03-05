@@ -3,7 +3,7 @@ import subprocess
 
 # Customer-specific variables
 CUSTOMER_NAME = "IPWLC"
-CUSTOMER_DB_NAMES = "Industrial Piping & Welding llc"
+CUSTOMER_DB_NAMES = ["Industrial Piping & Welding llc"]  # Now an array
 SQL_SERVER = "206.71.70.141"
 SQL_INSTANCE = "SN-33307"
 SQL_PORT = "50422"
@@ -20,12 +20,15 @@ central_script_path = os.path.join(base_dir, "metabase_update_scripts", "update_
 if not os.path.exists(central_script_path):
     raise FileNotFoundError(f"Script not found: {central_script_path}")
 
+# Convert CUSTOMER_DB_NAMES list to a single string with properly quoted names
+formatted_db_names = ",".join(CUSTOMER_DB_NAMES)  # Convert list to comma-separated string
+
 # Command to execute the centralized script with connection details
 command = [
     "python3",
     central_script_path,
     CUSTOMER_NAME,
-    CUSTOMER_DB_NAMES,
+    formatted_db_names,  # Pass as a string instead of a list
     SQL_SERVER,
     SQL_INSTANCE,
     SQL_PORT,
@@ -37,7 +40,7 @@ command = [
 
 # Execute the script
 try:
-    result = subprocess.run(command, text=True, capture_output=True, timeout=600)  # Timeout after 10 minutes
+    result = subprocess.run(command, text=True, timeout=600)  # Timeout after 10 minutes
 
     # Log output or errors
     if result.returncode == 0:
