@@ -16,15 +16,18 @@ SQL_FILENAME = "SageXcel Rollup Reporting Table Clear.sql"
 base_dir = os.path.dirname(os.path.dirname(__file__))  # Move up to the base directory
 central_script_path = os.path.join(base_dir, "metabase_update_scripts", "update_sql_script.py")
 
+# Ensure central_script_path is a string
+central_script_path = str(central_script_path)
+
 # Convert CUSTOMER_DB_NAMES list to a single string with properly quoted names
 formatted_db_names = ",".join(CUSTOMER_DB_NAMES)  # Convert list to comma-separated string
 
 # Command to execute the centralized script with connection details
 command = [
-    "python3", 
+    "python3",
     central_script_path,
     CUSTOMER_NAME,
-    formatted_db_names,
+    formatted_db_names,  # Pass as a string instead of a list
     SQL_SERVER,
     SQL_INSTANCE,
     SQL_PORT,
@@ -36,7 +39,7 @@ command = [
 
 # Execute the script
 try:
-    result = subprocess.run(command, text=True)
+    result = subprocess.run(command, text=True, capture_output=True)
 
     # Log output or errors
     if result.returncode == 0:
