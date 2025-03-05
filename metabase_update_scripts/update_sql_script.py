@@ -120,7 +120,6 @@ try:
             "-S", f"{SQL_SERVER},{SQL_PORT}",
             "-U", SQL_USERNAME,
             "-P", SQL_PASSWORD,  # Ensure no unnecessary quotes around password
-            "-d", db_name,  # Specify the correct database name
             "-i", modified_sql_file_path
         ]
 
