@@ -119,9 +119,11 @@ try:
             sqlcmd_path,
             "-S", f"{SQL_SERVER},{SQL_PORT}",
             "-U", SQL_USERNAME,
-            "-P", f'"{SQL_PASSWORD}"',
+            "-P", SQL_PASSWORD,  # Ensure no unnecessary quotes around password
+            "-d", db_name,  # Specify the correct database name
             "-i", modified_sql_file_path
         ]
+
         logger.info(f"Executing SQL script for database {db_name} with command: {' '.join(command)}")
 
         # Run the command and capture output
