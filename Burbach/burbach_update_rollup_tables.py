@@ -16,6 +16,9 @@ SQL_FILENAME = "Update SageXcel Rollup Reporting Tables.sql"
 base_dir = os.path.dirname(os.path.dirname(__file__))  # Move up to the base directory
 central_script_path = os.path.join(base_dir, "metabase_update_scripts", "update_sql_script.py")
 
+# Ensure central_script_path is a string
+central_script_path = str(central_script_path)
+
 # Convert CUSTOMER_DB_NAMES list to a single string with properly quoted names
 formatted_db_names = ",".join(CUSTOMER_DB_NAMES)  # Convert list to comma-separated string
 
