@@ -4,7 +4,7 @@ import subprocess
 # Customer-specific variables
 CUSTOMER_NAME = "Vertex"
 CUSTOMER_DB_NAMES = "Vertex Coatings"
-SQL_SERVER = "169.254.130.198"
+SQL_SERVER = "vertexcoatings.servernova.net"
 SQL_INSTANCE = "SN-30147"
 SQL_PORT = "50285"
 SQL_USERNAME = "jobxcel"
