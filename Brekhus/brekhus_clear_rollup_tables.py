@@ -2,15 +2,15 @@ import os
 import subprocess
 
 # Customer-specific variables
-CUSTOMER_NAME = "ASG"
-CUSTOMER_DB_NAMES = "Bryan - S100 Ultimate,Andy - S100 Ultimate 1,Craig - S100 Ultimate,Danielle - S100 Ultimate,Catie - S100 Ultimate,Home Builders of FL,Jennifer - S100 Ultimate,JS-Ultimate Demonstration Data,MH-Ultimate Demonstration Data,Nate - S100 Ultimate,Nick - S100 Ultimate,Pat - S100 Ultimate,Sarah - Ultimate,Tanya - S100 Ultimate,Trish - Ultimate,ZB - Ultimate"
-SQL_SERVER = "asgdemo.servernova.net"
-SQL_INSTANCE= "SN-20202"
-SQL_PORT = "65288"
-SQL_USERNAME = "jobxcel"
-SQL_PASSWORD = "jobxcel"
-USE_SSH_TUNNEL = False
-SQL_FILENAME = "Weekly Snapshot.sql"
+CUSTOMER_NAME = "Brekhus"
+CUSTOMER_DB_NAMES = "Brekhus Marble & Granite,Brekhus Marble & Granite"
+SQL_SERVER = "50.169.189.130"
+SQL_INSTANCE = "BTSSRV"
+SQL_PORT = "1433"
+SQL_USERNAME = "sagexcel"
+SQL_PASSWORD = "qkJt>X@%iLtrR"
+USE_SSH_TUNNEL = True
+SQL_FILENAME = "SageXcel Rollup Reporting Table Clear.sql"
 
 # Path to the centralized script
 base_dir = os.path.dirname(os.path.dirname(__file__))  # Move up to the base directory
@@ -28,7 +28,7 @@ command = [
     SQL_USERNAME,
     SQL_PASSWORD,
     str(USE_SSH_TUNNEL),
-    SQL_FILENAME
+    SQL_FILENAME,
 ]
 
 # Execute the script

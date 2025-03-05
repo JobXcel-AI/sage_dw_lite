@@ -10,16 +10,17 @@ SQL_PORT = "65288"
 SQL_USERNAME = "jobxcel"
 SQL_PASSWORD = "jobxcel"
 USE_SSH_TUNNEL = False
-SQL_FILENAME = "Update All Reporting Tables.sql"
+SQL_FILENAME = "Monthly Snapshot.sql"
 
 # Path to the centralized script
 base_dir = os.path.dirname(os.path.dirname(__file__))  # Move up to the base directory
-central_script_path = os.path.join(base_dir, "metabase_update_scripts", "update_snapshot_monthly.py")
+central_script_path = os.path.join(base_dir, "metabase_update_scripts", "update_sql_script.py")
 
 # Command to execute the centralized script with connection details
 command = [
     "python3", 
     central_script_path,
+    CUSTOMER_NAME,
     CUSTOMER_DB_NAMES,
     SQL_SERVER,
     SQL_INSTANCE,

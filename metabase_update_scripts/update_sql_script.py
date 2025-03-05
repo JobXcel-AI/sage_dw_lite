@@ -4,6 +4,7 @@ from logging.handlers import TimedRotatingFileHandler
 import os
 import sys
 import time
+import shlex
 
 # Configure rolling log file
 log_file_path = os.path.join(os.path.dirname(__file__), "update_table_script.log")
@@ -30,7 +31,7 @@ if len(sys.argv) < 9:
 
 # Extract arguments
 CUSTOMER_NAME = sys.argv[1]
-CUSTOMER_DB_NAMES = sys.argv[2].split(",")  # Convert comma-separated list to array
+CUSTOMER_DB_NAMES = shlex.split(sys.argv[2])  # Correctly handles quoted names
 SQL_SERVER = sys.argv[3]
 SQL_INSTANCE = sys.argv[4]
 SQL_PORT = sys.argv[5]
@@ -92,7 +93,7 @@ try:
 
     # Locate sqlcmd
     try:
-        sqlcmd_path = subprocess.check_output(["which", "sqlcmd"], text=True).strip()
+        sqlcmd_path = "/opt/mssql-tools/bin/sqlcmd"
     except subprocess.CalledProcessError:
         logger.error("sqlcmd not found. Ensure it's installed and in PATH.")
         sys.exit(1)
@@ -106,7 +107,7 @@ try:
         logger.info(f"Processing SQL script for database: {db_name}")
 
         # Replace placeholders with actual database name
-        modified_sql_content = sql_content.replace(client_db_placeholder, f"'{db_name}'")
+        modified_sql_content = sql_content.replace(client_db_placeholder, db_name)
 
         # Save the modified SQL file
         with open(modified_sql_file_path, "w") as file:
@@ -118,9 +119,11 @@ try:
             sqlcmd_path,
             "-S", f"{SQL_SERVER},{SQL_PORT}",
             "-U", SQL_USERNAME,
-            "-P", SQL_PASSWORD,
+            "-P", SQL_PASSWORD,  # Ensure no unnecessary quotes around password
+            "-d", db_name,  # Specify the correct database name
             "-i", modified_sql_file_path
         ]
+
         logger.info(f"Executing SQL script for database {db_name} with command: {' '.join(command)}")
 
         # Run the command and capture output
