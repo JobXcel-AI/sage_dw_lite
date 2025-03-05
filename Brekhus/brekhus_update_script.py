@@ -39,7 +39,7 @@ command = [
 
 # Execute the script
 try:
-    result = subprocess.run(command, text=True, capture_output=True)
+    result = subprocess.run(command, text=True)
 
     # Log output or errors
     if result.returncode == 0:
