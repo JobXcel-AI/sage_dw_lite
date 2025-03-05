@@ -24,10 +24,10 @@ formatted_db_names = ",".join(CUSTOMER_DB_NAMES)  # Convert list to comma-separa
 
 # Command to execute the centralized script with connection details
 command = [
-    "python3", 
+    "python3",
     central_script_path,
     CUSTOMER_NAME,
-    CUSTOMER_DB_NAMES,
+    formatted_db_names,  # Pass as a string instead of a list
     SQL_SERVER,
     SQL_INSTANCE,
     SQL_PORT,
