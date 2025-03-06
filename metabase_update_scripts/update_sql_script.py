@@ -4,7 +4,6 @@ from logging.handlers import TimedRotatingFileHandler
 import os
 import sys
 import time
-import shlex
 
 # Configure rolling log file
 log_file_path = os.path.join(os.path.dirname(__file__), "update_table_script.log")
@@ -31,7 +30,7 @@ if len(sys.argv) < 9:
 
 # Extract arguments
 CUSTOMER_NAME = sys.argv[1]
-CUSTOMER_DB_NAMES = shlex.split(sys.argv[2])  # Correctly handles quoted names
+CUSTOMER_DB_NAMES = sys.argv[2].split(",")  # Convert comma-separated list to array
 SQL_SERVER = sys.argv[3]
 SQL_INSTANCE = sys.argv[4]
 SQL_PORT = sys.argv[5]
