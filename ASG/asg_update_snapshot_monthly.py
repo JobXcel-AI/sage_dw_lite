@@ -3,7 +3,7 @@ import subprocess
 
 # Customer-specific variables
 CUSTOMER_NAME = "ASG"
-CUSTOMER_DB_NAMES = "Bryan - S100 Ultimate,Andy - S100 Ultimate 1,Craig - S100 Ultimate,Danielle - S100 Ultimate,Catie - S100 Ultimate,Home Builders of FL,Jennifer - S100 Ultimate,JS-Ultimate Demonstration Data,MH-Ultimate Demonstration Data,Nate - S100 Ultimate,Nick - S100 Ultimate,Pat - S100 Ultimate,Sarah - Ultimate,Tanya - S100 Ultimate,Trish - Ultimate,ZB - Ultimate"
+CUSTOMER_DB_NAMES = "Bryan~-~S100~Ultimate,Andy-~S100~Ultimate~1,Craig~-~S100~Ultimate,Danielle~-~S100~Ultimate,Catie~-~S100~Ultimate,Home~Builders~of~FL,Jennifer~-~S100~Ultimate,JS-Ultimate~Demonstration~Data,MH-Ultimate~Demonstration~Data,Nate~-~S100~Ultimate,Nick~-~S100~Ultimate,Pat~-~S100~Ultimate,Sarah~-~Ultimate,Tanya~-~S100~Ultimate,Trish~-~Ultimate,ZB~-~Ultimate"
 SQL_SERVER = "asgdemo.servernova.net"
 SQL_INSTANCE= "SN-20202"
 SQL_PORT = "65288"
