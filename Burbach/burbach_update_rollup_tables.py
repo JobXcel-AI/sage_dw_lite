@@ -3,7 +3,7 @@ import subprocess
 
 # Customer-specific variables
 CUSTOMER_NAME = "Burbach"
-CUSTOMER_DB_NAMES = ["BC Master", "RES", "RBB", "CES", "Enhanced", "BEL", "BP"]  # Now an array
+CUSTOMER_DB_NAMES = ["BC~Master", "RES", "RBB", "CES", "Enhanced", "BEL", "BP"]  # Now an array
 SQL_SERVER = "33.3.55.2"
 SQL_INSTANCE = "SN-34003"
 SQL_PORT = "49750"
@@ -18,6 +18,7 @@ central_script_path = os.path.join(base_dir, "metabase_update_scripts", "update_
 
 # Ensure central_script_path is a string
 central_script_path = str(central_script_path)
+print(central_script_path)
 
 # Convert CUSTOMER_DB_NAMES list to a single string with properly quoted names
 formatted_db_names = ",".join(CUSTOMER_DB_NAMES)  # Convert list to comma-separated string
