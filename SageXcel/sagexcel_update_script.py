@@ -3,7 +3,7 @@ import subprocess
 
 # Customer-specific variables
 CUSTOMER_NAME = "SageXcel"
-CUSTOMER_DB_NAMES = ["SageXcel Demo"]  # Now an array
+CUSTOMER_DB_NAMES = ["SageXcel~Demo"]  # Now an array
 SQL_SERVER = "mike.servernova.net"
 SQL_INSTANCE = "SN-33307"
 SQL_PORT = "49732"
