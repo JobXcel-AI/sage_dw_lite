@@ -1,26 +1,33 @@
 import os
 import subprocess
+
 # Customer-specific variables
-CUSTOMER_NAME = "ASG"
-CUSTOMER_DB_NAMES = "Bryan~-~S100~Ultimate,Andy-~S100~Ultimate~1,Craig~-~S100~Ultimate,Danielle~-~S100~Ultimate,Catie~-~S100~Ultimate,Home~Builders~of~FL,Jennifer~-~S100~Ultimate,JS-Ultimate~Demonstration~Data,MH-Ultimate~Demonstration~Data,Nate~-~S100~Ultimate,Nick~-~S100~Ultimate,Pat~-~S100~Ultimate,Sarah~-~Ultimate,Tanya~-~S100~Ultimate,Trish~-~Ultimate,ZB~-~Ultimate"
-SQL_SERVER = "asgdemo.servernova.net"
-SQL_INSTANCE= "SN-20202"
-SQL_PORT = "65288"
-SQL_USERNAME = "jobxcel"
-SQL_PASSWORD = "jobxcel"
+CUSTOMER_NAME = "Burbach"
+CUSTOMER_DB_NAMES = ["BC~Master", "RES", "RBB", "CES", "Enhanced", "BEL", "BP"]  # Now an array
+SQL_SERVER = "33.3.55.2"
+SQL_INSTANCE = "SN-34003"
+SQL_PORT = "49750"
+SQL_USERNAME = "sagexcel"
+SQL_PASSWORD = "!7j!ewCcihpS!5icnPP5"
 USE_SSH_TUNNEL = False
-SQL_FILENAME = "Create Committed Costs view.sql"
+SQL_FILENAME = "2025-03-06 patch.sql"
 
 # Path to the centralized script
 base_dir = os.path.dirname(os.path.dirname(__file__))  # Move up to the base directory
 central_script_path = os.path.join(base_dir, "metabase_update_scripts", "update_sql_script.py")
 
+# Ensure central_script_path is a string
+central_script_path = str(central_script_path)
+
+# Convert CUSTOMER_DB_NAMES list to a single string with properly quoted names
+formatted_db_names = ",".join(CUSTOMER_DB_NAMES)  # Convert list to comma-separated string
+
 # Command to execute the centralized script with connection details
 command = [
-    "python3", 
-    central_script_path,
+    "python3",
+    central_script_path,  # Ensure this is a string
     CUSTOMER_NAME,
-    CUSTOMER_DB_NAMES,
+    formatted_db_names,
     SQL_SERVER,
     SQL_INSTANCE,
     SQL_PORT,
