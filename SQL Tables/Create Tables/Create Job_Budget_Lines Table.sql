@@ -11,7 +11,8 @@ CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Job_Budget_Lines'), '(
 	cost_code NVARCHAR(50),
 	cost_code_name NVARCHAR(50),
 	cost_type NVARCHAR(30),
-	budget DECIMAL(12,2)
+	budget DECIMAL(12,2),
+	budget_hours DECIMAL(12,2)
 )')
 
 EXECUTE sp_executesql @SqlCreateTableCommand
@@ -26,7 +27,8 @@ SELECT
 	cstcde as cost_code,
 	cdenme as cost_code_name,
 	''Material'' as cost_type,
-	SUM(matbdg) as budget
+	SUM(matbdg) as budget,
+	SUM(hrsbdg) as budget_hours
 FROM ',QUOTENAME(@Client_DB_Name),'.dbo.bdglin b
 INNER JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.cstcde c on c.recnum = b.cstcde
 GROUP BY b.recnum, cstcde, cdenme
@@ -37,7 +39,8 @@ SELECT
 	cstcde as cost_code,
 	cdenme as cost_code_name,
 	''Labor'' as cost_type,
-	SUM(laborg) as budget
+	SUM(laborg) as budget,
+	SUM(hrsbdg) as budget_hours
 FROM ',QUOTENAME(@Client_DB_Name),'.dbo.bdglin b
 INNER JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.cstcde c on c.recnum = b.cstcde
 GROUP BY b.recnum, cstcde, cdenme
@@ -48,7 +51,8 @@ SELECT
 	cstcde as cost_code,
 	cdenme as cost_code_name,
 	''Equipment'' as cost_type,
-	SUM(eqpbdg) as budget
+	SUM(eqpbdg) as budget,
+	SUM(hrsbdg) as budget_hours
 FROM ',QUOTENAME(@Client_DB_Name),'.dbo.bdglin b
 INNER JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.cstcde c on c.recnum = b.cstcde
 GROUP BY b.recnum, cstcde, cdenme
@@ -59,7 +63,8 @@ SELECT
 	cstcde as cost_code,
 	cdenme as cost_code_name,
 	''Subcontract'' as cost_type,
-	SUM(subbdg) as budget
+	SUM(subbdg) as budget,
+	SUM(hrsbdg) as budget_hours
 FROM ',QUOTENAME(@Client_DB_Name),'.dbo.bdglin b
 INNER JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.cstcde c on c.recnum = b.cstcde
 GROUP BY b.recnum, cstcde, cdenme
@@ -70,7 +75,8 @@ SELECT
 	cstcde as cost_code,
 	cdenme as cost_code_name,
 	''Other'' as cost_type,
-	SUM(othbdg) as budget
+	SUM(othbdg) as budget,
+	SUM(hrsbdg) as budget_hours
 FROM ',QUOTENAME(@Client_DB_Name),'.dbo.bdglin b
 INNER JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.cstcde c on c.recnum = b.cstcde
 GROUP BY b.recnum, cstcde, cdenme
@@ -81,7 +87,8 @@ SELECT
 	cstcde as cost_code,
 	cdenme as cost_code_name,
 	''User Def Type 6'' as cost_type,
-	SUM(usrcs6) as budget
+	SUM(usrcs6) as budget,
+	SUM(hrsbdg) as budget_hours
 FROM ',QUOTENAME(@Client_DB_Name),'.dbo.bdglin b
 INNER JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.cstcde c on c.recnum = b.cstcde
 GROUP BY b.recnum, cstcde, cdenme
@@ -92,7 +99,8 @@ SELECT
 	cstcde as cost_code,
 	cdenme as cost_code_name,
 	''User Def Type 7'' as cost_type,
-	SUM(usrcs7) as budget
+	SUM(usrcs7) as budget,
+	SUM(hrsbdg) as budget_hours
 FROM ',QUOTENAME(@Client_DB_Name),'.dbo.bdglin b
 INNER JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.cstcde c on c.recnum = b.cstcde
 GROUP BY b.recnum, cstcde, cdenme
@@ -103,7 +111,8 @@ SELECT
 	cstcde as cost_code,
 	cdenme as cost_code_name,
 	''User Def Type 8'' as cost_type,
-	SUM(usrcs8) as budget
+	SUM(usrcs8) as budget,
+	SUM(hrsbdg) as budget_hours
 FROM ',QUOTENAME(@Client_DB_Name),'.dbo.bdglin b
 INNER JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.cstcde c on c.recnum = b.cstcde
 GROUP BY b.recnum, cstcde, cdenme
@@ -114,7 +123,8 @@ SELECT
 	cstcde as cost_code,
 	cdenme as cost_code_name,
 	''User Def Type 9'' as cost_type,
-	SUM(usrcs9) as budget
+	SUM(usrcs9) as budget,
+	SUM(hrsbdg) as budget_hours
 FROM ',QUOTENAME(@Client_DB_Name),'.dbo.bdglin b
 INNER JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.cstcde c on c.recnum = b.cstcde
 GROUP BY b.recnum, cstcde, cdenme
