@@ -15,6 +15,9 @@ FROM (
 		MAX(ISNULL("jbl_col_jc_po"."budget",0)) AS "budget",
 		MAX(ISNULL("jbl_col_jc_po"."approved_change_amount",0)) AS "approved_change_amount",
 		MAX(ISNULL("jbl_col_jc_po"."revised_budget",0)) AS "revised_budget",
+		MAX(ISNULL("jbl_col_jc_po"."budget_hours",0)) AS "budget_hours",
+		MAX(ISNULL("jbl_col_jc_po"."approved_change_hours",0)) AS "approved_change_hours",
+		MAX(ISNULL("jbl_col_jc_po"."revised_budget_hours",0)) AS "revised_budget_hours",
 		MAX(ISNULL("jbl_col_jc_po"."job_cost_amount",0)) AS "job_cost_amount",
 		MAX(ISNULL("jbl_col_jc_po"."committed_po",0)) AS "committed_purchase_orders",
 		SUM(ISNULL("scl"."committed_amount",0)) as "committed_subcontracts",
@@ -27,6 +30,9 @@ FROM (
 			MAX(ISNULL("jbl_col_jc"."approved_change_amount",0)) AS "approved_change_amount",
 			MAX(ISNULL("jbl_col_jc"."budget",0)) AS "budget",
 			MAX(ISNULL("jbl_col_jc"."revised_budget",0)) AS "revised_budget",
+			MAX(ISNULL("jbl_col_jc"."approved_change_hours",0)) AS "approved_change_hours",
+			MAX(ISNULL("jbl_col_jc"."budget_hours",0)) AS "budget_hours",
+			MAX(ISNULL("jbl_col_jc"."revised_budget_hours",0)) AS "revised_budget_hours",
 			"jbl_col_jc"."cost_code_name",
 			COALESCE("jbl_col_jc"."cost_code","pol"."cost_code") AS "cost_code",
 			COALESCE("jbl_col_jc"."cost_type","pol"."cost_type") AS "cost_type",
@@ -37,7 +43,9 @@ FROM (
 			SELECT
 				MAX(ISNULL("jbl_col"."approved_change_amount",0)) AS "approved_change_amount",
 				MAX(ISNULL("jbl_col"."budget",0)) AS "budget",
-				MAX(ISNULL("jbl_col"."revised_budget",0)) AS "revised_budget",
+				MAX(ISNULL("jbl_col"."revised_budget",0)) AS "revised_budget",												MAX(ISNULL("jbl_col"."approved_change_hours",0)) AS "approved_change_hours",
+				MAX(ISNULL("jbl_col"."budget_hours",0)) AS "budget_hours",
+				MAX(ISNULL("jbl_col"."revised_budget_hours",0)) AS "revised_budget_hours",
 				COALESCE("jbl_col"."cost_code_name","jc"."job_cost_code_name") AS "cost_code_name",
 				COALESCE("jbl_col"."cost_code","jc"."job_cost_code") AS "cost_code",
 				COALESCE("jbl_col"."cost_type","jc"."cost_type") AS "cost_type",
@@ -51,8 +59,11 @@ FROM (
 					COALESCE("jbl"."cost_type", "co"."cost_type") AS "cost_type",
 					COALESCE("co"."job_number","jbl"."job_number") AS "job_number",
 					MAX(ISNULL("jbl"."budget",0)) AS "budget",
+					MAX(ISNULL("jbl"."budget_hours",0)) AS "budget_hours",
 					SUM(ISNULL("co"."approved_change_amount",0)) AS "approved_change_amount",
-					MAX(ISNULL("jbl"."budget",0)) + SUM(ISNULL("co"."approved_change_amount",0)) as "revised_budget"
+					SUM(ISNULL("co"."approved_change_hours",0)) AS "approved_change_hours",
+					MAX(ISNULL("jbl"."budget",0)) + SUM(ISNULL("co"."approved_change_amount",0)) as "revised_budget",
+					MAX(ISNULL("jbl"."budget_hours",0)) + SUM(ISNULL("co"."approved_change_hours",0)) as "revised_budget_hours"
 				FROM (
 					SELECT 
 						cost_code_name,
