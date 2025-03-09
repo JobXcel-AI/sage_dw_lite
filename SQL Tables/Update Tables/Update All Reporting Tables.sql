@@ -1,3 +1,5 @@
+--Version 0.0.0
+
 --Specify Client DB Name
 DECLARE @Client_DB_Name NVARCHAR(50) = '[CLIENT_DB_NAME]';
 --Specify Reporting DB Name
