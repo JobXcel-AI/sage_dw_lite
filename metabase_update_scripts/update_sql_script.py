@@ -124,8 +124,12 @@ try:
             sqlcmd_path,
             "-S", f"{SQL_SERVER},{SQL_PORT}",
             "-U", SQL_USERNAME,
-            "-P", SQL_PASSWORD,  # Ensure no unnecessary quotes around password
-            "-i", modified_sql_file_path
+            "-P", SQL_PASSWORD,
+            "-i", modified_sql_file_path,
+            "-b",  # Stops execution on first error (helps in debugging)
+            "-V", "16",  # Ensures verbosity for errors (default is 11)
+            "-y", "0",  # Removes truncation of long dynamic queries
+            "-X",  # Disables cmd scripting in sqlcmd (prevents unexpected behavior)
         ]
 
         logger.info(f"Executing SQL script for database {db_name} with command: {' '.join(command)}")
