@@ -115,7 +115,10 @@ try:
             file.write(modified_sql_content)
 
         logger.info(f"SQL script modified for database: {db_name}")
-        logger.info(modified_sql_content)
+
+        # Temporary remove this
+        with open("output.sql", "w", encoding="utf-8") as file:
+            file.write(modified_sql_content)
 
         command = [
             sqlcmd_path,
