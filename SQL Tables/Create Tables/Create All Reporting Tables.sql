@@ -1,6 +1,6 @@
-Version 1.0.0
+--Version 1.0.0
 
-USE 'Nvision Reporting'
+USE [Nvision Reporting]
 GO 
 --Specify Client DB Name
 DECLARE @Client_DB_Name NVARCHAR(50) = 'Nvision';  
