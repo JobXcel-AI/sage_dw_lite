@@ -1,11 +1,25 @@
-python3 sagexcel_patch_script.py
-2025-03-10 20:32:14,577 - INFO - Extracted arguments: CUSTOMER_NAME=SageXcel, SQL_SERVER=mike.servernova.net, SQL_PORT=49732, SQL_USERNAME=jobxcel, USE_SSH_TUNNEL=False, SQL_FILENAME=Patch then Update All Reporting Tables.sql
-2025-03-10 20:32:14,577 - INFO - Databases to update: SageXcel~Demo
-2025-03-10 20:32:14,577 - INFO - Processing SQL script for database: SageXcel~Demo
-2025-03-10 20:32:14,578 - INFO - SQL script modified for database: SageXcel Demo
-2025-03-10 20:32:14,578 - INFO - Executing SQL script for database SageXcel Demo with command: /opt/mssql-tools/bin/sqlcmd -S mike.servernova.net\SN-33307,49732 -U jobxcel -P wKif7qZiTxmsWXw.ebL9 -i /home/mike/dev/sage_dw_lite/SQL Tables/Update Tables/temp_update_sql.sql
-2025-03-10 20:32:15,708 - INFO - Process Return Code: 0
-2025-03-10 20:32:15,708 - INFO - Process STDOUT:
+mike@sn-33307-metabase:~/dev/sage_dw_lite/SageXcel$ git pull
+remote: Enumerating objects: 12, done.
+remote: Counting objects: 100% (12/12), done.
+remote: Compressing objects: 100% (2/2), done.
+remote: Total 7 (delta 5), reused 7 (delta 5), pack-reused 0 (from 0)
+Unpacking objects: 100% (7/7), 1.82 KiB | 465.00 KiB/s, done.
+From https://github.com/JobXcel-AI/sage_dw_lite
+   e71a324..e27c848  main       -> origin/main
+Updating e71a324..e27c848
+Fast-forward
+ SQL Tables/Update Tables/Patch then Update All Reporting Tables.sql |   2 +-
+ SageXcel/log-output.txt                                             | 407 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 408 insertions(+), 1 deletion(-)
+ create mode 100644 SageXcel/log-output.txt
+mike@sn-33307-metabase:~/dev/sage_dw_lite/SageXcel$ python3 sagexcel_patch_script.py
+2025-03-10 20:51:12,108 - INFO - Extracted arguments: CUSTOMER_NAME=SageXcel, SQL_SERVER=mike.servernova.net, SQL_PORT=49732, SQL_USERNAME=jobxcel, USE_SSH_TUNNEL=False, SQL_FILENAME=Patch then Update All Reporting Tables.sql
+2025-03-10 20:51:12,108 - INFO - Databases to update: SageXcel~Demo
+2025-03-10 20:51:12,109 - INFO - Processing SQL script for database: SageXcel~Demo
+2025-03-10 20:51:12,109 - INFO - SQL script modified for database: SageXcel Demo
+2025-03-10 20:51:12,109 - INFO - Executing SQL script for database SageXcel Demo with command: /opt/mssql-tools/bin/sqlcmd -S mike.servernova.net\SN-33307,49732 -U jobxcel -P wKif7qZiTxmsWXw.ebL9 -i /home/mike/dev/sage_dw_lite/SQL Tables/Update Tables/temp_update_sql.sql
+2025-03-10 20:51:13,028 - INFO - Process Return Code: 0
+2025-03-10 20:51:13,028 - INFO - Process STDOUT:
 Changed database context to 'SageXcel Demo Reporting'.
 
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -23,7 +37,7 @@ FROM (
 		COALESCE("jbl_col_jc_po"."job_number","scl"."job_number"
 
 ----------- -----------------------
-AR_Invoices 2025-03-10 13:32:14.610
+AR_Invoices 2025-03-10 13:51:12.173
 
 (1 rows affected)
 
@@ -40,7 +54,7 @@ AR_Invoices 2025-03-10 13:32:14.610
 (0 rows affected)
 
 ------------- -----------------------
-Change_Orders 2025-03-10 13:32:14.777
+Change_Orders 2025-03-10 13:51:12.317
 
 (1 rows affected)
 
@@ -57,7 +71,7 @@ Change_Orders 2025-03-10 13:32:14.777
 (0 rows affected)
 
 -------------------- -----------------------
-Change_Order_History 2025-03-10 13:32:14.790
+Change_Order_History 2025-03-10 13:51:12.330
 
 (1 rows affected)
 
@@ -72,7 +86,7 @@ Change_Order_History 2025-03-10 13:32:14.790
 (30 rows affected)
 
 ------------------------- -----------------------
-Change_Order_Open_History 2025-03-10 13:32:14.797
+Change_Order_Open_History 2025-03-10 13:51:12.337
 
 (1 rows affected)
 
@@ -107,7 +121,7 @@ Change_Order_Open_History 2025-03-10 13:32:14.797
 (2 rows affected)
 
 -------- -----------------------
-Employee 2025-03-10 13:32:14.797
+Employee 2025-03-10 13:51:12.337
 
 (1 rows affected)
 
@@ -124,7 +138,7 @@ Employee 2025-03-10 13:32:14.797
 (0 rows affected)
 
 --------- -----------------------
-Inventory 2025-03-10 13:32:14.813
+Inventory 2025-03-10 13:51:12.353
 
 (1 rows affected)
 
@@ -141,7 +155,7 @@ Inventory 2025-03-10 13:32:14.813
 (0 rows affected)
 
 ---- -----------------------
-Jobs 2025-03-10 13:32:14.847
+Jobs 2025-03-10 13:51:12.380
 
 (1 rows affected)
 
@@ -159,7 +173,7 @@ Warning: Null value is eliminated by an aggregate or other SET operation.
 (0 rows affected)
 
 -------- -----------------------
-Job_Cost 2025-03-10 13:32:14.920
+Job_Cost 2025-03-10 13:51:12.437
 
 (1 rows affected)
 
@@ -176,7 +190,7 @@ Job_Cost 2025-03-10 13:32:14.920
 (0 rows affected)
 
 ------------------ -----------------------
-Job_Status_History 2025-03-10 13:32:15.090
+Job_Status_History 2025-03-10 13:51:12.470
 
 (1 rows affected)
 
@@ -189,7 +203,7 @@ Job_Status_History 2025-03-10 13:32:15.090
 (18 rows affected)
 
 ------------------- -----------------------
-Jobs_Active_History 2025-03-10 13:32:15.097
+Jobs_Active_History 2025-03-10 13:51:12.477
 
 (1 rows affected)
 
@@ -226,7 +240,7 @@ Jobs_Active_History 2025-03-10 13:32:15.097
 (7 rows affected)
 
 ------------------ -----------------------
-Job_Cost_Waterfall 2025-03-10 13:32:15.097
+Job_Cost_Waterfall 2025-03-10 13:51:12.477
 
 (1 rows affected)
 
@@ -237,7 +251,7 @@ Job_Cost_Waterfall 2025-03-10 13:32:15.097
 (28 rows affected)
 
 --------------- -----------------------
-Ledger_Accounts 2025-03-10 13:32:15.173
+Ledger_Accounts 2025-03-10 13:51:12.480
 
 (1 rows affected)
 
@@ -254,7 +268,7 @@ Ledger_Accounts 2025-03-10 13:32:15.173
 (0 rows affected)
 
 ------------------------ -----------------------
-Ledger_Transaction_Lines 2025-03-10 13:32:15.203
+Ledger_Transaction_Lines 2025-03-10 13:51:12.573
 
 (1 rows affected)
 
@@ -271,7 +285,7 @@ Ledger_Transaction_Lines 2025-03-10 13:32:15.203
 (0 rows affected)
 
 --------------- -----------------------
-Payroll_Records 2025-03-10 13:32:15.420
+Payroll_Records 2025-03-10 13:51:12.760
 
 (1 rows affected)
 
@@ -288,7 +302,7 @@ Payroll_Records 2025-03-10 13:32:15.420
 (0 rows affected)
 
 --------------- -----------------------
-Purchase_Orders 2025-03-10 13:32:15.470
+Purchase_Orders 2025-03-10 13:51:12.810
 
 (1 rows affected)
 
@@ -305,7 +319,7 @@ Purchase_Orders 2025-03-10 13:32:15.470
 (0 rows affected)
 
 --------------- -----------------------
-Vendor Contacts 2025-03-10 13:32:15.500
+Vendor Contacts 2025-03-10 13:51:12.840
 
 (1 rows affected)
 
@@ -322,7 +336,7 @@ Vendor Contacts 2025-03-10 13:32:15.500
 (0 rows affected)
 
 ----------------- -----------------------
-Subcontract_Lines 2025-03-10 13:32:15.523
+Subcontract_Lines 2025-03-10 13:51:12.863
 
 (1 rows affected)
 
@@ -339,7 +353,7 @@ Subcontract_Lines 2025-03-10 13:32:15.523
 (0 rows affected)
 
 ------------------ -----------------------
-Change_Order_Lines 2025-03-10 13:32:15.547
+Change_Order_Lines 2025-03-10 13:51:12.880
 
 (1 rows affected)
 
@@ -356,7 +370,7 @@ Change_Order_Lines 2025-03-10 13:32:15.547
 (0 rows affected)
 
 -------------------- -----------------------
-Purchase_Order_Lines 2025-03-10 13:32:15.580
+Purchase_Order_Lines 2025-03-10 13:51:12.903
 
 (1 rows affected)
 
@@ -373,7 +387,7 @@ Purchase_Order_Lines 2025-03-10 13:32:15.580
 (0 rows affected)
 
 ---------------- -----------------------
-Job_Budget_Lines 2025-03-10 13:32:15.607
+Job_Budget_Lines 2025-03-10 13:51:12.927
 
 (1 rows affected)
 
@@ -382,7 +396,7 @@ Job_Budget_Lines 2025-03-10 13:32:15.607
 (310 rows affected)
 
 --------- -----------------------
-Timecards 2025-03-10 13:32:15.627
+Timecards 2025-03-10 13:51:12.943
 
 (1 rows affected)
 
@@ -400,8 +414,8 @@ Timecards 2025-03-10 13:32:15.627
 
 (1 rows affected)
 
-2025-03-10 20:32:15,708 - INFO - SQL script executed successfully for database: SageXcel Demo
-2025-03-10 20:32:15,708 - INFO - Temporary modified SQL file removed.
+2025-03-10 20:51:13,028 - INFO - SQL script executed successfully for database: SageXcel Demo
+2025-03-10 20:51:13,028 - INFO - Temporary modified SQL file removed.
 Script executed successfully.
 None
-mike@sn-33307-metabase:~/dev/sage_dw_li
+mike@sn-33307-metabase:~/dev/sage_dw_lite/SageXcel$
