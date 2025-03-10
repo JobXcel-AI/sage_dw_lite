@@ -10,7 +10,7 @@ SQL_PORT = "1433"
 SQL_USERNAME = "sagexcel"
 SQL_PASSWORD = "qkJt>X@%iLtrR"
 USE_SSH_TUNNEL = True
-SQL_FILENAME = "Update All Reporting Tables.sql"
+SQL_FILENAME = "Patch then Update All Reporting Tables.sql"
 
 # Path to the centralized script
 base_dir = os.path.dirname(os.path.dirname(__file__))  # Move up to the base directory

@@ -10,7 +10,7 @@ SQL_PORT = "50366"
 SQL_USERNAME = "jobxcel"
 SQL_PASSWORD = "bH2RqTYVPgtF4bH9LTD!"
 USE_SSH_TUNNEL = False
-SQL_FILENAME = "Update All Reporting Tables.sql"
+SQL_FILENAME = "Patch then Update All Reporting Tables.sql"
 
 # Path to the centralized script
 base_dir = os.path.dirname(os.path.dirname(__file__))  # Move up to the base directory
