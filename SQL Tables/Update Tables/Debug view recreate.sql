@@ -98,17 +98,17 @@ SET @SqlPatchQuery2 = N'
 					MAX(ISNULL("jbl"."budget_hours",0)) + SUM(ISNULL("co"."approved_change_hours",0)) as "revised_budget_hours"
 				FROM (
 					SELECT 
-						cost_code_name,
-						cost_code,
-						cost_type,
-						job_number,
-						sum(budget) as budget,
-						sum(budget_hours) as budget_hours
+						"cost_code_name",
+						"cost_code",
+						"cost_type",
+						"job_number",
+						sum("budget") as "budget",
+						sum("budget_hours") as "budget_hours"
 					FROM "Job_Budget_Lines"
-					GROUP BY cost_code_name,
-						cost_code,
-						cost_type,
-						job_number
+					GROUP BY "cost_code_name",
+						"cost_code",
+						"cost_type",
+						"job_number"
 					) as "jbl"
 				FULL JOIN "Change_Order_Lines" AS "co" ON 
 					"jbl"."job_number" = "co"."job_number" AND 
