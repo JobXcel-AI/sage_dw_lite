@@ -115,6 +115,7 @@ try:
             file.write(modified_sql_content)
 
         logger.info(f"SQL script modified for database: {db_name}")
+        logger.info(modified_sql_content)
 
         command = [
             sqlcmd_path,
