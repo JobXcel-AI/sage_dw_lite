@@ -1,28 +1,13 @@
-mike@sn-33307-metabase:~/dev/sage_dw_lite/SageXcel$ git pull
-remote: Enumerating objects: 12, done.
-remote: Counting objects: 100% (12/12), done.
-remote: Compressing objects: 100% (2/2), done.
-remote: Total 7 (delta 5), reused 7 (delta 5), pack-reused 0 (from 0)
-Unpacking objects: 100% (7/7), 1.82 KiB | 465.00 KiB/s, done.
-From https://github.com/JobXcel-AI/sage_dw_lite
-   e71a324..e27c848  main       -> origin/main
-Updating e71a324..e27c848
-Fast-forward
- SQL Tables/Update Tables/Patch then Update All Reporting Tables.sql |   2 +-
- SageXcel/log-output.txt                                             | 407 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 408 insertions(+), 1 deletion(-)
- create mode 100644 SageXcel/log-output.txt
+ 2 files changed, 52 insertions(+), 34 deletions(-)
 mike@sn-33307-metabase:~/dev/sage_dw_lite/SageXcel$ python3 sagexcel_patch_script.py
-2025-03-10 20:51:12,108 - INFO - Extracted arguments: CUSTOMER_NAME=SageXcel, SQL_SERVER=mike.servernova.net, SQL_PORT=49732, SQL_USERNAME=jobxcel, USE_SSH_TUNNEL=False, SQL_FILENAME=Patch then Update All Reporting Tables.sql
-2025-03-10 20:51:12,108 - INFO - Databases to update: SageXcel~Demo
-2025-03-10 20:51:12,109 - INFO - Processing SQL script for database: SageXcel~Demo
-2025-03-10 20:51:12,109 - INFO - SQL script modified for database: SageXcel Demo
-2025-03-10 20:51:12,109 - INFO - Executing SQL script for database SageXcel Demo with command: /opt/mssql-tools/bin/sqlcmd -S mike.servernova.net\SN-33307,49732 -U jobxcel -P wKif7qZiTxmsWXw.ebL9 -i /home/mike/dev/sage_dw_lite/SQL Tables/Update Tables/temp_update_sql.sql
-2025-03-10 20:51:13,028 - INFO - Process Return Code: 0
-2025-03-10 20:51:13,028 - INFO - Process STDOUT:
+2025-03-10 21:17:43,206 - INFO - Extracted arguments: CUSTOMER_NAME=SageXcel, SQL_SERVER=mike.servernova.net, SQL_PORT=49732, SQL_USERNAME=jobxcel, USE_SSH_TUNNEL=False, SQL_FILENAME=Patch then Update All Reporting Tables.sql
+2025-03-10 21:17:43,206 - INFO - Databases to update: SageXcel~Demo
+2025-03-10 21:17:43,206 - INFO - Processing SQL script for database: SageXcel~Demo
+2025-03-10 21:17:43,207 - INFO - SQL script modified for database: SageXcel Demo
+2025-03-10 21:17:43,207 - INFO - Executing SQL script for database SageXcel Demo with command: /opt/mssql-tools/bin/sqlcmd -S mike.servernova.net\SN-33307,49732 -U jobxcel -P wKif7qZiTxmsWXw.ebL9 -i /home/mike/dev/sage_dw_lite/SQL Tables/Update Tables/temp_update_sql.sql -b -V 16 -y 0 -X
+2025-03-10 21:17:43,866 - INFO - Process Return Code: 0
+2025-03-10 21:17:43,866 - INFO - Process STDOUT:
 Changed database context to 'SageXcel Demo Reporting'.
-
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 CREATE VIEW vw_committed_costs
 AS
@@ -34,10 +19,118 @@ SELECT
 	END AS "projected_costs"
 FROM (
 	SELECT
-		COALESCE("jbl_col_jc_po"."job_number","scl"."job_number"
+		COALESCE("jbl_col_jc_po"."job_number","scl"."job_number") AS "job_number",
+		"jbl_col_jc_po"."cost_code_name",
+		COALESCE("jbl_col_jc_po"."cost_code","scl"."cost_code") AS "cost_code",
+		COALESCE("jbl_col_jc_po"."cost_type","scl"."cost_type") AS "cost_type",
+		MAX(ISNULL("jbl_col_jc_po"."budget",0)) AS "budget",
+		MAX(ISNULL("jbl_col_jc_po"."approved_change_amount",0)) AS "approved_change_amount",
+		MAX(ISNULL("jbl_col_jc_po"."revised_budget",0)) AS "revised_budget",
+		MAX(ISNULL("jbl_col_jc_po"."budget_hours",0)) AS "budget_hours",
+		MAX(ISNULL("jbl_col_jc_po"."approved_change_hours",0)) AS "approved_change_hours",
+		MAX(ISNULL("jbl_col_jc_po"."revised_budget_hours",0)) AS "revised_budget_hours",
+		MAX(ISNULL("jbl_col_jc_po"."job_cost_amount",0)) AS "job_cost_amount",
+		MAX(ISNULL("jbl_col_jc_po"."committed_po",0)) AS "committed_purchase_orders",
+		SUM(ISNULL("scl"."committed_amount",0)) as "committed_subcontracts",
+		MAX(ISNULL("jbl_col_jc_po"."revised_budget",0)) -
+			MAX(ISNULL("jbl_col_jc_po"."job_cost_amount",0)) -
+			MAX(ISNULL("jbl_col_jc_po"."committed_po",0)) -
+			SUM(ISNULL("scl"."committed_amount",0)) as "balance_remaining"
+	FROM (
+		SELECT
+			MAX(ISNULL("jbl_col_jc"."approved_change_amount",0)) AS "approved_change_amount",
+			MAX(ISNULL("jbl_col_jc"."budget",0)) AS "budget",
+			MAX(ISNULL("jbl_col_jc"."revised_budget",0)) AS "revised_budget",
+			MAX(ISNULL("jbl_col_jc"."approved_change_hours",0)) AS "approved_change_hours",
+			MAX(ISNULL("jbl_col_jc"."budget_hours",0)) AS "budget_hours",
+			MAX(ISNULL("jbl_col_jc"."revised_budget_hours",0)) AS "revised_budget_hours",
+			"jbl_col_jc"."cost_code_name",
+			COALESCE("jbl_col_jc"."cost_code","pol"."cost_code") AS "cost_code",
+			COALESCE("jbl_col_jc"."cost_type","pol"."cost_type") AS "cost_type",
+			COALESCE("jbl_col_jc"."job_number","pol"."job_number") AS "job_number",
+			MAX(ISNULL("jbl_col_jc"."cost_amount",0)) AS "job_cost_amount",
+			SUM(ISNULL("pol"."committed_total",0)) AS "committed_po"
+		FROM (
+			SELECT
+				MAX(ISNULL("jbl_col"."approved_change_amount",0)) AS "approved_change_amount",
+				MAX(ISNULL("jbl_col"."budget",0)) AS "budget",
+				MAX(ISNULL("jbl_col"."revised_budget",0)) AS "revised_budget",
+				MAX(ISNULL("jbl_col"."approved_change_hours",0)) AS "approved_change_hours",
+				MAX(ISNULL("jbl_col"."budget_hours",0)) AS "budget_hours",
+				MAX(ISNULL("jbl_col"."revised_budget_hours",0)) AS "revised_budget_hours",
+				COALESCE("jbl_col"."cost_code_name","jc"."job_cost_code_name") AS "cost_code_name",
+				COALESCE("jbl_col"."cost_code","jc"."job_cost_code") AS "cost_code",
+				COALESCE("jbl_col"."cost_type","jc"."cost_type") AS "cost_type",
+				COALESCE("jbl_col"."job_number","jc"."job_number") AS "job_number",
+				SUM(ISNULL("jc"."cost_amount",0)) AS "cost_amount"
+			FROM
+			(
+				SELECT
+					COALESCE("jbl"."cost_code_name", "co"."cost_code_name") AS "cost_code_name",
+					COALESCE("jbl"."cost_code", "co"."cost_code") AS "cost_code",
+					COALESCE("jbl"."cost_type", "co"."cost_type") AS "cost_type",
+					COALESCE("co"."job_number","jbl"."job_number") AS "job_number",
+					MAX(ISNULL("jbl"."budget",0)) AS "budget",
+					MAX(ISNULL("jbl"."budget_hours",0)) AS "budget_hours",
 
------------ -----------------------
-AR_Invoices 2025-03-10 13:51:12.173
+
+					SUM(ISNULL("co"."approved_change_amount",0)) AS "approved_change_amount",
+					SUM(ISNULL("co"."approved_change_hours",0)) AS "approved_change_hours",
+					MAX(ISNULL("jbl"."budget",0)) + SUM(ISNULL("co"."approved_change_amount",0)) as "revised_budget",
+					MAX(ISNULL("jbl"."budget_hours",0)) + SUM(ISNULL("co"."approved_change_hours",0)) as "revised_budget_hours"
+				FROM (
+					SELECT
+						cost_code_name,
+						cost_code,
+						cost_type,
+						job_number,
+						sum(budget) as budget,
+						sum(budget_hours) as budget_hours
+					FROM "Job_Budget_Lines"
+					GROUP BY cost_code_name,
+						cost_code,
+						cost_type,
+						job_number
+					) as "jbl"
+				FULL JOIN "Change_Order_Lines" AS "co" ON
+					"jbl"."job_number" = "co"."job_number" AND
+					"jbl"."cost_code" = "co"."cost_code" AND
+					"jbl"."cost_type" = "co"."cost_type"
+				WHERE "co"."status" NOT IN ('Rejected','Void')
+				GROUP BY COALESCE("jbl"."cost_code_name", "co"."cost_code_name"),
+					COALESCE("jbl"."cost_code", "co"."cost_code"),
+					COALESCE("jbl"."cost_type", "co"."cost_type"),
+					COALESCE("co"."job_number","jbl"."job_number")
+			) AS "jbl_col"
+			FULL JOIN "Job_Cost" AS "jc" ON
+				"jbl_col"."job_number" = "jc"."job_number" AND
+				"jbl_col"."cost_code" = "jc"."job_cost_code" AND
+				"jbl_col"."cost_Type" = "jc"."cost_type"
+			GROUP BY COALESCE("jbl_col"."cost_code_name","jc"."job_cost_code_name"),
+				COALESCE("jbl_col"."cost_code","jc"."job_cost_code"),
+				COALESCE("jbl_col"."cost_type","jc"."cost_type"),
+				COALESCE("jbl_col"."job_number","jc"."job_number")
+		) AS "jbl_col_jc"
+		FULL JOIN "Purchase_Order_Lines" AS "pol" ON
+			"jbl_col_jc"."job_number" = "pol"."job_number" AND
+			"jbl_col_jc"."cost_type" = "pol"."cost_type" AND
+			"jbl_col_jc"."cost_code" = "pol"."cost_code"
+		GROUP BY "jbl_col_jc"."cost_code_name",
+			COALESCE("jbl_col_jc"."cost_code","pol"."cost_code"),
+			COALESCE("jbl_col_jc"."cost_type","pol"."cost_type"),
+			COALESCE("jbl_col_jc"."job_number","pol"."job_number")
+	) AS "jbl_col_jc_po"
+	LEFT JOIN "Subcontract_Lines" AS "scl" ON
+		"jbl_col_jc_po"."job_number" = "scl"."job_number" AND
+		"jbl_col_jc_po"."cost_code" = "scl"."cost_code" AND
+		"jbl_col_jc_po"."cost_type" = "scl"."cost_type"
+	GROUP BY COALESCE("jbl_col_jc_po"."job_number","scl"."job_number"),
+		"jbl_col_jc_po"."cost_code_name",
+		COALESCE("jbl_col_jc_po"."cost_code","scl"."cost_code"),
+		COALESCE("jbl_col_jc_po"."cost_type","scl"."cost_type")
+) "source"
+
+AR_Invoices 2025-03-10 14:17:43.257
 
 (1 rows affected)
 
@@ -52,9 +145,7 @@ AR_Invoices 2025-03-10 13:51:12.173
 (39 rows affected)
 
 (0 rows affected)
-
-------------- -----------------------
-Change_Orders 2025-03-10 13:51:12.317
+Change_Orders 2025-03-10 14:17:43.407
 
 (1 rows affected)
 
@@ -69,9 +160,7 @@ Change_Orders 2025-03-10 13:51:12.317
 (8 rows affected)
 
 (0 rows affected)
-
--------------------- -----------------------
-Change_Order_History 2025-03-10 13:51:12.330
+Change_Order_History 2025-03-10 14:17:43.417
 
 (1 rows affected)
 
@@ -84,9 +173,7 @@ Change_Order_History 2025-03-10 13:51:12.330
 (16 rows affected)
 
 (30 rows affected)
-
-------------------------- -----------------------
-Change_Order_Open_History 2025-03-10 13:51:12.337
+Change_Order_Open_History 2025-03-10 14:17:43.423
 
 (1 rows affected)
 
@@ -119,9 +206,7 @@ Change_Order_Open_History 2025-03-10 13:51:12.337
 (2 rows affected)
 
 (2 rows affected)
-
--------- -----------------------
-Employee 2025-03-10 13:51:12.337
+Employee 2025-03-10 14:17:43.423
 
 (1 rows affected)
 
@@ -136,9 +221,7 @@ Employee 2025-03-10 13:51:12.337
 (67 rows affected)
 
 (0 rows affected)
-
---------- -----------------------
-Inventory 2025-03-10 13:51:12.353
+Inventory 2025-03-10 14:17:43.437
 
 (1 rows affected)
 
@@ -153,9 +236,7 @@ Inventory 2025-03-10 13:51:12.353
 (9 rows affected)
 
 (0 rows affected)
-
----- -----------------------
-Jobs 2025-03-10 13:51:12.380
+Jobs 2025-03-10 14:17:43.463
 
 (1 rows affected)
 
@@ -171,9 +252,7 @@ Warning: Null value is eliminated by an aggregate or other SET operation.
 (11 rows affected)
 
 (0 rows affected)
-
--------- -----------------------
-Job_Cost 2025-03-10 13:51:12.437
+Job_Cost 2025-03-10 14:17:43.523
 
 (1 rows affected)
 
@@ -188,9 +267,7 @@ Job_Cost 2025-03-10 13:51:12.437
 (790 rows affected)
 
 (0 rows affected)
-
------------------- -----------------------
-Job_Status_History 2025-03-10 13:51:12.470
+Job_Status_History 2025-03-10 14:17:43.557
 
 (1 rows affected)
 
@@ -201,9 +278,7 @@ Job_Status_History 2025-03-10 13:51:12.470
 (29 rows affected)
 
 (18 rows affected)
-
-------------------- -----------------------
-Jobs_Active_History 2025-03-10 13:51:12.477
+Jobs_Active_History 2025-03-10 14:17:43.563
 
 (1 rows affected)
 
@@ -238,9 +313,7 @@ Jobs_Active_History 2025-03-10 13:51:12.477
 (7 rows affected)
 
 (7 rows affected)
-
------------------- -----------------------
-Job_Cost_Waterfall 2025-03-10 13:51:12.477
+Job_Cost_Waterfall 2025-03-10 14:17:43.563
 
 (1 rows affected)
 
@@ -249,9 +322,7 @@ Job_Cost_Waterfall 2025-03-10 13:51:12.477
 (4 rows affected)
 
 (28 rows affected)
-
---------------- -----------------------
-Ledger_Accounts 2025-03-10 13:51:12.480
+Ledger_Accounts 2025-03-10 14:17:43.567
 
 (1 rows affected)
 
@@ -266,9 +337,7 @@ Ledger_Accounts 2025-03-10 13:51:12.480
 (148 rows affected)
 
 (0 rows affected)
-
------------------------- -----------------------
-Ledger_Transaction_Lines 2025-03-10 13:51:12.573
+Ledger_Transaction_Lines 2025-03-10 14:17:43.590
 
 (1 rows affected)
 
@@ -283,9 +352,7 @@ Ledger_Transaction_Lines 2025-03-10 13:51:12.573
 (4862 rows affected)
 
 (0 rows affected)
-
---------------- -----------------------
-Payroll_Records 2025-03-10 13:51:12.760
+Payroll_Records 2025-03-10 14:17:43.680
 
 (1 rows affected)
 
@@ -300,9 +367,7 @@ Payroll_Records 2025-03-10 13:51:12.760
 (266 rows affected)
 
 (0 rows affected)
-
---------------- -----------------------
-Purchase_Orders 2025-03-10 13:51:12.810
+Purchase_Orders 2025-03-10 14:17:43.707
 
 (1 rows affected)
 
@@ -317,9 +382,7 @@ Purchase_Orders 2025-03-10 13:51:12.810
 (94 rows affected)
 
 (0 rows affected)
-
---------------- -----------------------
-Vendor Contacts 2025-03-10 13:51:12.840
+Vendor Contacts 2025-03-10 14:17:43.727
 
 (1 rows affected)
 
@@ -334,9 +397,7 @@ Vendor Contacts 2025-03-10 13:51:12.840
 (118 rows affected)
 
 (0 rows affected)
-
------------------ -----------------------
-Subcontract_Lines 2025-03-10 13:51:12.863
+Subcontract_Lines 2025-03-10 14:17:43.737
 
 (1 rows affected)
 
@@ -351,9 +412,7 @@ Subcontract_Lines 2025-03-10 13:51:12.863
 (142 rows affected)
 
 (0 rows affected)
-
------------------- -----------------------
-Change_Order_Lines 2025-03-10 13:51:12.880
+Change_Order_Lines 2025-03-10 14:17:43.760
 
 (1 rows affected)
 
@@ -368,9 +427,7 @@ Change_Order_Lines 2025-03-10 13:51:12.880
 (16 rows affected)
 
 (0 rows affected)
-
--------------------- -----------------------
-Purchase_Order_Lines 2025-03-10 13:51:12.903
+Purchase_Order_Lines 2025-03-10 14:17:43.763
 
 (1 rows affected)
 
@@ -385,18 +442,14 @@ Purchase_Order_Lines 2025-03-10 13:51:12.903
 (616 rows affected)
 
 (0 rows affected)
-
----------------- -----------------------
-Job_Budget_Lines 2025-03-10 13:51:12.927
+Job_Budget_Lines 2025-03-10 14:17:43.787
 
 (1 rows affected)
 
 (310 rows affected)
 
 (310 rows affected)
-
---------- -----------------------
-Timecards 2025-03-10 13:51:12.943
+Timecards 2025-03-10 14:17:43.797
 
 (1 rows affected)
 
@@ -414,8 +467,6 @@ Timecards 2025-03-10 13:51:12.943
 
 (1 rows affected)
 
-2025-03-10 20:51:13,028 - INFO - SQL script executed successfully for database: SageXcel Demo
-2025-03-10 20:51:13,028 - INFO - Temporary modified SQL file removed.
+2025-03-10 21:17:43,867 - INFO - SQL script executed successfully for database: SageXcel Demo
+2025-03-10 21:17:43,867 - INFO - Temporary modified SQL file removed.
 Script executed successfully.
-None
-mike@sn-33307-metabase:~/dev/sage_dw_lite/SageXcel$
