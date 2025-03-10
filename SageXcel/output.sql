@@ -1,8 +1,8 @@
 --Version 1.0.0
-USE [[CLIENT_DB_NAME] Reporting]
+USE [SageXcel Demo Reporting]
 GO
 --Specify Client DB Name
-DECLARE @Client_DB_Name NVARCHAR(50) = '[CLIENT_DB_NAME]';
+DECLARE @Client_DB_Name NVARCHAR(50) = 'SageXcel Demo';
 --Specify Reporting DB Name
 DECLARE @Reporting_DB_Name NVARCHAR(50) = QUOTENAME(CONCAT(@Client_DB_Name, ' Reporting'));
 DECLARE @SqlQuery NVARCHAR(100);
@@ -195,8 +195,8 @@ SET @SqlPatchQuery2 = N'
 SET @NestedSql = @NestedSQL1 + @NestedSQL2
 IF (SELECT [Name] FROM [Version]) = ''0.0.0'' 
 BEGIN
-SELECT @NestedSQL
--- EXECUTE sp_executesql @NestedSQL
+--SELECT @NestedSQL
+EXECUTE sp_executesql @NestedSQL
 END
 '
 SET @SqlPatchQuery = @SqlPatchQuery1 + @SqlPatchQuery2
