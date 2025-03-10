@@ -1,6 +1,6 @@
-Version 1.0.0
+--Version 1.0.0
 
-USE 'Nvision Reporting'
+USE [Nvision Reporting]
 GO 
 --Specify Client DB Name
 DECLARE @Client_DB_Name NVARCHAR(50) = 'Nvision';  
@@ -2613,7 +2613,7 @@ SET @SqlViewQuery2 = N'
 					"jbl"."job_number" = "co"."job_number" AND 
 					"jbl"."cost_code" = "co"."cost_code" AND
 					"jbl"."cost_type" = "co"."cost_type"
-				WHERE "co"."status" NOT IN (''''Rejected'''',''''Void'''')
+				WHERE "co"."status" NOT IN (''Rejected'',''Void'')
 				GROUP BY COALESCE("jbl"."cost_code_name", "co"."cost_code_name"),
 					COALESCE("jbl"."cost_code", "co"."cost_code"),
 					COALESCE("jbl"."cost_type", "co"."cost_type"),
