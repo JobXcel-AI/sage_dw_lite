@@ -70,7 +70,8 @@ FROM (
 						cost_code,
 						cost_type,
 						job_number,
-						sum(budget) as budget
+						sum(budget) as budget,
+						sum(budget_hours) as budget_hours
 					FROM "dbo"."Job_Budget_Lines"
 					GROUP BY cost_code_name,
 						cost_code,
