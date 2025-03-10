@@ -149,11 +149,8 @@ SET @SqlPatchQuery2 = N'
 ) "source"	
 ''
 SET @NestedSql = @NestedSQL1 + @NestedSQL2
-IF (SELECT [Name] FROM [Version]) = ''0.0.0'' 
-BEGIN
 --SELECT @NestedSQL
 EXECUTE sp_executesql @NestedSQL
-END
 '
 SET @SqlPatchQuery = @SqlPatchQuery1 + @SqlPatchQuery2
 EXECUTE sp_executesql @SqlPatchQuery
