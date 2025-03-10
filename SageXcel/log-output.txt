@@ -1,0 +1,407 @@
+python3 sagexcel_patch_script.py
+2025-03-10 20:32:14,577 - INFO - Extracted arguments: CUSTOMER_NAME=SageXcel, SQL_SERVER=mike.servernova.net, SQL_PORT=49732, SQL_USERNAME=jobxcel, USE_SSH_TUNNEL=False, SQL_FILENAME=Patch then Update All Reporting Tables.sql
+2025-03-10 20:32:14,577 - INFO - Databases to update: SageXcel~Demo
+2025-03-10 20:32:14,577 - INFO - Processing SQL script for database: SageXcel~Demo
+2025-03-10 20:32:14,578 - INFO - SQL script modified for database: SageXcel Demo
+2025-03-10 20:32:14,578 - INFO - Executing SQL script for database SageXcel Demo with command: /opt/mssql-tools/bin/sqlcmd -S mike.servernova.net\SN-33307,49732 -U jobxcel -P wKif7qZiTxmsWXw.ebL9 -i /home/mike/dev/sage_dw_lite/SQL Tables/Update Tables/temp_update_sql.sql
+2025-03-10 20:32:15,708 - INFO - Process Return Code: 0
+2025-03-10 20:32:15,708 - INFO - Process STDOUT:
+Changed database context to 'SageXcel Demo Reporting'.
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+CREATE VIEW vw_committed_costs
+AS
+SELECT
+	*,
+	CASE
+		WHEN "balance_remaining" < 0 THEN "revised_budget" - "balance_remaining"
+		ELSE "revised_budget"
+	END AS "projected_costs"
+FROM (
+	SELECT
+		COALESCE("jbl_col_jc_po"."job_number","scl"."job_number"
+
+----------- -----------------------
+AR_Invoices 2025-03-10 13:32:14.610
+
+(1 rows affected)
+
+(39 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(39 rows affected)
+
+(39 rows affected)
+
+(0 rows affected)
+
+------------- -----------------------
+Change_Orders 2025-03-10 13:32:14.777
+
+(1 rows affected)
+
+(8 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(8 rows affected)
+
+(8 rows affected)
+
+(0 rows affected)
+
+-------------------- -----------------------
+Change_Order_History 2025-03-10 13:32:14.790
+
+(1 rows affected)
+
+(16 rows affected)
+
+(24 rows affected)
+
+(24 rows affected)
+
+(16 rows affected)
+
+(30 rows affected)
+
+------------------------- -----------------------
+Change_Order_Open_History 2025-03-10 13:32:14.797
+
+(1 rows affected)
+
+(2 rows affected)
+
+(2 rows affected)
+
+(2 rows affected)
+
+(2 rows affected)
+
+(2 rows affected)
+
+(2 rows affected)
+
+(2 rows affected)
+
+(2 rows affected)
+
+(2 rows affected)
+
+(2 rows affected)
+
+(2 rows affected)
+
+(2 rows affected)
+
+(2 rows affected)
+
+(2 rows affected)
+
+(2 rows affected)
+
+-------- -----------------------
+Employee 2025-03-10 13:32:14.797
+
+(1 rows affected)
+
+(67 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(67 rows affected)
+
+(67 rows affected)
+
+(0 rows affected)
+
+--------- -----------------------
+Inventory 2025-03-10 13:32:14.813
+
+(1 rows affected)
+
+(9 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(9 rows affected)
+
+(9 rows affected)
+
+(0 rows affected)
+
+---- -----------------------
+Jobs 2025-03-10 13:32:14.847
+
+(1 rows affected)
+
+(11 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+Warning: Null value is eliminated by an aggregate or other SET operation.
+
+(11 rows affected)
+
+(11 rows affected)
+
+(0 rows affected)
+
+-------- -----------------------
+Job_Cost 2025-03-10 13:32:14.920
+
+(1 rows affected)
+
+(790 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(790 rows affected)
+
+(790 rows affected)
+
+(0 rows affected)
+
+------------------ -----------------------
+Job_Status_History 2025-03-10 13:32:15.090
+
+(1 rows affected)
+
+(18 rows affected)
+
+(29 rows affected)
+
+(29 rows affected)
+
+(18 rows affected)
+
+------------------- -----------------------
+Jobs_Active_History 2025-03-10 13:32:15.097
+
+(1 rows affected)
+
+(105 rows affected)
+
+(7 rows affected)
+
+(7 rows affected)
+
+(7 rows affected)
+
+(7 rows affected)
+
+(7 rows affected)
+
+(7 rows affected)
+
+(7 rows affected)
+
+(7 rows affected)
+
+(7 rows affected)
+
+(7 rows affected)
+
+(7 rows affected)
+
+(7 rows affected)
+
+(7 rows affected)
+
+(7 rows affected)
+
+(7 rows affected)
+
+------------------ -----------------------
+Job_Cost_Waterfall 2025-03-10 13:32:15.097
+
+(1 rows affected)
+
+(28 rows affected)
+
+(4 rows affected)
+
+(28 rows affected)
+
+--------------- -----------------------
+Ledger_Accounts 2025-03-10 13:32:15.173
+
+(1 rows affected)
+
+(148 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(148 rows affected)
+
+(148 rows affected)
+
+(0 rows affected)
+
+------------------------ -----------------------
+Ledger_Transaction_Lines 2025-03-10 13:32:15.203
+
+(1 rows affected)
+
+(4862 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(4862 rows affected)
+
+(4862 rows affected)
+
+(0 rows affected)
+
+--------------- -----------------------
+Payroll_Records 2025-03-10 13:32:15.420
+
+(1 rows affected)
+
+(266 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(266 rows affected)
+
+(266 rows affected)
+
+(0 rows affected)
+
+--------------- -----------------------
+Purchase_Orders 2025-03-10 13:32:15.470
+
+(1 rows affected)
+
+(94 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(94 rows affected)
+
+(94 rows affected)
+
+(0 rows affected)
+
+--------------- -----------------------
+Vendor Contacts 2025-03-10 13:32:15.500
+
+(1 rows affected)
+
+(118 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(118 rows affected)
+
+(118 rows affected)
+
+(0 rows affected)
+
+----------------- -----------------------
+Subcontract_Lines 2025-03-10 13:32:15.523
+
+(1 rows affected)
+
+(142 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(142 rows affected)
+
+(142 rows affected)
+
+(0 rows affected)
+
+------------------ -----------------------
+Change_Order_Lines 2025-03-10 13:32:15.547
+
+(1 rows affected)
+
+(16 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(16 rows affected)
+
+(16 rows affected)
+
+(0 rows affected)
+
+-------------------- -----------------------
+Purchase_Order_Lines 2025-03-10 13:32:15.580
+
+(1 rows affected)
+
+(616 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(616 rows affected)
+
+(616 rows affected)
+
+(0 rows affected)
+
+---------------- -----------------------
+Job_Budget_Lines 2025-03-10 13:32:15.607
+
+(1 rows affected)
+
+(310 rows affected)
+
+(310 rows affected)
+
+--------- -----------------------
+Timecards 2025-03-10 13:32:15.627
+
+(1 rows affected)
+
+(680 rows affected)
+
+(0 rows affected)
+
+(0 rows affected)
+
+(680 rows affected)
+
+(680 rows affected)
+
+(0 rows affected)
+
+(1 rows affected)
+
+2025-03-10 20:32:15,708 - INFO - SQL script executed successfully for database: SageXcel Demo
+2025-03-10 20:32:15,708 - INFO - Temporary modified SQL file removed.
+Script executed successfully.
+None
+mike@sn-33307-metabase:~/dev/sage_dw_li
