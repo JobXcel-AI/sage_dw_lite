@@ -1,4 +1,4 @@
---Version 1.0.0 Mike adding this line to show it's updated
+--Version 1.0.0
 USE [[CLIENT_DB_NAME] Reporting]
 GO
 --Specify Client DB Name
