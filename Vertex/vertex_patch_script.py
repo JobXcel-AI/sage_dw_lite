@@ -2,13 +2,13 @@ import os
 import subprocess
 
 # Customer-specific variables
-CUSTOMER_NAME = "Burbach"
-CUSTOMER_DB_NAMES = ["BC~Master", "RES", "RBB", "CES", "Enhanced", "BEL", "BP"]  # Now an array
-SQL_SERVER = "33.3.55.2"
-SQL_INSTANCE = "SN-34003"
-SQL_PORT = "49750"
-SQL_USERNAME = "sagexcel"
-SQL_PASSWORD = "!7j!ewCcihpS!5icnPP5"
+CUSTOMER_NAME = "Vertex"
+CUSTOMER_DB_NAMES = ["Vertex~Coatings"]  # Now an array
+SQL_SERVER = "vertexcoatings.servernova.net"
+SQL_INSTANCE = "SN-30147"
+SQL_PORT = "50285"
+SQL_USERNAME = "jobxcel"
+SQL_PASSWORD = "qn_uJYszjd4NCJuBcwFB"
 USE_SSH_TUNNEL = False
 SQL_FILENAME = "Patch then Update All Reporting Tables.sql"
 
@@ -25,9 +25,9 @@ formatted_db_names = ",".join(CUSTOMER_DB_NAMES)  # Convert list to comma-separa
 # Command to execute the centralized script with connection details
 command = [
     "python3",
-    central_script_path,  # Ensure this is a string
+    central_script_path,
     CUSTOMER_NAME,
-    formatted_db_names,
+    formatted_db_names,  # Pass as a string instead of a list
     SQL_SERVER,
     SQL_INSTANCE,
     SQL_PORT,
@@ -44,11 +44,14 @@ try:
     # Log output or errors
     if result.returncode == 0:
         print("Script executed successfully.")
+        print("Standard Output:")
         print(result.stdout)
     else:
         print("Script execution failed.")
-        print("Standard Output:", result.stdout)
-        print("Standard Error:", result.stderr)
+        print("Standard Output:")
+        print(result.stdout)
+        print("Standard Error:")
+        print(result.stderr)
 
 except Exception as e:
     print(f"Error occurred while running the script: {e}")

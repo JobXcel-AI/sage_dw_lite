@@ -2,14 +2,14 @@ import os
 import subprocess
 
 # Customer-specific variables
-CUSTOMER_NAME = "Burbach"
-CUSTOMER_DB_NAMES = ["BC~Master", "RES", "RBB", "CES", "Enhanced", "BEL", "BP"]  # Now an array
-SQL_SERVER = "33.3.55.2"
-SQL_INSTANCE = "SN-34003"
-SQL_PORT = "49750"
+CUSTOMER_NAME = "Brekhus"
+CUSTOMER_DB_NAMES = ["Brekhus~Marble~&~Granite", "Brekhus~Tile~&~Stone"]  # Now an array
+SQL_SERVER = "50.169.189.130"
+SQL_INSTANCE = "BTSSRV"
+SQL_PORT = "1433"
 SQL_USERNAME = "sagexcel"
-SQL_PASSWORD = "!7j!ewCcihpS!5icnPP5"
-USE_SSH_TUNNEL = False
+SQL_PASSWORD = "qkJt>X@%iLtrR"
+USE_SSH_TUNNEL = True
 SQL_FILENAME = "Patch then Update All Reporting Tables.sql"
 
 # Path to the centralized script
@@ -25,9 +25,9 @@ formatted_db_names = ",".join(CUSTOMER_DB_NAMES)  # Convert list to comma-separa
 # Command to execute the centralized script with connection details
 command = [
     "python3",
-    central_script_path,  # Ensure this is a string
+    central_script_path,
     CUSTOMER_NAME,
-    formatted_db_names,
+    formatted_db_names,  # Pass as a string instead of a list
     SQL_SERVER,
     SQL_INSTANCE,
     SQL_PORT,
