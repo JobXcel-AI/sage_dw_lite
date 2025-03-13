@@ -1,3 +1,5 @@
+--For version 1.0.0 to 1.0.1
+
 --Specify Client DB Name
 DECLARE @Client_DB_Name NVARCHAR(50) = '[CLIENT_DB_NAME]';  
 --Specify Reporting DB Name
@@ -104,5 +106,38 @@ BEGIN CATCH
 	@ErrorState = ERROR_STATE();  
 	RAISERROR (@ErrorMessage, @ErrorSeverity, @ErrorState); 
 END CATCH
+
+--If Ledger_Accounts_by_Month table does not exist, create it.
+SET @SqlPatchQuery = CONCAT(N'
+IF OBJECT_ID(''[Ledger_Accounts_by_Month]'',''U'') IS NULL
+BEGIN
+	CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Ledger_Accounts_by_Month'), '(
+	ledger_account_id BIGINT,
+	ledger_account NVARCHAR(50),
+	subsidiary_type NVARCHAR(12),
+	summary_account NVARCHAR(50),
+	cost_type NVARCHAR(30),
+	current_balance DECIMAL(14,2),
+	account_type NVARCHAR(22),
+	debit_or_credit NVARCHAR(6),
+	notes NVARCHAR(MAX),
+	balance_budget_date DATE,
+	balance DECIMAL(14,2),
+	budget DECIMAL(14,2),
+	created_date DATETIME,
+	last_updated_date DATETIME,
+	is_deleted BIT DEFAULT 0,
+	deleted_date DATETIME);
+END')
+EXECUTE sp_executesql @SqlPatchQuery
+
+--Wrap up Patch Run by updating version
+SET @SqlPatchQuery = N' 
+IF (SELECT [Name] FROM [Version]) = ''1.0.0'' 
+BEGIN
+	UPDATE [Version]
+	SET name = ''1.0.1''
+END;'
+EXECUTE sp_executesql @SqlPatchQuery
 
 
