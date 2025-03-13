@@ -3,7 +3,7 @@ import subprocess
 
 # Customer-specific variables
 CUSTOMER_NAME = "PCGOC"
-CUSTOMER_DB_NAMES = ["Nathan~Munn", "PCGAZLLC", "PCG-CA", "RMB Properties, LLC"]  # Now an array
+CUSTOMER_DB_NAMES = ["Nathan~Munn", "PCGAZLLC", "PCG-CA", "RMB~Properties,~LLC"]  # Now an array
 SQL_SERVER = "pcgoc.servernova.net"
 SQL_INSTANCE = "SNLV-20178"
 SQL_PORT = "50055"
