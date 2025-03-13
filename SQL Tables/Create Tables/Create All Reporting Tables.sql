@@ -1,136 +1,136 @@
 --Version 1.0.1
 
 --Specify Client DB Name
-DECLARE @Client_DB_Name NVARCHAR(50) = '[CLIENT_DB_NAME]';  
+DECLARE @Client_DB_Name NVARCHAR(50) = '[CLIENT_DB_NAME]';
 --Specify Reporting DB Name
 DECLARE @Reporting_DB_Name NVARCHAR(50) = QUOTENAME(CONCAT(@Client_DB_Name, ' Reporting'));
 
 --Sql Create Table Command
 DECLARE @SqlCreateTableCommand NVARCHAR(MAX);
 SET @SqlCreateTableCommand = CONCAT(N'
-        CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('AR_Invoices'), '(
-                                                                                 job_number BIGINT,
-                                                                                 job_name NVARCHAR(75),
-            job_phone_number NVARCHAR(14),
-            job_notes NVARCHAR(MAX),
-            job_address1 NVARCHAR(50),
-            job_address2 NVARCHAR(50),
-            job_city NVARCHAR(50),
-            job_state NVARCHAR(2),
-            job_zip_code NVARCHAR(10),
-            job_tax_district NVARCHAR(50),
-            job_type NVARCHAR(50),
-            job_status NVARCHAR(10),
-            ar_invoice_id BIGINT,
-            ar_invoice_date DATE,
-            ar_invoice_description NVARCHAR(50),
-            ar_invoice_number NVARCHAR(20),
-            ar_invoice_status NVARCHAR(8),
-            ar_invoice_tax_district NVARCHAR(50),
-            tax_entity1 NVARCHAR(50),
-            tax_entity1_rate DECIMAL(8,4),
-            tax_entity2 NVARCHAR(50),
-            tax_entity2_rate DECIMAL(8,4),
-            ar_invoice_due_date DATE,
-            ar_invoice_total DECIMAL(12,2),
-            ar_invoice_sales_tax DECIMAL(12,2),
-            ar_invoice_amount_paid DECIMAL(12,2),
-            ar_invoice_balance DECIMAL(14,2),
-            ar_invoice_retention DECIMAL(14,2),
-            ar_invoice_type NVARCHAR(8),
-            client_name NVARCHAR(75),
-            job_supervisor NVARCHAR(50),
-            job_salesperson NVARCHAR(50),
-            ar_invoice_payments_payment_amount DECIMAL(14,2),
-            ar_invoice_payments_discount_taken DECIMAL(14,2),
-            ar_invoice_payments_credit_taken DECIMAL(14,2),
-            last_payment_received_date DATE,
-            last_date_worked DATE,
-            created_date DATETIME,
-            last_updated_date DATETIME,
-            is_deleted BIT DEFAULT 0,
-            deleted_date DATETIME
-            )')
+CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('AR_Invoices'), '(
+	job_number BIGINT,
+	job_name NVARCHAR(75),
+	job_phone_number NVARCHAR(14),
+	job_notes NVARCHAR(MAX),
+	job_address1 NVARCHAR(50),
+	job_address2 NVARCHAR(50),
+	job_city NVARCHAR(50),
+	job_state NVARCHAR(2),
+	job_zip_code NVARCHAR(10),
+	job_tax_district NVARCHAR(50),
+	job_type NVARCHAR(50),
+	job_status NVARCHAR(10),
+	ar_invoice_id BIGINT,
+	ar_invoice_date DATE,
+	ar_invoice_description NVARCHAR(50),
+	ar_invoice_number NVARCHAR(20),
+	ar_invoice_status NVARCHAR(8),
+	ar_invoice_tax_district NVARCHAR(50),
+	tax_entity1 NVARCHAR(50),
+	tax_entity1_rate DECIMAL(8,4),
+	tax_entity2 NVARCHAR(50),
+	tax_entity2_rate DECIMAL(8,4),
+	ar_invoice_due_date DATE,
+	ar_invoice_total DECIMAL(12,2),
+	ar_invoice_sales_tax DECIMAL(12,2),
+	ar_invoice_amount_paid DECIMAL(12,2),
+	ar_invoice_balance DECIMAL(14,2),
+	ar_invoice_retention DECIMAL(14,2),
+	ar_invoice_type NVARCHAR(8),
+	client_name NVARCHAR(75),
+	job_supervisor NVARCHAR(50),
+	job_salesperson NVARCHAR(50),
+	ar_invoice_payments_payment_amount DECIMAL(14,2),
+	ar_invoice_payments_discount_taken DECIMAL(14,2),
+	ar_invoice_payments_credit_taken DECIMAL(14,2),
+	last_payment_received_date DATE,
+	last_date_worked DATE,
+	created_date DATETIME,
+	last_updated_date DATETIME,
+	is_deleted BIT DEFAULT 0,
+	deleted_date DATETIME
+)')
 
 EXECUTE sp_executesql @SqlCreateTableCommand
 
 --SQL data insertion Query
 DECLARE @SqlInsertCommand NVARCHAR(MAX);
 SET @SqlInsertCommand = CONCAT(N'
-        INSERT INTO ',@Reporting_DB_Name,'.dbo.',QUOTENAME('AR_Invoices'),'
+INSERT INTO ',@Reporting_DB_Name,'.dbo.',QUOTENAME('AR_Invoices'),'
 
-        SELECT
-            a.recnum as job_number,
-            a.jobnme as job_name,
-            a.phnnum as job_phone_number,
-            a.ntetxt as job_notes,
-            a.addrs1 as job_address1,
-            a.addrs2 as job_address2,
-            a.ctynme as job_city,
-            a.state_ as job_state,
-            a.zipcde as job_zip_code,
-            j_t.dstnme as job_tax_district,
-            jt.typnme as job_type,
-            CASE a.status
-                WHEN 1 THEN ''Bid''
-                WHEN 2 THEN ''Refused''
-                WHEN 3 THEN ''Contract''
-                WHEN 4 THEN ''Current''
-        WHEN 5 THEN ''Complete''
-        WHEN 6 THEN ''Closed''
-        ELSE ''Other''
-        END as job_status,
-    acrinv.recnum as ar_invoice_id,
-    acrinv.invdte as ar_invoice_date,
-    acrinv.dscrpt as ar_invoice_description,
-    acrinv.invnum as ar_invoice_number,
-    CASE acrinv.status 
-        WHEN 1 THEN ''Open''
-            WHEN 2 THEN ''Review''
-        WHEN 3 THEN ''Dispute''
-        WHEN 4 THEN ''Paid''
-        WHEN 5 THEN ''Void''
-        ELSE ''Other''
-        END as ar_invoice_status,
-    tax.dstnme as ar_invoice_tax_district,
-    te.entnme as tax_entity1,
-    te.taxrt1 as tax_entity1_rate,
-    te2.entnme as tax_entity2,
-    te2.taxrt1 as tax_entity2_rate,
-    acrinv.duedte as ar_invoice_due_date,
-    ISNULL(acrinv.invttl,0) as ar_invoice_total,
-    ISNULL(acrinv.slstax,0) as ar_invoice_sales_tax,
-    ISNULL(acrinv.amtpad,0) as ar_invoice_amount_paid,
-    ISNULL(acrinv.invbal,0) as ar_invoice_balance,
-    ISNULL(acrinv.retain,0) as ar_invoice_retention,
-    CASE acrinv.invtyp 
-        WHEN 1 THEN ''Contract''
-        WHEN 2 THEN ''Memo''
-        ELSE ''Other''
-        END as ar_invoice_type,
-    r.clnnme as client_name,
-    CONCAT(es.fstnme, '' '', es.lstnme) as job_supervisor,
-    CONCAT(e.fstnme, '' '', e.lstnme) as job_salesperson,
-    ISNULL(pmt.amount,0) as ar_invoice_payments_payment_amount,
-    ISNULL(pmt.dsctkn,0) as ar_invoice_payments_discount_taken,
-    ISNULL(pmt.aplcrd,0) as ar_invoice_payments_credit_taken,
-    pmt.chkdte as last_payment_received_date,
-    tc.last_date_worked,
-    acrinv.insdte as created_date,
-    acrinv.upddte as last_updated_date,
-    0 as is_deleted,
-    null as deleted_date
+SELECT
+	a.recnum as job_number,
+	a.jobnme as job_name,
+	a.phnnum as job_phone_number,
+	a.ntetxt as job_notes,
+	a.addrs1 as job_address1,
+	a.addrs2 as job_address2,
+	a.ctynme as job_city,
+	a.state_ as job_state,
+	a.zipcde as job_zip_code,
+	j_t.dstnme as job_tax_district,
+	jt.typnme as job_type,
+	CASE a.status
+		WHEN 1 THEN ''Bid''
+		WHEN 2 THEN ''Refused''
+		WHEN 3 THEN ''Contract''
+		WHEN 4 THEN ''Current''
+		WHEN 5 THEN ''Complete''
+		WHEN 6 THEN ''Closed''
+		ELSE ''Other''
+	END as job_status,
+	acrinv.recnum as ar_invoice_id,
+	acrinv.invdte as ar_invoice_date,
+	acrinv.dscrpt as ar_invoice_description,
+	acrinv.invnum as ar_invoice_number,
+	CASE acrinv.status
+		WHEN 1 THEN ''Open''
+		WHEN 2 THEN ''Review''
+		WHEN 3 THEN ''Dispute''
+		WHEN 4 THEN ''Paid''
+		WHEN 5 THEN ''Void''
+		ELSE ''Other''
+	END as ar_invoice_status,
+	tax.dstnme as ar_invoice_tax_district,
+	te.entnme as tax_entity1,
+	te.taxrt1 as tax_entity1_rate,
+	te2.entnme as tax_entity2,
+	te2.taxrt1 as tax_entity2_rate,
+	acrinv.duedte as ar_invoice_due_date,
+	ISNULL(acrinv.invttl,0) as ar_invoice_total,
+	ISNULL(acrinv.slstax,0) as ar_invoice_sales_tax,
+	ISNULL(acrinv.amtpad,0) as ar_invoice_amount_paid,
+	ISNULL(acrinv.invbal,0) as ar_invoice_balance,
+	ISNULL(acrinv.retain,0) as ar_invoice_retention,
+	CASE acrinv.invtyp
+		WHEN 1 THEN ''Contract''
+		WHEN 2 THEN ''Memo''
+		ELSE ''Other''
+	END as ar_invoice_type,
+	r.clnnme as client_name,
+	CONCAT(es.fstnme, '' '', es.lstnme) as job_supervisor,
+	CONCAT(e.fstnme, '' '', e.lstnme) as job_salesperson,
+	ISNULL(pmt.amount,0) as ar_invoice_payments_payment_amount,
+	ISNULL(pmt.dsctkn,0) as ar_invoice_payments_discount_taken,
+	ISNULL(pmt.aplcrd,0) as ar_invoice_payments_credit_taken,
+	pmt.chkdte as last_payment_received_date,
+	tc.last_date_worked,
+	acrinv.insdte as created_date,
+	acrinv.upddte as last_updated_date,
+	0 as is_deleted,
+	null as deleted_date
 FROM ',QUOTENAME(@Client_DB_Name),'.dbo.actrec a
 INNER JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.acrinv acrinv on acrinv.jobnum = a.recnum
 LEFT JOIN (
-    SELECT
-        recnum,
-        sum(amount) as amount,
-        sum(dsctkn) as dsctkn,
-        sum(aplcrd) as aplcrd,
-        max(chkdte) as chkdte
-    FROM ',QUOTENAME(@Client_DB_Name),'.dbo.acrpmt
-    GROUP BY recnum
+	SELECT
+		recnum,
+		sum(amount) as amount,
+		sum(dsctkn) as dsctkn,
+		sum(aplcrd) as aplcrd,
+		max(chkdte) as chkdte
+	FROM ',QUOTENAME(@Client_DB_Name),'.dbo.acrpmt
+	GROUP BY recnum
 ) pmt on pmt.recnum = acrinv.recnum
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.taxdst tax on tax.recnum = acrinv.taxdst
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.taxdst j_t on j_t.recnum = a.slstax
@@ -138,14 +138,14 @@ LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.jobtyp jt on jt.recnum = a.jobtyp
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.reccln r on r.recnum = a.clnnum
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.taxent te on te.recnum = tax.entty1
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.taxent te2 on te2.recnum = tax.entty2
-LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.employ es on es.recnum = a.sprvsr 
+LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.employ es on es.recnum = a.sprvsr
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.employ e on e.recnum = a.slsemp
 LEFT JOIN (
-    SELECT
-        MAX(dtewrk) last_date_worked,
-        jobnum
-    FROM ',QUOTENAME(@Client_DB_Name),'.dbo.tmcdln
-    GROUP BY jobnum
+	SELECT
+		MAX(dtewrk) last_date_worked,
+		jobnum
+	FROM ',QUOTENAME(@Client_DB_Name),'.dbo.tmcdln
+	GROUP BY jobnum
 ) tc on tc.jobnum = a.recnum
 ')
 
@@ -182,9 +182,9 @@ CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Change_Orders'), '(
 EXECUTE sp_executesql @SqlCreateTableCommand
 
 SET @SqlInsertCommand = CONCAT(N'
-INSERT INTO ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Change_Orders'),' 
+INSERT INTO ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Change_Orders'),'
 
-SELECT 
+SELECT
 	c.recnum as change_order_id,
 	chgnum as change_order_number,
 	chgdte as change_order_date,
@@ -250,21 +250,21 @@ CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Employees'), '(
 EXECUTE sp_executesql @SqlCreateTableCommand
 
 SET @SqlInsertCommand = CONCAT(N'
-INSERT INTO ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Employees'),' 
+INSERT INTO ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Employees'),'
 
-SELECT 
+SELECT
 	e.recnum as employee_id,
 	lstnme as last_name,
 	fstnme as first_name,
 	CONCAT(fstnme, '' '', lstnme) as full_name,
-	CASE 
-		WHEN status = 1 THEN ''Current'' 
+	CASE
+		WHEN status = 1 THEN ''Current''
 		WHEN status = 2 THEN ''On Leave''
-		WHEN status = 3 THEN ''Quit'' 
-		WHEN status = 4 THEN ''Laid Off'' 
-		WHEN status = 5 THEN ''Terminated'' 
+		WHEN status = 3 THEN ''Quit''
+		WHEN status = 4 THEN ''Laid Off''
+		WHEN status = 5 THEN ''Terminated''
 		WHEN status = 6 THEN ''On Probation''
-		WHEN status = 7 THEN ''Deceased'' 
+		WHEN status = 7 THEN ''Deceased''
 		WHEN status = 8 THEN ''Retired''
 	END as employee_status,
 	addrs1 as address1,
@@ -281,7 +281,7 @@ SELECT
 	e.insdte as created_date,
 	e.upddte as last_updated_date,
 	0 as is_deleted,
-	null as deleted_date 
+	null as deleted_date
 FROM ',QUOTENAME(@Client_DB_Name),'.dbo.employ e
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.paypst p ON p.recnum = e.paypst
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.dptmnt d ON d.recnum = p.dptmnt')
@@ -317,7 +317,7 @@ CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Inventory'), '(
 EXECUTE sp_executesql @SqlCreateTableCommand
 
 SET @SqlInsertCommand = CONCAT(N'
-INSERT INTO ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Inventory'),' 
+INSERT INTO ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Inventory'),'
 
 SELECT
 	q.prtnum as part_number,
@@ -341,9 +341,9 @@ SELECT
 	0 as is_deleted,
 	null as deleted_date
 FROM ',QUOTENAME(@Client_DB_Name),'.dbo.invqty q
-LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.invloc l on l.recnum = q.locnum 
+LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.invloc l on l.recnum = q.locnum
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.tkfprt p on p.recnum = q.prtnum
-LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.invloc dl on dl.recnum = p.dftloc 
+LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.invloc dl on dl.recnum = p.dftloc
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.cstcde cd on cd.recnum = p.cstcde
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.csttyp ct on ct.recnum = p.csttyp
 ')
@@ -382,8 +382,8 @@ CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Job_Cost'), '(
 	supervisor NVARCHAR(100),
 	salesperson_id BIGINT,
 	salesperson NVARCHAR(100),
-	estimator_id BIGINT,	
-	estimator NVARCHAR(100), 
+	estimator_id BIGINT,
+	estimator NVARCHAR(100),
 	created_date DATETIME,
 	last_updated_date DATETIME,
 	is_deleted BIT DEFAULT 0,
@@ -393,13 +393,13 @@ CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Job_Cost'), '(
 EXECUTE sp_executesql @SqlCreateTableCommand
 
 SET @SqlInsertCommand = CONCAT(N'
-INSERT INTO ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Job_Cost'),' 
+INSERT INTO ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Job_Cost'),'
 
-SELECT 
+SELECT
 	j.recnum as job_cost_id,
 	j.jobnum as job_number,
 	ar.jobnme as job_name,
-	CASE ar.status 
+	CASE ar.status
 		WHEN 1 THEN ''Bid''
 		WHEN 2 THEN ''Refused''
 		WHEN 3 THEN ''Contract''
@@ -418,25 +418,25 @@ SELECT
 	ct.typnme as cost_type,
 	ISNULL(csthrs,0) as cost_in_hours,
 	ISNULL(cstamt,0) as cost_amount,
-	CASE 
+	CASE
 		WHEN ct.typnme = ''Material'' THEN ISNULL(cstamt,0)
-		ELSE 0 
+		ELSE 0
 	END as material_cost,
-	CASE 
+	CASE
 		WHEN ct.typnme = ''Labor'' THEN ISNULL(cstamt,0)
-		ELSE 0 
+		ELSE 0
 	END as labor_cost,
-	CASE 
+	CASE
 		WHEN ct.typnme = ''Equipment'' THEN ISNULL(cstamt,0)
-		ELSE 0 
+		ELSE 0
 	END as equipment_cost,
-	CASE 
+	CASE
 		WHEN ct.typnme = ''Other'' THEN ISNULL(cstamt,0)
-		ELSE 0 
+		ELSE 0
 	END as other_cost,
-	CASE 
+	CASE
 		WHEN ct.typnme = ''Subcontract'' THEN ISNULL(cstamt,0)
-		ELSE 0 
+		ELSE 0
 	END as subcontract_cost,
 	ISNULL(j.blgqty,0) as billing_quantity,
 	ISNULL(j.blgamt,0) as billing_amount,
@@ -461,7 +461,7 @@ LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.source s on s.recnum = j.srcnum
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.cstcde cd on cd.recnum = j.cstcde
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.actpay v on v.recnum = j.vndnum
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.actrec ar on ar.recnum = j.jobnum
-LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.employ es on es.recnum = ar.sprvsr 
+LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.employ es on es.recnum = ar.sprvsr
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.employ e on e.recnum = ar.slsemp
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),N'.dbo.employ est on est.recnum = ar.estemp')
 
@@ -540,9 +540,9 @@ DECLARE @SqlInsertCommand1 NVARCHAR(MAX)
 DECLARE @SqlInsertCommand2 NVARCHAR(MAX)
 DECLARE @SqlInsertCommand3 NVARCHAR(MAX)
 SET @SqlInsertCommand1 = CONCAT(N'
-INSERT INTO ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Ledger_Accounts'),' 
+INSERT INTO ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Ledger_Accounts'),'
 
-SELECT 
+SELECT
 	a.recnum as ledger_account_id,
 	a.lngnme as ledger_account,
 	CASE a.subact
@@ -554,7 +554,7 @@ SELECT
 	pa.lngnme as summary_account,
 	ct.typnme as cost_type,
 	a.endbal as ending_balance,
-	CASE a.acttyp 
+	CASE a.acttyp
 		WHEN 1 THEN ''Cash Accounts''
 		WHEN 2 THEN ''Current Assets''
 		WHEN 3 THEN ''WIP Assets''
@@ -630,14 +630,14 @@ SELECT
 	a.insdte as created_date,
 	a.upddte as last_updated_date,
 	0 as is_deleted,
-	null as deleted_date	
-FROM ',QUOTENAME(@Client_DB_Name),'.dbo.lgract a 
+	null as deleted_date
+FROM ',QUOTENAME(@Client_DB_Name),'.dbo.lgract a
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.lgract pa on pa.recnum = a.sumact
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),N'.dbo.csttyp ct on ct.recnum = a.csttyp
 ')
 SET @SqlInsertCommand2 = CONCAT(N'
 LEFT JOIN (
-	SELECT 
+	SELECT
 		lgract,
 		SUM(ISNULL(CY_PD1_Balance,0)) as CY_PD1_Balance,
 		SUM(ISNULL(CY_PD2_Balance,0)) as CY_PD2_Balance,
@@ -687,9 +687,9 @@ LEFT JOIN (
 		SUM(ISNULL(PY_PD10_Budget,0)) as PY_PD10_Budget,
 		SUM(ISNULL(PY_PD11_Budget,0)) as PY_PD11_Budget,
 		SUM(ISNULL(PY_PD12_Budget,0)) as PY_PD12_Budget
-	FROM 
+	FROM
 	(
-		SELECT 
+		SELECT
 			lgract,
 			SUM(CASE WHEN current_year = 1 AND actprd = 1 THEN balnce ELSE 0 END) as CY_PD1_Balance,
 			SUM(CASE WHEN current_year = 1 AND actprd = 2 THEN balnce ELSE 0 END) as CY_PD2_Balance,
@@ -741,10 +741,10 @@ LEFT JOIN (
 			SUM(CASE WHEN current_year = 0 AND actprd = 12 THEN budget ELSE 0 END) as PY_PD12_Budget
 		FROM
 		(
-			SELECT 
+			SELECT
 				lgract, actprd,	balnce,	budget,
 				CASE WHEN postyr = DATEPART(YEAR,GETDATE()) THEN 1 ELSE 0 END as current_year
-			FROM ',QUOTENAME(@Client_DB_Name),'.dbo.lgrbal 
+			FROM ',QUOTENAME(@Client_DB_Name),'.dbo.lgrbal
 			WHERE DATEPART(YEAR,DATEADD(YEAR,-1,GETDATE())) <= postyr
 		) q1
 		GROUP BY lgract, current_year, actprd
@@ -792,7 +792,7 @@ CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Purchase_Orders'), '(
 EXECUTE sp_executesql @SqlCreateTableCommand
 
 SET @SqlInsertCommand = CONCAT(N'
-INSERT INTO ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Purchase_Orders'),' 
+INSERT INTO ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Purchase_Orders'),'
 
 SELECT
 	p.recnum as purchase_order_id,
@@ -869,7 +869,7 @@ CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Vendor_Contacts'), '(
 EXECUTE sp_executesql @SqlCreateTableCommand
 
 SET @SqlInsertCommand = CONCAT(N'
-INSERT INTO ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Vendor_Contacts'),' 
+INSERT INTO ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Vendor_Contacts'),'
 
 SELECT
 	CONCAT(act.recnum,''-'',c.linnum) as vendor_contact_id,
@@ -894,7 +894,7 @@ SELECT
 	c.upddte as last_updated_date,
 	0 as is_deleted,
 	null as deleted_date
-FROM ',QUOTENAME(@Client_DB_Name),'.dbo.actpay AS act 
+FROM ',QUOTENAME(@Client_DB_Name),'.dbo.actpay AS act
 INNER JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.vndcnt AS c ON act.recnum = c.recnum
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.cstcde cst on cst.recnum = act.cdedft
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.csttyp ct on ct.recnum = act.typdft
@@ -906,7 +906,7 @@ EXECUTE sp_executesql @SqlInsertCommand
 
 SET @SqlCreateTableCommand = CONCAT(N'
 CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Jobs'), '(
-	job_number BIGINT,	
+	job_number BIGINT,
 	job_name NVARCHAR(75),
 	job_status NVARCHAR(8),
 	job_status_number INT,
@@ -921,7 +921,7 @@ CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Jobs'), '(
 	supervisor NVARCHAR(100),
 	salesperson_id BIGINT,
 	salesperson NVARCHAR(100),
-	estimator_id BIGINT,	
+	estimator_id BIGINT,
 	estimator NVARCHAR(100),
 	contact NVARCHAR(50),
 	address1 NVARCHAR(50),
@@ -949,20 +949,20 @@ CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Jobs'), '(
 	invoice_net_due DECIMAL(14,2) DEFAULT 0,
 	invoice_balance DECIMAL(14,2) DEFAULT 0,
 	last_payment_received_date DATE,
-	takeoff_ext_cost_excl_labor DECIMAL(14,2) DEFAULT 0, 
-	takeoff_sales_tax_excl_labor DECIMAL(14,2) DEFAULT 0, 
-	takeoff_overhead_amount_excl_labor DECIMAL(14,2) DEFAULT 0, 
-	takeoff_profit_amount_excl_labor DECIMAL(14,2) DEFAULT 0, 
+	takeoff_ext_cost_excl_labor DECIMAL(14,2) DEFAULT 0,
+	takeoff_sales_tax_excl_labor DECIMAL(14,2) DEFAULT 0,
+	takeoff_overhead_amount_excl_labor DECIMAL(14,2) DEFAULT 0,
+	takeoff_profit_amount_excl_labor DECIMAL(14,2) DEFAULT 0,
 	takeoff_ext_price_excl_labor DECIMAL(14,2) DEFAULT 0,
-	takeoff_ext_cost DECIMAL(14,2) DEFAULT 0, 
-	takeoff_sales_tax DECIMAL(14,2) DEFAULT 0, 
-	takeoff_overhead_amount DECIMAL(14,2) DEFAULT 0, 
-	takeoff_profit_amount DECIMAL(14,2) DEFAULT 0, 
+	takeoff_ext_cost DECIMAL(14,2) DEFAULT 0,
+	takeoff_sales_tax DECIMAL(14,2) DEFAULT 0,
+	takeoff_overhead_amount DECIMAL(14,2) DEFAULT 0,
+	takeoff_profit_amount DECIMAL(14,2) DEFAULT 0,
 	takeoff_ext_price DECIMAL(14,2) DEFAULT 0,
 	first_date_worked DATE,
 	last_date_worked DATE,
-	invoice_billed DECIMAL(14,2), 
-	job_number_job_name NVARCHAR(100), 
+	invoice_billed DECIMAL(14,2),
+	job_number_job_name NVARCHAR(100),
 	total_contract_amount DECIMAL(14,2),
 	original_budget_amount DECIMAL(14,2),
 	total_budget_amount DECIMAL(14,2),
@@ -977,10 +977,10 @@ EXECUTE sp_executesql @SqlCreateTableCommand
 
 --SQL data insertion Query
 SET @SqlInsertCommand1 = CONCAT(N'
-INSERT INTO ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Jobs'), ' 
+INSERT INTO ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Jobs'), '
 
 SELECT
-	a.recnum as job_number,	
+	a.recnum as job_number,
 	a.jobnme as job_name,
 	CASE a.status
 		WHEN 1 THEN ''Bid''
@@ -1031,15 +1031,15 @@ SELECT
 	ISNULL(i.invnet,0) as invoice_net_due,
 	ISNULL(i.invbal,0) as invoice_balance,
 	i.chkdte as last_payment_received_date,
-	ISNULL(tkof.ext_cost_excl_labor,0) as takeoff_ext_cost_excl_labor, 
-	ISNULL(tkof.sales_tax_excl_labor,0) as takeoff_sales_tax_excl_labor, 
-	ISNULL(tkof.overhead_amount_excl_labor,0) as takeoff_overhead_amount_excl_labor, 
-	ISNULL(tkof.profit_amount_excl_labor,0) as takeoff_profit_amount_excl_labor, 
+	ISNULL(tkof.ext_cost_excl_labor,0) as takeoff_ext_cost_excl_labor,
+	ISNULL(tkof.sales_tax_excl_labor,0) as takeoff_sales_tax_excl_labor,
+	ISNULL(tkof.overhead_amount_excl_labor,0) as takeoff_overhead_amount_excl_labor,
+	ISNULL(tkof.profit_amount_excl_labor,0) as takeoff_profit_amount_excl_labor,
 	ISNULL(tkof.ext_price_excl_labor,0) as takeoff_ext_price_excl_labor,
-	ISNULL(tkof.ext_cost,0) as takeoff_ext_cost, 
-	ISNULL(tkof.sales_tax,0) as takeoff_sales_tax, 
-	ISNULL(tkof.overhead_amount,0) as takeoff_overhead_amount, 
-	ISNULL(tkof.profit_amount,0) as takeoff_profit_amount, 
+	ISNULL(tkof.ext_cost,0) as takeoff_ext_cost,
+	ISNULL(tkof.sales_tax,0) as takeoff_sales_tax,
+	ISNULL(tkof.overhead_amount,0) as takeoff_overhead_amount,
+	ISNULL(tkof.profit_amount,0) as takeoff_profit_amount,
 	ISNULL(tkof.ext_price,0) as takeoff_ext_price,
 	tc.first_date_worked,
 	tc.last_date_worked,
@@ -1052,13 +1052,13 @@ SELECT
 	a.insdte as created_date,
 	a.upddte as last_updated_date,
 	0 as is_deleted,
-	null as deleted_date 
+	null as deleted_date
 ')
 SET @SqlInsertCommand2 = CONCAT(N'
 FROM ',QUOTENAME(@Client_DB_Name),'.dbo.actrec a
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.jobtyp j on j.recnum = a.jobtyp
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.reccln r on r.recnum = a.clnnum
-LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.employ es on es.recnum = a.sprvsr 
+LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.employ es on es.recnum = a.sprvsr
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.employ e on e.recnum = a.slsemp
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),N'.dbo.employ est on est.recnum = a.estemp
 LEFT JOIN (
@@ -1080,27 +1080,27 @@ LEFT JOIN (
 	SELECT
 		recnum,
 		phnnum
-	FROM ',QUOTENAME(@Client_DB_Name),N'.dbo.jobcnt 
+	FROM ',QUOTENAME(@Client_DB_Name),N'.dbo.jobcnt
 	WHERE linnum = 1
 ) jctct on jctct.recnum = a.recnum
 LEFT JOIN (
 	SELECT
 		jobnum,
-		SUM(CASE 
-			WHEN ct.typnme = ''Material'' THEN cstamt 
-			ELSE 0 
+		SUM(CASE
+			WHEN ct.typnme = ''Material'' THEN cstamt
+			ELSE 0
 		END) as material_cost,
-		SUM(CASE 
-			WHEN ct.typnme = ''Labor'' THEN cstamt 
-			ELSE 0 
+		SUM(CASE
+			WHEN ct.typnme = ''Labor'' THEN cstamt
+			ELSE 0
 		END) as labor_cost,
-		SUM(CASE 
-			WHEN ct.typnme = ''Equipment'' THEN cstamt 
-			ELSE 0 
+		SUM(CASE
+			WHEN ct.typnme = ''Equipment'' THEN cstamt
+			ELSE 0
 		END) as equipment_cost,
-		SUM(CASE 
-			WHEN ct.typnme = ''Other'' THEN cstamt 
-			ELSE 0 
+		SUM(CASE
+			WHEN ct.typnme = ''Other'' THEN cstamt
+			ELSE 0
 		END) as other_cost,
 		SUM(jcst.ovhamt) as overhead_amount
 	FROM ',QUOTENAME(@Client_DB_Name),'.dbo.jobcst jcst
@@ -1109,7 +1109,7 @@ LEFT JOIN (
 	GROUP BY jobnum
 ) jc on jc.jobnum = a.recnum
 LEFT JOIN (
-	SELECT 
+	SELECT
 		jobnum,
 		SUM(acrinv.invttl) as invttl,
 		SUM(acrinv.amtpad) as amtpad,
@@ -1126,22 +1126,22 @@ LEFT JOIN (
 		FROM ',QUOTENAME(@Client_DB_Name),'.dbo.acrpmt
 		GROUP BY recnum
 	) payments on payments.recnum = acrinv.recnum
-	WHERE 
+	WHERE
 		invtyp = 1
 		AND status != 5
 	GROUP BY jobnum
 ) as i on a.recnum = i.jobnum
 ')
 SET @SqlInsertCommand3 = CONCAT(N'
-LEFT JOIN 
+LEFT JOIN
 (
-	SELECT 
-		jobnum, 
-		SUM(appamt) as appamt, 
+	SELECT
+		jobnum,
+		SUM(appamt) as appamt,
 		SUM(approved_budget) as approved_budget
 	FROM
-	(	
-		SELECT 
+	(
+		SELECT
 			p.jobnum,
 			SUM(p.appamt) as appamt,
 			CASE p.status WHEN 1 THEN SUM(ISNULL(l.bdgprc,0)) ELSE 0 END as approved_budget
@@ -1151,42 +1151,42 @@ LEFT JOIN
 			SELECT recnum, SUM(bdgprc) as bdgprc
 			FROM ',QUOTENAME(@Client_DB_Name),'.dbo.sbcgln
 			GROUP BY recnum
-		) l on l.recnum = p.recnum 
+		) l on l.recnum = p.recnum
 		WHERE
 			p.status < 5
 		GROUP BY p.jobnum, p.status
 	) changes
 	GROUP BY jobnum
 ) co on co.jobnum = a.recnum
-LEFT JOIN 
+LEFT JOIN
 (SELECT
 	recnum,
-	SUM(ext_cost) as ext_cost, 
-	SUM(sales_tax) as sales_tax, 
-	SUM(overhead_amount) as overhead_amount, 
-	SUM(profit_amount) as profit_amount, 
+	SUM(ext_cost) as ext_cost,
+	SUM(sales_tax) as sales_tax,
+	SUM(overhead_amount) as overhead_amount,
+	SUM(profit_amount) as profit_amount,
 	SUM(ext_price) as ext_price,
-	SUM(ext_cost_excl_labor) as ext_cost_excl_labor, 
-	SUM(sales_tax_excl_labor) as sales_tax_excl_labor, 
-	SUM(overhead_amount_excl_labor) as overhead_amount_excl_labor, 
-	SUM(profit_amount_excl_labor) as profit_amount_excl_labor, 
+	SUM(ext_cost_excl_labor) as ext_cost_excl_labor,
+	SUM(sales_tax_excl_labor) as sales_tax_excl_labor,
+	SUM(overhead_amount_excl_labor) as overhead_amount_excl_labor,
+	SUM(profit_amount_excl_labor) as profit_amount_excl_labor,
 	SUM(ext_price_excl_labor) as ext_price_excl_labor
 FROM (
-	SELECT 
+	SELECT
 		recnum,
 		prtdsc,
-		SUM(extttl) as ext_cost, 
-		SUM(slstax) as sales_tax, 
-		SUM(ovhamt) as overhead_amount, 
-		SUM(pftamt) as profit_amount, 
+		SUM(extttl) as ext_cost,
+		SUM(slstax) as sales_tax,
+		SUM(ovhamt) as overhead_amount,
+		SUM(pftamt) as profit_amount,
 		SUM(bidprc) as ext_price,
-		CASE WHEN prtdsc NOT LIKE ''%labor%'' THEN SUM(extttl) ELSE 0 END as ext_cost_excl_labor, 
-		CASE WHEN prtdsc NOT LIKE ''%labor%'' THEN SUM(slstax) ELSE 0 END as sales_tax_excl_labor, 
-		CASE WHEN prtdsc NOT LIKE ''%labor%'' THEN SUM(ovhamt) ELSE 0 END as overhead_amount_excl_labor, 
-		CASE WHEN prtdsc NOT LIKE ''%labor%'' THEN SUM(pftamt) ELSE 0 END as profit_amount_excl_labor, 
-		CASE WHEN prtdsc NOT LIKE ''%labor%'' THEN SUM(bidprc) ELSE 0 END as ext_price_excl_labor 
+		CASE WHEN prtdsc NOT LIKE ''%labor%'' THEN SUM(extttl) ELSE 0 END as ext_cost_excl_labor,
+		CASE WHEN prtdsc NOT LIKE ''%labor%'' THEN SUM(slstax) ELSE 0 END as sales_tax_excl_labor,
+		CASE WHEN prtdsc NOT LIKE ''%labor%'' THEN SUM(ovhamt) ELSE 0 END as overhead_amount_excl_labor,
+		CASE WHEN prtdsc NOT LIKE ''%labor%'' THEN SUM(pftamt) ELSE 0 END as profit_amount_excl_labor,
+		CASE WHEN prtdsc NOT LIKE ''%labor%'' THEN SUM(bidprc) ELSE 0 END as ext_price_excl_labor
 
-	FROM ',QUOTENAME(@Client_DB_Name),'.dbo.tkflin 
+	FROM ',QUOTENAME(@Client_DB_Name),'.dbo.tkflin
 	GROUP BY recnum, prtdsc
 ) tkof2
 GROUP BY recnum
@@ -1207,7 +1207,7 @@ EXECUTE sp_executesql @SqlInsertCommand
 
 SET @SqlCreateTableCommand = CONCAT(N'
 CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Job_Cost_Waterfall'), '(
-	job_number BIGINT,	
+	job_number BIGINT,
 	waterfall_category NVARCHAR(50),
 	waterfall_value DECIMAL(14,2)
 )')
@@ -1217,17 +1217,17 @@ EXECUTE sp_executesql @SqlCreateTableCommand
 DECLARE @SQLinsertWFtable NVARCHAR(MAX);
 SET @SQLinsertWFtable = CONCAT(N'
 DECLARE @wf_table TABLE (
-	job_number BIGINT, contract_amount DECIMAL(14,2), 
-	invoice_total DECIMAL(14,2), invoice_amount_paid DECIMAL(14,2), 
+	job_number BIGINT, contract_amount DECIMAL(14,2),
+	invoice_total DECIMAL(14,2), invoice_amount_paid DECIMAL(14,2),
 	invoice_sales_tax DECIMAL(14,2),material_cost DECIMAL(14,2),
 	labor_cost DECIMAL(14,2), equipment_cost DECIMAL(14,2),
 	other_cost DECIMAL(14,2), overhead_cost DECIMAL(14,2),
 	approved_amount DECIMAL(14,2)
 );
 
-INSERT INTO @wf_table 
+INSERT INTO @wf_table
 SELECT
-	a.recnum as job_number,	
+	a.recnum as job_number,
 	ISNULL(a.cntrct,0) as contract_amount,
 	ISNULL(i.invttl,0) as invoice_total,
 	ISNULL(i.amtpad,0) as invoice_amount_paid,
@@ -1242,21 +1242,21 @@ FROM ',QUOTENAME(@Client_DB_Name),'.dbo.actrec a
 LEFT JOIN (
 	SELECT
 		jobnum,
-		SUM(CASE 
-			WHEN ct.typnme = ''Material'' THEN cstamt 
-			ELSE 0 
+		SUM(CASE
+			WHEN ct.typnme = ''Material'' THEN cstamt
+			ELSE 0
 		END) as material_cost,
-		SUM(CASE 
-			WHEN ct.typnme = ''Labor'' THEN cstamt 
-			ELSE 0 
+		SUM(CASE
+			WHEN ct.typnme = ''Labor'' THEN cstamt
+			ELSE 0
 		END) as labor_cost,
-		SUM(CASE 
-			WHEN ct.typnme = ''Equipment'' THEN cstamt 
-			ELSE 0 
+		SUM(CASE
+			WHEN ct.typnme = ''Equipment'' THEN cstamt
+			ELSE 0
 		END) as equipment_cost,
-		SUM(CASE 
-			WHEN ct.typnme = ''Other'' THEN cstamt 
-			ELSE 0 
+		SUM(CASE
+			WHEN ct.typnme = ''Other'' THEN cstamt
+			ELSE 0
 		END) as other_cost,
 		SUM(jcst.ovhamt) as overhead_amount
 	FROM ',QUOTENAME(@Client_DB_Name),'.dbo.jobcst jcst
@@ -1265,93 +1265,93 @@ LEFT JOIN (
 	GROUP BY jobnum
 ) jc on jc.jobnum = a.recnum
 INNER JOIN (
-	SELECT 
+	SELECT
 		jobnum,
 		SUM(invttl) as invttl,
 		SUM(amtpad) as amtpad,
 		SUM(slstax) as slstax
-	FROM ',QUOTENAME(@Client_DB_Name),'.dbo.acrinv 
-	WHERE 
+	FROM ',QUOTENAME(@Client_DB_Name),'.dbo.acrinv
+	WHERE
 		invtyp = 1
 		AND status != 5
 		GROUP BY jobnum
 ) as i on a.recnum = i.jobnum
-LEFT JOIN 
-(SELECT 
+LEFT JOIN
+(SELECT
 	jobnum,
 	SUM(appamt) as appamt,
 	sum(ovhamt) as ovhamt
-FROM ',QUOTENAME(@Client_DB_Name),'.dbo.prmchg 
+FROM ',QUOTENAME(@Client_DB_Name),'.dbo.prmchg
 WHERE status < 5
 GROUP BY jobnum) c on c.jobnum = a.recnum
 
-INSERT INTO ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Job_Cost_Waterfall'), ' 
+INSERT INTO ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Job_Cost_Waterfall'), '
 
 SELECT
 	job_number,
 	waterfall_category,
-	waterfall_value 
+	waterfall_value
 FROM (
-	SELECT 
+	SELECT
 		job_number,
 		''Contract Amount'' as waterfall_category,
 		contract_amount as waterfall_value
 	FROM @wf_table
-	UNION ALL 
-	SELECT 
+	UNION ALL
+	SELECT
 		job_number,
 		''Invoice Total'' as waterfall_category,
 		invoice_total as waterfall_value
 	FROM @wf_table
 	UNION ALL
-	SELECT 
+	SELECT
 		job_number,
 		''Invoice Amount Paid'' as waterfall_category,
 		invoice_amount_paid as waterfall_value
 	FROM @wf_table
 	UNION ALL
-	SELECT 
+	SELECT
 		job_number,
 		''Invoice Sales Tax'' as waterfall_category,
 		invoice_sales_tax as waterfall_value
 	FROM @wf_table
 	UNION ALL
-	SELECT 
+	SELECT
 		job_number,
 		''Material Cost'' as waterfall_category,
 		material_cost as waterfall_value
 	FROM @wf_table
 	UNION ALL
-	SELECT 
+	SELECT
 		job_number,
 		''Labor Cost'' as waterfall_category,
 		labor_cost as waterfall_value
 	FROM @wf_table
 	UNION ALL
-	SELECT 
+	SELECT
 		job_number,
 		''Equipment Cost'' as waterfall_category,
 		equipment_cost as waterfall_value
 	FROM @wf_table
 	UNION ALL
-	SELECT 
+	SELECT
 		job_number,
 		''Other Cost'' as waterfall_category,
 		other_cost as waterfall_value
 	FROM @wf_table
 	UNION ALL
-	SELECT 
+	SELECT
 		job_number,
 		''Overhead Cost'' as waterfall_category,
 		overhead_cost as waterfall_value
 	FROM @wf_table
 	UNION ALL
-	SELECT 
+	SELECT
 		job_number,
 		''Approved Amount'' as waterfall_category,
 		approved_amount as waterfall_value
 	FROM @wf_table
-) wf 
+) wf
 WHERE waterfall_value < 0 OR waterfall_value > 0
 ')
 
@@ -1390,9 +1390,9 @@ CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Ledger_Transaction_Lines'),
 EXECUTE sp_executesql @SqlCreateTableCommand
 
 SET @SqlInsertCommand = CONCAT(N'
-INSERT INTO ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Ledger_Transaction_Lines'), ' 
+INSERT INTO ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Ledger_Transaction_Lines'), '
 
-SELECT 
+SELECT
 	ltl.dscrpt ledger_transaction_description,
 	ltl.lgract ledger_account_id,
 	la.lngnme ledger_account_name,
@@ -1421,20 +1421,20 @@ FROM ',QUOTENAME(@Client_DB_Name),'.dbo.lgrtrn lt
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.lgtnln ltl on lt.recnum = ltl.recnum
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.lgract la on la.recnum = ltl.lgract
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.actpay v on v.recnum = lt.vndnum
-LEFT JOIN 
+LEFT JOIN
 (
 	SELECT
 		vndnum,
 		SUM(cstamt) as cstamt
-	FROM ',QUOTENAME(@Client_DB_Name),'.dbo.jobcst 
+	FROM ',QUOTENAME(@Client_DB_Name),'.dbo.jobcst
 	GROUP BY vndnum
 ) jc on jc.vndnum = v.recnum
-LEFT JOIN 
+LEFT JOIN
 (
 	SELECT
 		vndnum,
 		SUM(cstamt) as cstamt
-	FROM ',QUOTENAME(@Client_DB_Name),'.dbo.eqpcst 
+	FROM ',QUOTENAME(@Client_DB_Name),'.dbo.eqpcst
 	GROUP BY vndnum
 ) ec on ec.vndnum = v.recnum
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.source s on s.recnum = lt.srcnum
@@ -1492,20 +1492,20 @@ CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Payroll_Records'), '(
 EXECUTE sp_executesql @SqlCreateTableCommand
 
 SET @SqlInsertCommand = CONCAT(N'
-INSERT INTO ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Payroll_Records'), ' 
+INSERT INTO ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Payroll_Records'), '
 
 SELECT
 	p.recnum as payroll_record_id,
 	p.empnum as employee_id,
 	CONCAT(e.fstnme, '' '', e.lstnme) as employee_full_name,
 	CASE e.status
-		WHEN 1 THEN ''Current'' 
+		WHEN 1 THEN ''Current''
 		WHEN 2 THEN ''On Leave''
-		WHEN 3 THEN ''Quit'' 
-		WHEN 4 THEN ''Laid Off'' 
-		WHEN 5 THEN ''Terminated'' 
+		WHEN 3 THEN ''Quit''
+		WHEN 4 THEN ''Laid Off''
+		WHEN 5 THEN ''Terminated''
 		WHEN 6 THEN ''On Probation''
-		WHEN 7 THEN ''Deceased'' 
+		WHEN 7 THEN ''Deceased''
 		WHEN 8 THEN ''Retired''
 	END as employee_status,
 	p.chknum as check_number,
@@ -1568,7 +1568,7 @@ LEFT JOIN (
 		SUM(CASE WHEN paytyp = 1 THEN hrswrk ELSE 0 END) as regular_hours,
 		SUM(CASE WHEN paytyp = 2 THEN hrswrk ELSE 0 END) as overtime_hours,
 		SUM(CASE WHEN paytyp = 3 THEN hrswrk ELSE 0 END) as premium_hours
-	FROM ',QUOTENAME(@Client_DB_Name),'.dbo.tmcdln 
+	FROM ',QUOTENAME(@Client_DB_Name),'.dbo.tmcdln
 	WHERE jobnum IS NOT NULL
 	GROUP BY recnum
 ) tc on tc.recnum = p.recnum
@@ -1592,7 +1592,7 @@ EXECUTE sp_executesql @SqlCreateTableCommand
 DECLARE @SQLinsertJobHistory NVARCHAR(MAX);
 SET @SQLinsertJobHistory = CONCAT(N'
 DECLARE @JobHistory TABLE (job_number BIGINT, version_date DATETIME, job_status_number INT, job_status NVARCHAR(8))
-INSERT INTO @JobHistory 
+INSERT INTO @JobHistory
 
 SELECT DISTINCT
 	coalesce(a.recnum,b.recnum) as job_number,
@@ -1608,7 +1608,7 @@ SELECT DISTINCT
 		ELSE ''Other''
 	END as job_status
 FROM (
-	SELECT 
+	SELECT
 		recnum,
 		status,
 		_Date,
@@ -1616,10 +1616,10 @@ FROM (
 	FROM ',QUOTENAME(@Client_DB_Name),N'.[dbo_Audit].[actrec]
 ) a
 RIGHT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.actrec b on a.recnum = b.recnum
-UNION ALL 
-SELECT job_number, version_date, job_status_number, job_status 
+UNION ALL
+SELECT job_number, version_date, job_status_number, job_status
 FROM (
-	SELECT 
+	SELECT
 		coalesce(a.recnum,b.recnum) as job_number,
 		b.insdte as version_date,
 		coalesce(a.status, b.status) as job_status_number,
@@ -1634,7 +1634,7 @@ FROM (
 		END as job_status,
 		ROW_NUMBER() OVER (PARTITION BY coalesce(a.recnum,b.recnum) ORDER BY coalesce(a.recnum,b.recnum), b.insdte, a.status) as row_num
 	FROM (
-		SELECT 
+		SELECT
 			recnum,
 			status,
 			_Date,
@@ -1642,13 +1642,13 @@ FROM (
 		FROM ',QUOTENAME(@Client_DB_Name),'.[dbo_Audit].[actrec]
 	) a
 	RIGHT JOIN ',QUOTENAME(@Client_DB_Name),N'.dbo.actrec b on a.recnum = b.recnum
-) q2 
+) q2
 WHERE row_num = 1
-UNION ALL 
+UNION ALL
 SELECT
 	recnum as job_number,
 	DATEADD(SECOND,1,upddte) as version_date,
-	status as job_status_number, 
+	status as job_status_number,
 	CASE status
 		WHEN 1 THEN ''Bid''
 		WHEN 2 THEN ''Refused''
@@ -1662,20 +1662,20 @@ FROM ',QUOTENAME(@Client_DB_Name),N'.dbo.actrec
 WHERE upddte IS NOT NULL
 
 DECLARE @JobHistory2 TABLE (id BIGINT, job_number BIGINT, version_date DATETIME, job_status_number INT, job_status NVARCHAR(8), can_be_removed BIT)
-INSERT INTO @JobHistory2 
-	
-SELECT 
+INSERT INTO @JobHistory2
+
+SELECT
 	ROW_NUMBER() OVER (PARTITION BY job_number ORDER BY job_number, version_date) as id,
 	job_number, version_date, job_status_number, job_status,
-	CASE WHEN 
-		LAG(job_status) OVER(PARTITION BY job_number ORDER BY job_number, version_date) = job_status AND 
+	CASE WHEN
+		LAG(job_status) OVER(PARTITION BY job_number ORDER BY job_number, version_date) = job_status AND
 		LEAD(job_status) OVER(PARTITION BY job_number ORDER BY job_number, version_date) = job_status
 	THEN 1
 	ELSE 0
 	END as can_be_removed
-FROM @JobHistory 
+FROM @JobHistory
 
-INSERT INTO ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Job_Status_History'), ' 
+INSERT INTO ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Job_Status_History'), '
 SELECT DISTINCT
 	job_number,
 	job_status_number,
@@ -1696,7 +1696,7 @@ FROM
 					AND UNBOUNDED FOLLOWING)) as last_version_date,
 		record_count = COUNT(*) OVER(PARTITION BY job_number ORDER BY job_number, version_date ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING),
 		ROW_NUMBER() OVER (PARTITION BY job_number ORDER BY job_number, version_date) as record_number
-	FROM @JobHistory2 
+	FROM @JobHistory2
 	WHERE version_date IS NOT NULL AND can_be_removed = 0
 ) q
 ')
@@ -1718,12 +1718,12 @@ DECLARE @DateVal DATETIME
 SET @DateVal = CAST(CAST(DATEPART(YEAR,GETDATE()) -1 as NVARCHAR) + ''-01-01'' as datetime)
 WHILE (@DateVal < GETDATE())
 BEGIN
-	INSERT INTO ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Jobs_Active_History'), ' 
-	SELECT @DateVal as job_active_date, job_number 
+	INSERT INTO ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Jobs_Active_History'), '
+	SELECT @DateVal as job_active_date, job_number
 	FROM ',@Reporting_DB_Name,'.dbo.Job_Status_History
-	WHERE 
+	WHERE
 		job_status_number BETWEEN 3 AND 5
-		AND valid_from_date < @DateVal 
+		AND valid_from_date < @DateVal
 		AND valid_to_date >= @DateVal
 	SET @DateVal = DATEADD(MONTH,1,@DateVal)
 END
@@ -1751,7 +1751,7 @@ DECLARE @SQLinsertChangeOrderHistory1 NVARCHAR(MAX);
 DECLARE @SQLinsertChangeOrderHistory2 NVARCHAR(MAX);
 SET @SQLinsertChangeOrderHistory1 = CONCAT(N'
 DECLARE @ChangeOrderHistory TABLE (record_number BIGINT, job_number BIGINT, version_date DATETIME, change_order_status_number INT, change_order_status NVARCHAR(8))
-INSERT INTO @ChangeOrderHistory 
+INSERT INTO @ChangeOrderHistory
 
 SELECT DISTINCT
 	coalesce(a.recnum,b.change_order_id) as record_number,
@@ -1768,7 +1768,7 @@ SELECT DISTINCT
 		ELSE ''Other''
 	END as change_order_status
 FROM (
-	SELECT 
+	SELECT
 		recnum,
 		status,
 		_Date,
@@ -1776,10 +1776,10 @@ FROM (
 	FROM ',QUOTENAME(@Client_DB_Name),N'.[dbo_Audit].[prmchg]
 ) a
 RIGHT JOIN ',@Reporting_DB_Name,'.dbo.Change_Orders b on a.recnum = b.change_order_id
-UNION ALL 
-SELECT record_number, job_number, version_date, change_order_status_number, change_order_status 
+UNION ALL
+SELECT record_number, job_number, version_date, change_order_status_number, change_order_status
 FROM (
-	SELECT 
+	SELECT
 		coalesce(a.recnum,b.change_order_id) as record_number,
 		coalesce(a.jobnum,b.job_number) as job_number,
 		b.created_date as version_date,
@@ -1795,7 +1795,7 @@ FROM (
 		END as change_order_status,
 		ROW_NUMBER() OVER (PARTITION BY coalesce(a.recnum,b.change_order_id) ORDER BY coalesce(a.recnum,b.change_order_id), b.created_date, coalesce(a.status, b.status_number)) as row_num
 	FROM (
-		SELECT 
+		SELECT
 			recnum,
 			status,
 			_Date,
@@ -1803,35 +1803,35 @@ FROM (
 		FROM ',QUOTENAME(@Client_DB_Name),'.[dbo_Audit].[prmchg]
 	) a
 	RIGHT JOIN ',@Reporting_DB_Name,'.dbo.Change_Orders b on a.recnum = b.change_order_id
-) q2 
+) q2
 WHERE row_num = 1
-UNION ALL 
+UNION ALL
 SELECT
 	change_order_id as record_number,
 	job_number,
 	DATEADD(SECOND,1,last_updated_date) as version_date,
-	status_number as change_order_status_number, 
+	status_number as change_order_status_number,
 	status as change_order_status
 FROM ',@Reporting_DB_Name,'.dbo.Change_Orders
 WHERE last_updated_date IS NOT NULL
 
 DECLARE @ChangeOrderHistory2 TABLE (id BIGINT, record_number BIGINT, job_number BIGINT, version_date DATETIME, change_order_status_number INT, change_order_status NVARCHAR(8), can_be_removed BIT)
-INSERT INTO @ChangeOrderHistory2 
-	
-SELECT 
+INSERT INTO @ChangeOrderHistory2
+
+SELECT
 	ROW_NUMBER() OVER (PARTITION BY record_number ORDER BY record_number, version_date) as id,
 	record_number, job_number, version_date, change_order_status_number, change_order_status,
-	CASE WHEN 
-		LAG(change_order_status) OVER(PARTITION BY record_number ORDER BY record_number, version_date) = change_order_status AND 
+	CASE WHEN
+		LAG(change_order_status) OVER(PARTITION BY record_number ORDER BY record_number, version_date) = change_order_status AND
 		LEAD(change_order_status) OVER(PARTITION BY record_number ORDER BY record_number, version_date) = change_order_status
 	THEN 1
 	ELSE 0
 	END as can_be_removed
-FROM @ChangeOrderHistory 
+FROM @ChangeOrderHistory
 
 ')
 SET @SQLinsertChangeOrderHistory2 = CONCAT(N'
-INSERT INTO ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Change_Order_History'), ' 
+INSERT INTO ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Change_Order_History'), '
 
 SELECT DISTINCT
 	record_number,
@@ -1855,7 +1855,7 @@ FROM
 					AND UNBOUNDED FOLLOWING)) as last_version_date,
 		record_count = COUNT(*) OVER(PARTITION BY record_number ORDER BY record_number, version_date ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING),
 		ROW_NUMBER() OVER (PARTITION BY record_number ORDER BY record_number, version_date) as record_row_number
-	FROM @ChangeOrderHistory2 
+	FROM @ChangeOrderHistory2
 	WHERE version_date IS NOT NULL AND can_be_removed = 0
 ) q
 ')
@@ -1881,12 +1881,12 @@ DECLARE @DateVal DATETIME
 SET @DateVal = CAST(CAST(DATEPART(YEAR,GETDATE()) -1 as NVARCHAR) + ''-01-01'' as datetime)
 WHILE (@DateVal < GETDATE())
 BEGIN
-	INSERT INTO ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Change_Order_Open_History'), ' 
-	SELECT @DateVal as change_order_open_date, record_number, job_number 
+	INSERT INTO ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Change_Order_Open_History'), '
+	SELECT @DateVal as change_order_open_date, record_number, job_number
 	FROM ',@Reporting_DB_Name,'.dbo.Change_Order_History
-	WHERE 
+	WHERE
 		change_order_status_number BETWEEN 2 AND 4
-		AND valid_from_date < @DateVal 
+		AND valid_from_date < @DateVal
 		AND valid_to_date >= @DateVal
 	SET @DateVal = DATEADD(MONTH,1,@DateVal)
 END
@@ -1934,7 +1934,7 @@ EXECUTE sp_executesql @SqlCreateTableCommand
 
 --SQL data insertion Query
 SET @SqlInsertCommand = CONCAT(N'
-INSERT INTO ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Purchase_Order_Lines'),' 
+INSERT INTO ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Purchase_Order_Lines'),'
 
 SELECT
 	p.recnum as purchase_order_id,
@@ -1980,7 +1980,7 @@ LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.vndtyp vt on vt.recnum = a.vndtyp
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.eqpmnt e on e.recnum = p.eqpmnt
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.pchtyp pt on pt.recnum = p.ordtyp
 LEFT JOIN (
-	SELECT 
+	SELECT
 	pl.recnum,
 	pl.linnum,
 	cstcde,
@@ -1990,11 +1990,11 @@ LEFT JOIN (
 	SUM(linprc) as price,
 	SUM(linqty) as quantity,
 	SUM(rcvdte) as received_to_date,
-	SUM(cancel) as canceled 
+	SUM(cancel) as canceled
 	FROM ',QUOTENAME(@Client_DB_Name),'.dbo.pcorln pl
 	LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.csttyp c on c.recnum = pl.csttyp
 	GROUP BY pl.recnum, pl.linnum, cstcde, typnme
-) l on l.recnum = p.recnum 
+) l on l.recnum = p.recnum
 ')
 
 EXECUTE sp_executesql @SqlInsertCommand
@@ -2035,9 +2035,9 @@ EXECUTE sp_executesql @SqlCreateTableCommand
 
 --SQL data insertion Query
 SET @SqlInsertCommand = CONCAT(N'
-INSERT INTO ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Change_Order_Lines'),' 
+INSERT INTO ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Change_Order_Lines'),'
 
-SELECT 
+SELECT
 	c.recnum as change_order_id,
 	c.chgnum as change_order_number,
 	c.chgdte as change_order_date,
@@ -2061,7 +2061,7 @@ SELECT
 	invdte as invoice_date,
 	c.pchord as purchase_order_number,
 	cl.cstcde as cost_code,
-	cd.cdenme as cost_code_name,	
+	cd.cdenme as cost_code_name,
 	cst.typnme as cost_type,
 	CASE c.status WHEN 1 THEN SUM(ISNULL(cl.bdgprc,0)) ELSE 0 END as approved_change_amount,
 	SUM(ISNULL(cl.bdgprc,0)) as change_amount,
@@ -2116,7 +2116,7 @@ EXECUTE sp_executesql @SqlCreateTableCommand
 
 --SQL data insertion Query
 SET @SqlInsertCommand = CONCAT(N'
-INSERT INTO ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Subcontract_Lines'),' 
+INSERT INTO ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Subcontract_Lines'),'
 
 SELECT
 	p.recnum as subcontract_id,
@@ -2154,7 +2154,7 @@ FROM ',QUOTENAME(@Client_DB_Name),'.dbo.subcon p
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.actpay a on a.recnum = p.vndnum
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.vndtyp vt on vt.recnum = a.vndtyp
 LEFT JOIN (
-	SELECT 
+	SELECT
 	s.recnum,
 	cstcde,
 	typnme,
@@ -2183,7 +2183,7 @@ EXECUTE sp_executesql @SqlCreateTableCommand
 
 --SQL data insertion Query
 SET @SqlInsertCommand = CONCAT(N'
-INSERT INTO ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Job_Budget_Lines'),' 
+INSERT INTO ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Job_Budget_Lines'),'
 
 SELECT
 	b.recnum as job_number,
@@ -2345,7 +2345,7 @@ EXECUTE sp_executesql @SqlCreateTableCommand
 
 --SQL data insertion Query
 SET @SqlInsertCommand = CONCAT(N'
-INSERT INTO ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Timecards'),' 
+INSERT INTO ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Timecards'),'
 
 SELECT
 	t.recnum as payroll_record_id,
@@ -2353,13 +2353,13 @@ SELECT
 	p.empnum as employee_id,
 	CONCAT(e.fstnme, '' '', e.lstnme) as employee_full_name,
 	CASE e.status
-		WHEN 1 THEN ''Current'' 
+		WHEN 1 THEN ''Current''
 		WHEN 2 THEN ''On Leave''
 		WHEN 3 THEN ''Quit''
 		WHEN 4 THEN ''Laid Off''
 		WHEN 5 THEN ''Terminated''
 		WHEN 6 THEN ''On Probation''
-		WHEN 7 THEN ''Deceased'' 
+		WHEN 7 THEN ''Deceased''
 		WHEN 8 THEN ''Retired''
 	END as employee_status,
 	p.chknum as check_number,
@@ -2393,7 +2393,7 @@ SELECT
 	t.cstcde as cost_code_number,
 	cc.cdenme as cost_code_name,
 	t.paytyp as pay_type_number,
-	CASE t.paytyp 
+	CASE t.paytyp
 		WHEN 1 THEN ''Regular''
 		WHEN 2 THEN ''Overtime''
 		WHEN 3 THEN ''Premium''
@@ -2409,7 +2409,7 @@ SELECT
 	pg.grpnme as pay_group_name,
 	t.payrte as pay_rate,
 	t.hrswrk as hours_worked,
-	t.cmpcde as comp_code,	
+	t.cmpcde as comp_code,
 	w.cdenme as workers_compensation_name,
 	t.dptmnt as department_id,
 	d.dptnme as department_name,
@@ -2433,7 +2433,7 @@ LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.dptmnt d on d.recnum = t.dptmnt
 EXECUTE sp_executesql @SqlInsertCommand
 
 SET @SqlCreateTableCommand = CONCAT(N'
-SELECT * INTO ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Weekly_Snapshot_Jobs'),'  
+SELECT * INTO ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Weekly_Snapshot_Jobs'),'
 FROM ',@Reporting_DB_Name,'.dbo.Jobs;
 DELETE FROM ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Weekly_Snapshot_Jobs'),';
 ALTER TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Weekly_Snapshot_Jobs'),'
@@ -2443,7 +2443,7 @@ ADD snapshot_date DATETIME;
 EXECUTE sp_executesql @SqlCreateTableCommand
 
 SET @SqlCreateTableCommand = CONCAT(N'
-SELECT * INTO ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Weekly_Snapshot_AR_Invoices'),'  
+SELECT * INTO ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Weekly_Snapshot_AR_Invoices'),'
 FROM ',@Reporting_DB_Name,'.dbo.',QUOTENAME('AR_Invoices'),';
 DELETE FROM ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Weekly_Snapshot_AR_Invoices'),';
 ALTER TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Weekly_Snapshot_AR_Invoices'),'
@@ -2453,7 +2453,7 @@ ADD snapshot_date DATETIME;
 EXECUTE sp_executesql @SqlCreateTableCommand
 
 SET @SqlCreateTableCommand = CONCAT(N'
-SELECT * INTO ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Weekly_Snapshot_Job_Cost'),'  
+SELECT * INTO ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Weekly_Snapshot_Job_Cost'),'
 FROM ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Job_Cost'),';
 DELETE FROM ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Weekly_Snapshot_Job_Cost'),';
 ALTER TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Weekly_Snapshot_Job_Cost'),'
@@ -2463,7 +2463,7 @@ ADD snapshot_date DATETIME;
 EXECUTE sp_executesql @SqlCreateTableCommand
 
 SET @SqlCreateTableCommand = CONCAT(N'
-SELECT * INTO ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Weekly_Snapshot_Change_Orders'),'  
+SELECT * INTO ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Weekly_Snapshot_Change_Orders'),'
 FROM ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Change_Orders'),';
 DELETE FROM ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Weekly_Snapshot_Change_Orders'),';
 ALTER TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Weekly_Snapshot_Change_Orders'),'
@@ -2473,7 +2473,7 @@ ADD snapshot_date DATETIME;
 EXECUTE sp_executesql @SqlCreateTableCommand
 
 SET @SqlCreateTableCommand = CONCAT(N'
-SELECT * INTO ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Monthly_Snapshot_Jobs'),'  
+SELECT * INTO ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Monthly_Snapshot_Jobs'),'
 FROM ',@Reporting_DB_Name,'.dbo.Jobs;
 DELETE FROM ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Monthly_Snapshot_Jobs'),';
 ALTER TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Monthly_Snapshot_Jobs'),'
@@ -2483,7 +2483,7 @@ ADD snapshot_date DATETIME;
 EXECUTE sp_executesql @SqlCreateTableCommand
 
 SET @SqlCreateTableCommand = CONCAT(N'
-SELECT * INTO ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Monthly_Snapshot_AR_Invoices'),'  
+SELECT * INTO ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Monthly_Snapshot_AR_Invoices'),'
 FROM ',@Reporting_DB_Name,'.dbo.',QUOTENAME('AR_Invoices'),';
 DELETE FROM ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Monthly_Snapshot_AR_Invoices'),';
 ALTER TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Monthly_Snapshot_AR_Invoices'),'
@@ -2493,7 +2493,7 @@ ADD snapshot_date DATETIME;
 EXECUTE sp_executesql @SqlCreateTableCommand
 
 SET @SqlCreateTableCommand = CONCAT(N'
-SELECT * INTO ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Monthly_Snapshot_Job_Cost'),'  
+SELECT * INTO ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Monthly_Snapshot_Job_Cost'),'
 FROM ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Job_Cost'),';
 DELETE FROM ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Monthly_Snapshot_Job_Cost'),';
 ALTER TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Monthly_Snapshot_Job_Cost'),'
@@ -2503,7 +2503,7 @@ ADD snapshot_date DATETIME;
 EXECUTE sp_executesql @SqlCreateTableCommand
 
 SET @SqlCreateTableCommand = CONCAT(N'
-SELECT * INTO ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Monthly_Snapshot_Change_Orders'),'  
+SELECT * INTO ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Monthly_Snapshot_Change_Orders'),'
 FROM ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Change_Orders'),';
 DELETE FROM ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Monthly_Snapshot_Change_Orders'),';
 ALTER TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Monthly_Snapshot_Change_Orders'),'
@@ -2512,31 +2512,25 @@ ADD snapshot_date DATETIME;
 
 EXECUTE sp_executesql @SqlCreateTableCommand
 
--- Create Version Table
+--Create Version Table
 SET @SqlCreateTableCommand = '
-        IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N''[dbo].[Version]'') AND type in (N''U''))
-            BEGIN
-                CREATE TABLE [Version] (
-                                           name NVARCHAR(10),
-                                           update_date DATETIME NOT NULL DEFAULT GETDATE(),
-                                           update_user CHAR(50) NOT NULL DEFAULT CURRENT_USER
-                );
-                INSERT [Version] (name)
-                VALUES (''1.0.1'');
-            END'
+CREATE TABLE [Version] (
+	name NVARCHAR(10),
+	update_date DATETIME NOT NULL DEFAULT GETDATE(),
+	update_user CHAR(50) NOT NULL DEFAULT CURRENT_USER
+);
+INSERT [Version] (name)
+VALUES (''1.0.0'');'
 
 EXECUTE sp_executesql @SqlCreateTableCommand
 
--- Create Update Log Table
+--Create Update Log Table
 SET @SqlCreateTableCommand = '
-        IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N''[dbo].[Update_Log]'') AND type in (N''U''))
-            BEGIN
-                CREATE TABLE [Update_Log] (
-                                              version_name NVARCHAR(10),
-                                              run_date DATETIME NOT NULL DEFAULT GETDATE(),
-                                              update_user CHAR(50) NOT NULL DEFAULT CURRENT_USER
-                );
-            END'
+CREATE TABLE [Update_Log] (
+	version_name NVARCHAR(10),
+	run_date DATETIME NOT NULL DEFAULT GETDATE(),
+	update_user CHAR(50) NOT NULL DEFAULT CURRENT_USER
+);'
 
 EXECUTE sp_executesql @SqlCreateTableCommand
 
@@ -2566,62 +2560,63 @@ EXECUTE sp_executesql @SqlCreateTableCommand
 
 --SQL data insertion Query
 SET @SqlInsertCommand = CONCAT(N'
-        INSERT INTO ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Ledger_Accounts_by_Month'),'
-        SELECT
-            a.recnum as ledger_account_id,
-            a.lngnme as ledger_account,
-            CASE a.subact
-                WHEN 0 THEN ''None''
-                WHEN 1 THEN ''Subaccounts''
-                WHEN 2 THEN ''Departments''
-                ELSE ''Other''
-                END as subsidiary_type,
-            pa.lngnme as summary_account,
-            ct.typnme as cost_type,
-            a.endbal as current_balance,
-            CASE a.acttyp
-                WHEN 1 THEN ''Cash Accounts''
-                WHEN 2 THEN ''Current Assets''
-        WHEN 3 THEN ''WIP Assets''
-        WHEN 4 THEN ''Other Assets''
-        WHEN 5 THEN ''Fixed Assets''
-        WHEN 6 THEN ''Depreciation''
-        WHEN 7 THEN ''Current Liabilities''
-        WHEN 8 THEN ''Long Term Liabilities''
-        WHEN 9 THEN ''Equity''
-        WHEN 11 THEN ''Operating Income''
-        WHEN 12 THEN ''Other Income''
-        WHEN 13 THEN ''Direct Expense''
-        WHEN 14 THEN ''Equip/Shop Expense''
-        WHEN 15 THEN ''Overhead Expense''
-        WHEN 16 THEN ''Administrative Expense''
-        WHEN 17 THEN ''After Tax Inc/Expense''
-        ELSE ''Other''
-        END as account_type,
-    CASE a.dbtcrd
-        WHEN 1 THEN ''Debit''
-        WHEN 2 THEN ''Credit''
-        ELSE ''Other''
-        END as debit_or_credit,
-    a.ntetxt as notes,
-    q1.Account_Date as balance_budget_date,
-    SUM(q1.balnce) as balance,
-    SUM(q1.budget) as budget,
-    a.insdte as created_date,
-    a.upddte as last_updated_date,
-    0 as is_deleted,
-    null as deleted_date
-FROM ',QUOTENAME(@Client_DB_Name),'.dbo.lgract a 
-LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.lgract pa on pa.recnum = a.sumact
-LEFT JOIN ',QUOTENAME(@Client_DB_Name),N'.dbo.csttyp ct on ct.recnum = a.csttyp
-LEFT JOIN
-(
-    SELECT 
-        lgract, actprd, balnce, budget,
-        DATEADD(day,-1,DATEFROMPARTS(CASE WHEN actprd=12 THEN postyr + 1 ELSE postyr END, CASE WHEN actprd=12 THEN 1 ELSE actprd + 1 END, 1)) as Account_Date
-    FROM ',QUOTENAME(@Client_DB_Name),'.dbo.lgrbal 
-    WHERE DATEPART(YEAR,DATEADD(YEAR,-4,GETDATE())) <= postyr
-) q1 on q1.lgract = a.recnum
-GROUP BY a.recnum, a.lngnme, a.subact, pa.lngnme, ct.typnme, a.endbal, a.acttyp, a.dbtcrd, a.ntetxt, q1.Account_Date, a.insdte, a.upddte')
+INSERT INTO ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Ledger_Accounts_by_Month'),'
+
+SELECT
+		a.recnum as ledger_account_id,
+		a.lngnme as ledger_account,
+		CASE a.subact
+			WHEN 0 THEN ''None''
+			WHEN 1 THEN ''Subaccounts''
+			WHEN 2 THEN ''Departments''
+			ELSE ''Other''
+		END as subsidiary_type,
+		pa.lngnme as summary_account,
+		ct.typnme as cost_type,
+		a.endbal as current_balance,
+		CASE a.acttyp
+			WHEN 1 THEN ''Cash Accounts''
+			WHEN 2 THEN ''Current Assets''
+			WHEN 3 THEN ''WIP Assets''
+			WHEN 4 THEN ''Other Assets''
+			WHEN 5 THEN ''Fixed Assets''
+			WHEN 6 THEN ''Depreciation''
+			WHEN 7 THEN ''Current Liabilities''
+			WHEN 8 THEN ''Long Term Liabilities''
+			WHEN 9 THEN ''Equity''
+			WHEN 11 THEN ''Operating Income''
+			WHEN 12 THEN ''Other Income''
+			WHEN 13 THEN ''Direct Expense''
+			WHEN 14 THEN ''Equip/Shop Expense''
+			WHEN 15 THEN ''Overhead Expense''
+			WHEN 16 THEN ''Administrative Expense''
+			WHEN 17 THEN ''After Tax Inc/Expense''
+			ELSE ''Other''
+		END as account_type,
+		CASE a.dbtcrd
+			WHEN 1 THEN ''Debit''
+			WHEN 2 THEN ''Credit''
+			ELSE ''Other''
+		END as debit_or_credit,
+		a.ntetxt as notes,
+		q1.Account_Date as balance_budget_date,
+		SUM(q1.balnce) as balance,
+		SUM(q1.budget) as budget,
+		a.insdte as created_date,
+		a.upddte as last_updated_date,
+		0 as is_deleted,
+		null as deleted_date
+	FROM ',QUOTENAME(@Client_DB_Name),'.dbo.lgract a
+	LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.lgract pa on pa.recnum = a.sumact
+	LEFT JOIN ',QUOTENAME(@Client_DB_Name),N'.dbo.csttyp ct on ct.recnum = a.csttyp
+	LEFT JOIN
+	(
+		SELECT
+			lgract, actprd,	balnce,	budget,
+			DATEADD(day,-1,DATEFROMPARTS(CASE WHEN actprd=12 THEN postyr + 1 ELSE postyr END, CASE WHEN actprd=12 THEN 1 ELSE actprd + 1 END, 1)) as Account_Date
+		FROM ',QUOTENAME(@Client_DB_Name),'.dbo.lgrbal
+		WHERE DATEPART(YEAR,DATEADD(YEAR,-4,GETDATE())) <= postyr
+	) q1 on q1.lgract = a.recnum
+	GROUP BY a.recnum, a.lngnme, a.subact, pa.lngnme, ct.typnme, a.endbal, a.acttyp, a.dbtcrd, a.ntetxt, q1.Account_Date, a.insdte, a.upddte ')
 
 EXECUTE sp_executesql @SqlInsertCommand
