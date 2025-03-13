@@ -2513,24 +2513,24 @@ ADD snapshot_date DATETIME;
 EXECUTE sp_executesql @SqlCreateTableCommand
 
 --Create Version Table
-SET @SqlCreateTableCommand = '
-CREATE TABLE [Version] (
+SET @SqlCreateTableCommand = CONCAT(N'
+CREATE TABLE ',@Reporting_DB_Name,'.dbo.[Version] (
 	name NVARCHAR(10),
 	update_date DATETIME NOT NULL DEFAULT GETDATE(),
 	update_user CHAR(50) NOT NULL DEFAULT CURRENT_USER
 );
 INSERT [Version] (name)
-VALUES (''1.0.0'');'
+VALUES (''1.0.1'');')
 
 EXECUTE sp_executesql @SqlCreateTableCommand
 
 --Create Update Log Table
-SET @SqlCreateTableCommand = '
-CREATE TABLE [Update_Log] (
+SET @SqlCreateTableCommand = CONCAT(N'
+CREATE TABLE ',@Reporting_DB_Name,'.dbo.[Update_Log] (
 	version_name NVARCHAR(10),
 	run_date DATETIME NOT NULL DEFAULT GETDATE(),
 	update_user CHAR(50) NOT NULL DEFAULT CURRENT_USER
-);'
+);')
 
 EXECUTE sp_executesql @SqlCreateTableCommand
 
