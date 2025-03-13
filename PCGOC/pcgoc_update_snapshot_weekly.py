@@ -3,7 +3,7 @@ import subprocess
 
 # Customer-specific variables We escape commas with carets (^) to avoid splitting the string and we escape spaces with tildes (`) to avoid splitting the string
 CUSTOMER_NAME = "PCGOC"
-CUSTOMER_DB_NAMES = ["Nathan~Munn", "PCGAZLLC", "PCG-CA", "RMB~Properties^~LLC", "MTM`Builders~LLC"]  # Now an array
+CUSTOMER_DB_NAMES = ["Nathan~Munn", "PCGAZLLC", "PCG-CA", "RMB~Properties^~LLC", "MTM~Builders~LLC"]  # Now an array
 SQL_SERVER = "pcgoc.servernova.net"
 SQL_INSTANCE = "SNLV-20178"
 SQL_PORT = "50055"
