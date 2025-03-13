@@ -8,129 +8,129 @@ DECLARE @Reporting_DB_Name NVARCHAR(50) = QUOTENAME(CONCAT(@Client_DB_Name, ' Re
 --Sql Create Table Command
 DECLARE @SqlCreateTableCommand NVARCHAR(MAX);
 SET @SqlCreateTableCommand = CONCAT(N'
-CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('AR_Invoices'), '(
-	job_number BIGINT,
-	job_name NVARCHAR(75),
-	job_phone_number NVARCHAR(14),
-	job_notes NVARCHAR(MAX),
-	job_address1 NVARCHAR(50),
-	job_address2 NVARCHAR(50),
-	job_city NVARCHAR(50),
-	job_state NVARCHAR(2),
-	job_zip_code NVARCHAR(10),
-	job_tax_district NVARCHAR(50),
-	job_type NVARCHAR(50),
-	job_status NVARCHAR(10),
-	ar_invoice_id BIGINT,
-	ar_invoice_date DATE,
-	ar_invoice_description NVARCHAR(50),
-	ar_invoice_number NVARCHAR(20),
-	ar_invoice_status NVARCHAR(8),
-	ar_invoice_tax_district NVARCHAR(50),
-	tax_entity1 NVARCHAR(50),
-	tax_entity1_rate DECIMAL(8,4),
-	tax_entity2 NVARCHAR(50),
-	tax_entity2_rate DECIMAL(8,4),
-	ar_invoice_due_date DATE,
-	ar_invoice_total DECIMAL(12,2),
-	ar_invoice_sales_tax DECIMAL(12,2),
-	ar_invoice_amount_paid DECIMAL(12,2),
-	ar_invoice_balance DECIMAL(14,2),
-	ar_invoice_retention DECIMAL(14,2),
-	ar_invoice_type NVARCHAR(8),
-	client_name NVARCHAR(75),
-	job_supervisor NVARCHAR(50),
-	job_salesperson NVARCHAR(50),
-	ar_invoice_payments_payment_amount DECIMAL(14,2),
-	ar_invoice_payments_discount_taken DECIMAL(14,2),
-	ar_invoice_payments_credit_taken DECIMAL(14,2),
-	last_payment_received_date DATE,
-	last_date_worked DATE,
-	created_date DATETIME,
-	last_updated_date DATETIME,
-	is_deleted BIT DEFAULT 0,
-	deleted_date DATETIME
-)')
+        CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('AR_Invoices'), '(
+                                                                                 job_number BIGINT,
+                                                                                 job_name NVARCHAR(75),
+            job_phone_number NVARCHAR(14),
+            job_notes NVARCHAR(MAX),
+            job_address1 NVARCHAR(50),
+            job_address2 NVARCHAR(50),
+            job_city NVARCHAR(50),
+            job_state NVARCHAR(2),
+            job_zip_code NVARCHAR(10),
+            job_tax_district NVARCHAR(50),
+            job_type NVARCHAR(50),
+            job_status NVARCHAR(10),
+            ar_invoice_id BIGINT,
+            ar_invoice_date DATE,
+            ar_invoice_description NVARCHAR(50),
+            ar_invoice_number NVARCHAR(20),
+            ar_invoice_status NVARCHAR(8),
+            ar_invoice_tax_district NVARCHAR(50),
+            tax_entity1 NVARCHAR(50),
+            tax_entity1_rate DECIMAL(8,4),
+            tax_entity2 NVARCHAR(50),
+            tax_entity2_rate DECIMAL(8,4),
+            ar_invoice_due_date DATE,
+            ar_invoice_total DECIMAL(12,2),
+            ar_invoice_sales_tax DECIMAL(12,2),
+            ar_invoice_amount_paid DECIMAL(12,2),
+            ar_invoice_balance DECIMAL(14,2),
+            ar_invoice_retention DECIMAL(14,2),
+            ar_invoice_type NVARCHAR(8),
+            client_name NVARCHAR(75),
+            job_supervisor NVARCHAR(50),
+            job_salesperson NVARCHAR(50),
+            ar_invoice_payments_payment_amount DECIMAL(14,2),
+            ar_invoice_payments_discount_taken DECIMAL(14,2),
+            ar_invoice_payments_credit_taken DECIMAL(14,2),
+            last_payment_received_date DATE,
+            last_date_worked DATE,
+            created_date DATETIME,
+            last_updated_date DATETIME,
+            is_deleted BIT DEFAULT 0,
+            deleted_date DATETIME
+            )')
 
 EXECUTE sp_executesql @SqlCreateTableCommand
 
 --SQL data insertion Query
 DECLARE @SqlInsertCommand NVARCHAR(MAX);
 SET @SqlInsertCommand = CONCAT(N'
-INSERT INTO ',@Reporting_DB_Name,'.dbo.',QUOTENAME('AR_Invoices'),' 
+        INSERT INTO ',@Reporting_DB_Name,'.dbo.',QUOTENAME('AR_Invoices'),'
 
-SELECT 
-	a.recnum as job_number,
-	a.jobnme as job_name,
-	a.phnnum as job_phone_number,
-	a.ntetxt as job_notes,
-	a.addrs1 as job_address1,
-	a.addrs2 as job_address2,
-	a.ctynme as job_city,
-	a.state_ as job_state,
-	a.zipcde as job_zip_code,
-	j_t.dstnme as job_tax_district,
-	jt.typnme as job_type,
-	CASE a.status 
-		WHEN 1 THEN ''Bid''
-		WHEN 2 THEN ''Refused''
-		WHEN 3 THEN ''Contract''
-		WHEN 4 THEN ''Current''
-		WHEN 5 THEN ''Complete''
-		WHEN 6 THEN ''Closed''
-		ELSE ''Other''
-	END as job_status,
-	acrinv.recnum as ar_invoice_id,
-	acrinv.invdte as ar_invoice_date,
-	acrinv.dscrpt as ar_invoice_description,
-	acrinv.invnum as ar_invoice_number,
-	CASE acrinv.status 
-		WHEN 1 THEN ''Open''
-		WHEN 2 THEN ''Review''
-		WHEN 3 THEN ''Dispute''
-		WHEN 4 THEN ''Paid''
-		WHEN 5 THEN ''Void''
-		ELSE ''Other''
-	END as ar_invoice_status,
-	tax.dstnme as ar_invoice_tax_district,
-	te.entnme as tax_entity1,
-	te.taxrt1 as tax_entity1_rate,
-	te2.entnme as tax_entity2,
-	te2.taxrt1 as tax_entity2_rate,
-	acrinv.duedte as ar_invoice_due_date,
-	ISNULL(acrinv.invttl,0) as ar_invoice_total,
-	ISNULL(acrinv.slstax,0) as ar_invoice_sales_tax,
-	ISNULL(acrinv.amtpad,0) as ar_invoice_amount_paid,
-	ISNULL(acrinv.invbal,0) as ar_invoice_balance,
-	ISNULL(acrinv.retain,0) as ar_invoice_retention,
-	CASE acrinv.invtyp 
-		WHEN 1 THEN ''Contract''
-		WHEN 2 THEN ''Memo''
-		ELSE ''Other''
-	END as ar_invoice_type,
-	r.clnnme as client_name,
-	CONCAT(es.fstnme, '' '', es.lstnme) as job_supervisor,
-	CONCAT(e.fstnme, '' '', e.lstnme) as job_salesperson,
-	ISNULL(pmt.amount,0) as ar_invoice_payments_payment_amount,
-	ISNULL(pmt.dsctkn,0) as ar_invoice_payments_discount_taken,
-	ISNULL(pmt.aplcrd,0) as ar_invoice_payments_credit_taken,
-	pmt.chkdte as last_payment_received_date,
-	tc.last_date_worked,
-	acrinv.insdte as created_date,
-	acrinv.upddte as last_updated_date,
-	0 as is_deleted,
-	null as deleted_date
+        SELECT
+            a.recnum as job_number,
+            a.jobnme as job_name,
+            a.phnnum as job_phone_number,
+            a.ntetxt as job_notes,
+            a.addrs1 as job_address1,
+            a.addrs2 as job_address2,
+            a.ctynme as job_city,
+            a.state_ as job_state,
+            a.zipcde as job_zip_code,
+            j_t.dstnme as job_tax_district,
+            jt.typnme as job_type,
+            CASE a.status
+                WHEN 1 THEN ''Bid''
+                WHEN 2 THEN ''Refused''
+                WHEN 3 THEN ''Contract''
+                WHEN 4 THEN ''Current''
+        WHEN 5 THEN ''Complete''
+        WHEN 6 THEN ''Closed''
+        ELSE ''Other''
+        END as job_status,
+    acrinv.recnum as ar_invoice_id,
+    acrinv.invdte as ar_invoice_date,
+    acrinv.dscrpt as ar_invoice_description,
+    acrinv.invnum as ar_invoice_number,
+    CASE acrinv.status 
+        WHEN 1 THEN ''Open''
+            WHEN 2 THEN ''Review''
+        WHEN 3 THEN ''Dispute''
+        WHEN 4 THEN ''Paid''
+        WHEN 5 THEN ''Void''
+        ELSE ''Other''
+        END as ar_invoice_status,
+    tax.dstnme as ar_invoice_tax_district,
+    te.entnme as tax_entity1,
+    te.taxrt1 as tax_entity1_rate,
+    te2.entnme as tax_entity2,
+    te2.taxrt1 as tax_entity2_rate,
+    acrinv.duedte as ar_invoice_due_date,
+    ISNULL(acrinv.invttl,0) as ar_invoice_total,
+    ISNULL(acrinv.slstax,0) as ar_invoice_sales_tax,
+    ISNULL(acrinv.amtpad,0) as ar_invoice_amount_paid,
+    ISNULL(acrinv.invbal,0) as ar_invoice_balance,
+    ISNULL(acrinv.retain,0) as ar_invoice_retention,
+    CASE acrinv.invtyp 
+        WHEN 1 THEN ''Contract''
+        WHEN 2 THEN ''Memo''
+        ELSE ''Other''
+        END as ar_invoice_type,
+    r.clnnme as client_name,
+    CONCAT(es.fstnme, '' '', es.lstnme) as job_supervisor,
+    CONCAT(e.fstnme, '' '', e.lstnme) as job_salesperson,
+    ISNULL(pmt.amount,0) as ar_invoice_payments_payment_amount,
+    ISNULL(pmt.dsctkn,0) as ar_invoice_payments_discount_taken,
+    ISNULL(pmt.aplcrd,0) as ar_invoice_payments_credit_taken,
+    pmt.chkdte as last_payment_received_date,
+    tc.last_date_worked,
+    acrinv.insdte as created_date,
+    acrinv.upddte as last_updated_date,
+    0 as is_deleted,
+    null as deleted_date
 FROM ',QUOTENAME(@Client_DB_Name),'.dbo.actrec a
 INNER JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.acrinv acrinv on acrinv.jobnum = a.recnum
 LEFT JOIN (
-	SELECT
-		recnum,
-		sum(amount) as amount,
-		sum(dsctkn) as dsctkn,
-		sum(aplcrd) as aplcrd,
-		max(chkdte) as chkdte
-	FROM ',QUOTENAME(@Client_DB_Name),'.dbo.acrpmt
-	GROUP BY recnum
+    SELECT
+        recnum,
+        sum(amount) as amount,
+        sum(dsctkn) as dsctkn,
+        sum(aplcrd) as aplcrd,
+        max(chkdte) as chkdte
+    FROM ',QUOTENAME(@Client_DB_Name),'.dbo.acrpmt
+    GROUP BY recnum
 ) pmt on pmt.recnum = acrinv.recnum
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.taxdst tax on tax.recnum = acrinv.taxdst
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.taxdst j_t on j_t.recnum = a.slstax
@@ -141,11 +141,11 @@ LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.taxent te2 on te2.recnum = tax.entt
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.employ es on es.recnum = a.sprvsr 
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.employ e on e.recnum = a.slsemp
 LEFT JOIN (
-	SELECT
-		MAX(dtewrk) last_date_worked,
-		jobnum
-	FROM ',QUOTENAME(@Client_DB_Name),'.dbo.tmcdln
-	GROUP BY jobnum
+    SELECT
+        MAX(dtewrk) last_date_worked,
+        jobnum
+    FROM ',QUOTENAME(@Client_DB_Name),'.dbo.tmcdln
+    GROUP BY jobnum
 ) tc on tc.jobnum = a.recnum
 ')
 
@@ -2512,25 +2512,31 @@ ADD snapshot_date DATETIME;
 
 EXECUTE sp_executesql @SqlCreateTableCommand
 
---Create Version Table
+-- Create Version Table
 SET @SqlCreateTableCommand = '
-CREATE TABLE [Version] (
-	name NVARCHAR(10),
-	update_date DATETIME NOT NULL DEFAULT GETDATE(),
-	update_user CHAR(50) NOT NULL DEFAULT CURRENT_USER
-);
-INSERT [Version] (name)
-VALUES (''1.0.0'');'
+        IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N''[dbo].[Version]'') AND type in (N''U''))
+            BEGIN
+                CREATE TABLE [Version] (
+                                           name NVARCHAR(10),
+                                           update_date DATETIME NOT NULL DEFAULT GETDATE(),
+                                           update_user CHAR(50) NOT NULL DEFAULT CURRENT_USER
+                );
+                INSERT [Version] (name)
+                VALUES (''1.0.1'');
+            END'
 
 EXECUTE sp_executesql @SqlCreateTableCommand
 
---Create Update Log Table
+-- Create Update Log Table
 SET @SqlCreateTableCommand = '
-CREATE TABLE [Update_Log] (
-	version_name NVARCHAR(10),
-	run_date DATETIME NOT NULL DEFAULT GETDATE(),
-	update_user CHAR(50) NOT NULL DEFAULT CURRENT_USER 
-);'
+        IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N''[dbo].[Update_Log]'') AND type in (N''U''))
+            BEGIN
+                CREATE TABLE [Update_Log] (
+                                              version_name NVARCHAR(10),
+                                              run_date DATETIME NOT NULL DEFAULT GETDATE(),
+                                              update_user CHAR(50) NOT NULL DEFAULT CURRENT_USER
+                );
+            END'
 
 EXECUTE sp_executesql @SqlCreateTableCommand
 
@@ -2560,63 +2566,62 @@ EXECUTE sp_executesql @SqlCreateTableCommand
 
 --SQL data insertion Query
 SET @SqlInsertCommand = CONCAT(N'
-INSERT INTO ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Ledger_Accounts_by_Month'),' 
-
-SELECT 
-		a.recnum as ledger_account_id,
-		a.lngnme as ledger_account,
-		CASE a.subact
-			WHEN 0 THEN ''None''
-			WHEN 1 THEN ''Subaccounts''
-			WHEN 2 THEN ''Departments''
-			ELSE ''Other''
-		END as subsidiary_type,
-		pa.lngnme as summary_account,
-		ct.typnme as cost_type,
-		a.endbal as current_balance,
-		CASE a.acttyp 
-			WHEN 1 THEN ''Cash Accounts''
-			WHEN 2 THEN ''Current Assets''
-			WHEN 3 THEN ''WIP Assets''
-			WHEN 4 THEN ''Other Assets''
-			WHEN 5 THEN ''Fixed Assets''
-			WHEN 6 THEN ''Depreciation''
-			WHEN 7 THEN ''Current Liabilities''
-			WHEN 8 THEN ''Long Term Liabilities''
-			WHEN 9 THEN ''Equity''
-			WHEN 11 THEN ''Operating Income''
-			WHEN 12 THEN ''Other Income''
-			WHEN 13 THEN ''Direct Expense''
-			WHEN 14 THEN ''Equip/Shop Expense''
-			WHEN 15 THEN ''Overhead Expense''
-			WHEN 16 THEN ''Administrative Expense''
-			WHEN 17 THEN ''After Tax Inc/Expense''
-			ELSE ''Other''
-		END as account_type,
-		CASE a.dbtcrd
-			WHEN 1 THEN ''Debit''
-			WHEN 2 THEN ''Credit''
-			ELSE ''Other''
-		END as debit_or_credit,
-		a.ntetxt as notes,
-		q1.Account_Date as balance_budget_date,
-		SUM(q1.balnce) as balance,
-		SUM(q1.budget) as budget,
-		a.insdte as created_date,
-		a.upddte as last_updated_date,
-		0 as is_deleted,
-		null as deleted_date
-	FROM ',QUOTENAME(@Client_DB_Name),'.dbo.lgract a 
-	LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.lgract pa on pa.recnum = a.sumact
-	LEFT JOIN ',QUOTENAME(@Client_DB_Name),N'.dbo.csttyp ct on ct.recnum = a.csttyp
-	LEFT JOIN
-	(
-		SELECT 
-			lgract, actprd,	balnce,	budget,
-			DATEADD(day,-1,DATEFROMPARTS(CASE WHEN actprd=12 THEN postyr + 1 ELSE postyr END, CASE WHEN actprd=12 THEN 1 ELSE actprd + 1 END, 1)) as Account_Date
-		FROM ',QUOTENAME(@Client_DB_Name),'.dbo.lgrbal 
-		WHERE DATEPART(YEAR,DATEADD(YEAR,-4,GETDATE())) <= postyr
-	) q1 on q1.lgract = a.recnum
-	GROUP BY a.recnum, a.lngnme, a.subact, pa.lngnme, ct.typnme, a.endbal, a.acttyp, a.dbtcrd, a.ntetxt, q1.Account_Date, a.insdte, a.upddte ')
+        INSERT INTO ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Ledger_Accounts_by_Month'),'
+        SELECT
+            a.recnum as ledger_account_id,
+            a.lngnme as ledger_account,
+            CASE a.subact
+                WHEN 0 THEN ''None''
+                WHEN 1 THEN ''Subaccounts''
+                WHEN 2 THEN ''Departments''
+                ELSE ''Other''
+                END as subsidiary_type,
+            pa.lngnme as summary_account,
+            ct.typnme as cost_type,
+            a.endbal as current_balance,
+            CASE a.acttyp
+                WHEN 1 THEN ''Cash Accounts''
+                WHEN 2 THEN ''Current Assets''
+        WHEN 3 THEN ''WIP Assets''
+        WHEN 4 THEN ''Other Assets''
+        WHEN 5 THEN ''Fixed Assets''
+        WHEN 6 THEN ''Depreciation''
+        WHEN 7 THEN ''Current Liabilities''
+        WHEN 8 THEN ''Long Term Liabilities''
+        WHEN 9 THEN ''Equity''
+        WHEN 11 THEN ''Operating Income''
+        WHEN 12 THEN ''Other Income''
+        WHEN 13 THEN ''Direct Expense''
+        WHEN 14 THEN ''Equip/Shop Expense''
+        WHEN 15 THEN ''Overhead Expense''
+        WHEN 16 THEN ''Administrative Expense''
+        WHEN 17 THEN ''After Tax Inc/Expense''
+        ELSE ''Other''
+        END as account_type,
+    CASE a.dbtcrd
+        WHEN 1 THEN ''Debit''
+        WHEN 2 THEN ''Credit''
+        ELSE ''Other''
+        END as debit_or_credit,
+    a.ntetxt as notes,
+    q1.Account_Date as balance_budget_date,
+    CAST(SUM(q1.balnce) AS DECIMAL(18,2)) as balance,
+    CAST(SUM(q1.budget) AS DECIMAL(18,2)) as budget,
+    a.insdte as created_date,
+    a.upddte as last_updated_date,
+    0 as is_deleted,
+    null as deleted_date
+FROM ',QUOTENAME(@Client_DB_Name),'.dbo.lgract a 
+LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.lgract pa on pa.recnum = a.sumact
+LEFT JOIN ',QUOTENAME(@Client_DB_Name),N'.dbo.csttyp ct on ct.recnum = a.csttyp
+LEFT JOIN
+(
+    SELECT 
+        lgract, actprd, balnce, budget,
+        DATEADD(day,-1,DATEFROMPARTS(CASE WHEN actprd=12 THEN postyr + 1 ELSE postyr END, CASE WHEN actprd=12 THEN 1 ELSE actprd + 1 END, 1)) as Account_Date
+    FROM ',QUOTENAME(@Client_DB_Name),'.dbo.lgrbal 
+    WHERE DATEPART(YEAR,DATEADD(YEAR,-4,GETDATE())) <= postyr
+) q1 on q1.lgract = a.recnum
+GROUP BY a.recnum, a.lngnme, a.subact, pa.lngnme, ct.typnme, a.endbal, a.acttyp, a.dbtcrd, a.ntetxt, q1.Account_Date, a.insdte, a.upddte')
 
 EXECUTE sp_executesql @SqlInsertCommand
