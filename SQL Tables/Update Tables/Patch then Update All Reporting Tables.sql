@@ -1,4 +1,4 @@
---Version 1.0.0
+--Version 1.0.1
 USE [[CLIENT_DB_NAME] Reporting]
 GO
 --Specify Client DB Name
@@ -15,6 +15,7 @@ DECLARE @SqlDeleteCommand NVARCHAR(100);
 DECLARE @SqlPatchQuery NVARCHAR(MAX);
 DECLARE @SqlPatchQuery1 NVARCHAR(MAX);
 DECLARE @SqlPatchQuery2 NVARCHAR(MAX);
+DECLARE @DropConstraints NVARCHAR(MAX);
 DECLARE @TranName VARCHAR(20);
 DECLARE @ErrorMessage NVARCHAR(4000);  
 DECLARE @ErrorSeverity INT;  
@@ -52,156 +53,6 @@ BEGIN
 END'
 EXECUTE sp_executesql @SqlPatchQuery
 
---Create Updated vw_committed_costs
---Drop view if it exists then create it
-SET @SqlPatchQuery = N' 
-IF (SELECT [Name] FROM [Version]) = ''0.0.0'' 
-BEGIN
-	IF OBJECT_ID(''[vw_committed_costs]'',''V'') IS NOT NULL
-	BEGIN
-		DROP VIEW vw_committed_costs;
-	END
-END'
-EXECUTE sp_executesql @SqlPatchQuery
-
-SET @SqlPatchQuery1 = N' 
-DECLARE @NestedSql NVARCHAR(MAX);
-DECLARE @NestedSql1 NVARCHAR(MAX);
-DECLARE @NestedSql2 NVARCHAR(MAX);
-SET @NestedSQL1 = N''
-CREATE VIEW vw_committed_costs
-AS
-SELECT 
-	*, 
-	CASE 
-		WHEN "balance_remaining" < 0 THEN "revised_budget" - "balance_remaining" 
-		ELSE "revised_budget" 
-	END AS "projected_costs"
-FROM (
-	SELECT 
-		COALESCE("jbl_col_jc_po"."job_number","scl"."job_number") AS "job_number",
-		"jbl_col_jc_po"."cost_code_name",
-		COALESCE("jbl_col_jc_po"."cost_code","scl"."cost_code") AS "cost_code",
-		COALESCE("jbl_col_jc_po"."cost_type","scl"."cost_type") AS "cost_type",
-		MAX(ISNULL("jbl_col_jc_po"."budget",0)) AS "budget",
-		MAX(ISNULL("jbl_col_jc_po"."approved_change_amount",0)) AS "approved_change_amount",
-		MAX(ISNULL("jbl_col_jc_po"."revised_budget",0)) AS "revised_budget",
-		MAX(ISNULL("jbl_col_jc_po"."budget_hours",0)) AS "budget_hours",
-		MAX(ISNULL("jbl_col_jc_po"."approved_change_hours",0)) AS "approved_change_hours",
-		MAX(ISNULL("jbl_col_jc_po"."revised_budget_hours",0)) AS "revised_budget_hours",
-		MAX(ISNULL("jbl_col_jc_po"."job_cost_amount",0)) AS "job_cost_amount",
-		MAX(ISNULL("jbl_col_jc_po"."committed_po",0)) AS "committed_purchase_orders",
-		SUM(ISNULL("scl"."committed_amount",0)) as "committed_subcontracts",
-		MAX(ISNULL("jbl_col_jc_po"."revised_budget",0)) - 
-			MAX(ISNULL("jbl_col_jc_po"."job_cost_amount",0)) -
-			MAX(ISNULL("jbl_col_jc_po"."committed_po",0)) - 
-			SUM(ISNULL("scl"."committed_amount",0)) as "balance_remaining"
-	FROM (
-		SELECT 
-			MAX(ISNULL("jbl_col_jc"."approved_change_amount",0)) AS "approved_change_amount",
-			MAX(ISNULL("jbl_col_jc"."budget",0)) AS "budget",
-			MAX(ISNULL("jbl_col_jc"."revised_budget",0)) AS "revised_budget",
-			MAX(ISNULL("jbl_col_jc"."approved_change_hours",0)) AS "approved_change_hours",
-			MAX(ISNULL("jbl_col_jc"."budget_hours",0)) AS "budget_hours",
-			MAX(ISNULL("jbl_col_jc"."revised_budget_hours",0)) AS "revised_budget_hours",
-			"jbl_col_jc"."cost_code_name",
-			COALESCE("jbl_col_jc"."cost_code","pol"."cost_code") AS "cost_code",
-			COALESCE("jbl_col_jc"."cost_type","pol"."cost_type") AS "cost_type",
-			COALESCE("jbl_col_jc"."job_number","pol"."job_number") AS "job_number",
-			MAX(ISNULL("jbl_col_jc"."cost_amount",0)) AS "job_cost_amount",
-			SUM(ISNULL("pol"."committed_total",0)) AS "committed_po"
-		FROM (
-			SELECT
-				MAX(ISNULL("jbl_col"."approved_change_amount",0)) AS "approved_change_amount",
-				MAX(ISNULL("jbl_col"."budget",0)) AS "budget",
-				MAX(ISNULL("jbl_col"."revised_budget",0)) AS "revised_budget",
-				MAX(ISNULL("jbl_col"."approved_change_hours",0)) AS "approved_change_hours",
-				MAX(ISNULL("jbl_col"."budget_hours",0)) AS "budget_hours",
-				MAX(ISNULL("jbl_col"."revised_budget_hours",0)) AS "revised_budget_hours",
-				COALESCE("jbl_col"."cost_code_name","jc"."job_cost_code_name") AS "cost_code_name",
-				COALESCE("jbl_col"."cost_code","jc"."job_cost_code") AS "cost_code",
-				COALESCE("jbl_col"."cost_type","jc"."cost_type") AS "cost_type",
-				COALESCE("jbl_col"."job_number","jc"."job_number") AS "job_number",
-				SUM(ISNULL("jc"."cost_amount",0)) AS "cost_amount"
-			FROM
-			(
-				SELECT
-					COALESCE("jbl"."cost_code_name", "co"."cost_code_name") AS "cost_code_name",
-					COALESCE("jbl"."cost_code", "co"."cost_code") AS "cost_code",
-					COALESCE("jbl"."cost_type", "co"."cost_type") AS "cost_type",
-					COALESCE("co"."job_number","jbl"."job_number") AS "job_number",
-					MAX(ISNULL("jbl"."budget",0)) AS "budget",
-					MAX(ISNULL("jbl"."budget_hours",0)) AS "budget_hours",
-''
-SET @NestedSql2 = N''
-'
-SET @SqlPatchQuery2 = N'
-					SUM(ISNULL("co"."approved_change_amount",0)) AS "approved_change_amount",
-					SUM(ISNULL("co"."approved_change_hours",0)) AS "approved_change_hours",
-					MAX(ISNULL("jbl"."budget",0)) + SUM(ISNULL("co"."approved_change_amount",0)) as "revised_budget",
-					MAX(ISNULL("jbl"."budget_hours",0)) + SUM(ISNULL("co"."approved_change_hours",0)) as "revised_budget_hours"
-				FROM (
-					SELECT 
-						cost_code_name,
-						cost_code,
-						cost_type,
-						job_number,
-						sum(budget) as budget,
-						sum(budget_hours) as budget_hours
-					FROM "Job_Budget_Lines"
-					GROUP BY cost_code_name,
-						cost_code,
-						cost_type,
-						job_number
-					) as "jbl"
-				FULL JOIN "Change_Order_Lines" AS "co" ON 
-					"jbl"."job_number" = "co"."job_number" AND 
-					"jbl"."cost_code" = "co"."cost_code" AND
-					"jbl"."cost_type" = "co"."cost_type"
-				WHERE "co"."status" NOT IN (''''Rejected'''',''''Void'''')
-				GROUP BY COALESCE("jbl"."cost_code_name", "co"."cost_code_name"),
-					COALESCE("jbl"."cost_code", "co"."cost_code"),
-					COALESCE("jbl"."cost_type", "co"."cost_type"),
-					COALESCE("co"."job_number","jbl"."job_number")
-			) AS "jbl_col"
-			FULL JOIN "Job_Cost" AS "jc" ON 
-				"jbl_col"."job_number" = "jc"."job_number" AND
-				"jbl_col"."cost_code" = "jc"."job_cost_code" AND
-				"jbl_col"."cost_Type" = "jc"."cost_type"
-			GROUP BY COALESCE("jbl_col"."cost_code_name","jc"."job_cost_code_name"),
-				COALESCE("jbl_col"."cost_code","jc"."job_cost_code"),
-				COALESCE("jbl_col"."cost_type","jc"."cost_type"),
-				COALESCE("jbl_col"."job_number","jc"."job_number")
-		) AS "jbl_col_jc"
-		FULL JOIN "Purchase_Order_Lines" AS "pol" ON 
-			"jbl_col_jc"."job_number" = "pol"."job_number" AND
-			"jbl_col_jc"."cost_type" = "pol"."cost_type" AND
-			"jbl_col_jc"."cost_code" = "pol"."cost_code"
-		GROUP BY "jbl_col_jc"."cost_code_name",
-			COALESCE("jbl_col_jc"."cost_code","pol"."cost_code"),
-			COALESCE("jbl_col_jc"."cost_type","pol"."cost_type"),
-			COALESCE("jbl_col_jc"."job_number","pol"."job_number")
-	) AS "jbl_col_jc_po"
-	LEFT JOIN "Subcontract_Lines" AS "scl" ON 
-		"jbl_col_jc_po"."job_number" = "scl"."job_number" AND
-		"jbl_col_jc_po"."cost_code" = "scl"."cost_code" AND 
-		"jbl_col_jc_po"."cost_type" = "scl"."cost_type"
-	GROUP BY COALESCE("jbl_col_jc_po"."job_number","scl"."job_number"),
-		"jbl_col_jc_po"."cost_code_name",
-		COALESCE("jbl_col_jc_po"."cost_code","scl"."cost_code"),
-		COALESCE("jbl_col_jc_po"."cost_type","scl"."cost_type")
-) "source"	
-''
-SET @NestedSql = @NestedSQL1 + @NestedSQL2
-IF (SELECT [Name] FROM [Version]) = ''0.0.0'' 
-BEGIN
-SELECT @NestedSQL
--- EXECUTE sp_executesql @NestedSQL
-END
-'
-SET @SqlPatchQuery = @SqlPatchQuery1 + @SqlPatchQuery2
-EXECUTE sp_executesql @SqlPatchQuery
-
 --Wrap up Patch Run by updating version
 SET @SqlPatchQuery = N' 
 IF (SELECT [Name] FROM [Version]) = ''0.0.0'' 
@@ -210,6 +61,112 @@ BEGIN
 	SET name = ''1.0.0''
 END;'
 EXECUTE sp_executesql @SqlPatchQuery
+
+--Version 1.0.1 patch
+--Remove constraint on is_deleted if supervisor doesn't exist in Job Cost
+SET @DropConstraints = CONCAT(N'
+DECLARE @NestedSQL NVARCHAR(MAX);
+IF COL_LENGTH(''',@Reporting_DB_Name,N'.dbo.Job_Cost'', ''approved_change_hours'') IS NULL
+BEGIN
+	SELECT TOP 1 @NestedSQL = N''ALTER TABLE ',@Reporting_DB_Name,N'.dbo.[Job_Cost] drop constraint [''+dc.name+N'']''
+	FROM sys.default_constraints dc
+	JOIN sys.columns c ON c.default_object_id = dc.object_id
+	WHERE dc.parent_object_id = OBJECT_ID(''',@Reporting_DB_Name,N'.dbo.Job_Cost'') AND c.name = ''is_deleted''
+	EXECUTE sp_executesql @NestedSQL
+END
+')
+SELECT @TranName = 'Job Cost_Drop_Constraint_Is_Deleted';
+BEGIN TRY
+	BEGIN TRANSACTION @TranName;
+
+	EXECUTE sp_executesql @DropConstraints
+
+	COMMIT TRANSACTION @TranName
+END TRY
+BEGIN CATCH
+	IF @@TRANCOUNT > 0
+		ROLLBACK TRANSACTION @TranName
+	SELECT   
+	@ErrorMessage = ERROR_MESSAGE(),  
+	@ErrorSeverity = ERROR_SEVERITY(),  
+	@ErrorState = ERROR_STATE();  
+	RAISERROR (@ErrorMessage, @ErrorSeverity, @ErrorState); 
+END CATCH
+
+
+--Insert supervisor/estimator/salesperson into Job Cost.  
+--Also places it 5th/6th from the last, temporarily removing and readding the last 4 columns in Job Cost
+SET @SqlPatchQuery = CONCAT(N'
+IF COL_LENGTH(''',@Reporting_DB_Name,N'.dbo.Job_Cost'', ''supervisor'') IS NULL
+BEGIN
+    SELECT job_cost_id, created_date, last_updated_date, is_deleted, deleted_date INTO #TempTbl FROM ',@Reporting_DB_Name,N'.dbo.Job_Cost;
+	ALTER TABLE ',@Reporting_DB_Name,N'.dbo.Job_Cost
+	DROP COLUMN created_date, last_updated_date, is_deleted, deleted_date;
+	ALTER TABLE ',@Reporting_DB_Name,N'.dbo.Job_Cost
+    ADD [supervisor_id] BIGINT,
+	[supervisor] NVARCHAR(100),
+	[salesperson_id] BIGINT,
+	[salesperson] NVARCHAR(100),
+	[estimator_id] BIGINT,	
+	[estimator] NVARCHAR(100), 
+	created_date DATETIME, last_updated_date DATETIME, is_deleted BIT DEFAULT 0, deleted_date DATETIME;
+    UPDATE a
+	SET a.supervisor_id = cl.supervisor_id,
+		a.supervisor = cl.supervisor,
+		a.salesperson_id = cl.salesperson_id,
+		a.salesperson = cl.salesperson,
+		a.estimator_id = cl.estimator_id,
+		a.estimator = cl.estimator,
+		a.created_date = meta.created_date,
+		a.last_updated_date = meta.last_updated_date,
+		a.is_deleted = meta.is_deleted,
+		a.deleted_date = meta.deleted_date
+	FROM ',@Reporting_DB_Name,N'.dbo.Job_Cost a
+	LEFT JOIN (
+		SELECT
+			a.recnum,
+			a.sprvsr as supervisor_id,
+			CONCAT(es.fstnme, '' '', es.lstnme) as supervisor,
+			a.slsemp as salesperson_id,
+			CONCAT(e.fstnme, '' '', e.lstnme) as salesperson,
+			a.estemp as estimator_id,
+			CONCAT(est.fstnme, '' '', est.lstnme) as estimator
+		FROM ',QUOTENAME(@Client_DB_Name),'.dbo.actrec a
+		LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.employ es on es.recnum = a.sprvsr 
+		LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.employ e on e.recnum = a.slsemp
+		LEFT JOIN ',QUOTENAME(@Client_DB_Name),N'.dbo.employ est on est.recnum = a.estemp
+	) cl ON a.job_number = cl.recnum
+	LEFT JOIN #TempTbl meta ON meta.job_cost_id = a.job_cost_id
+END
+')
+
+SELECT @TranName = 'Job Cost_Supervisor_add';
+BEGIN TRY
+	BEGIN TRANSACTION @TranName;
+
+	EXECUTE sp_executesql @SqlPatchQuery
+
+	COMMIT TRANSACTION @TranName
+END TRY
+BEGIN CATCH
+	IF @@TRANCOUNT > 0
+		ROLLBACK TRANSACTION @TranName
+	SELECT   
+	@ErrorMessage = ERROR_MESSAGE(),  
+	@ErrorSeverity = ERROR_SEVERITY(),  
+	@ErrorState = ERROR_STATE();  
+	RAISERROR (@ErrorMessage, @ErrorSeverity, @ErrorState); 
+END CATCH
+
+--Wrap up Patch Run by updating version
+SET @SqlPatchQuery = N' 
+IF (SELECT [Name] FROM [Version]) = ''1.0.0'' 
+BEGIN
+	UPDATE [Version]
+	SET name = ''1.0.1''
+END;'
+EXECUTE sp_executesql @SqlPatchQuery
+
 SET NOCOUNT OFF
 
 
@@ -1082,6 +1039,12 @@ SELECT
 		WHEN 1 THEN ''Open''
 		WHEN 2 THEN ''Void''
 	END as job_cost_status,
+	ar.sprvsr as supervisor_id,
+	CONCAT(es.fstnme, '' '', es.lstnme) as supervisor,
+	ar.slsemp as salesperson_id,
+	CONCAT(e.fstnme, '' '', e.lstnme) as salesperson,
+	ar.estemp as estimator_id,
+	CONCAT(est.fstnme, '' '', est.lstnme) as estimator,
 	j.insdte as created_date,
 	j.upddte as last_updated_date,
 	0 as is_deleted,
@@ -1091,7 +1054,11 @@ LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.csttyp ct on ct.recnum = j.csttyp
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.source s on s.recnum = j.srcnum
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.cstcde cd on cd.recnum = j.cstcde
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.actpay v on v.recnum = j.vndnum
-LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.actrec ar on ar.recnum = j.jobnum;',
+LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.actrec ar on ar.recnum = j.jobnum
+LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.employ es on es.recnum = ar.sprvsr 
+LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.employ e on e.recnum = ar.slsemp
+LEFT JOIN ',QUOTENAME(@Client_DB_Name),N'.dbo.employ est on est.recnum = ar.estemp
+;',
 --Step 3. Find any values in Temp Table not in Reporting Table, insert them as records flagged as deleted
 'INSERT INTO ',@Reporting_DB_Name,N'.dbo.Job_Cost
 SELECT *, 

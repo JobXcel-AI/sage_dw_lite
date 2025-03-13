@@ -66,6 +66,12 @@ SELECT
 		WHEN 1 THEN ''Open''
 		WHEN 2 THEN ''Void''
 	END as job_cost_status,
+	ar.sprvsr as supervisor_id,
+	CONCAT(es.fstnme, '' '', es.lstnme) as supervisor,
+	ar.slsemp as salesperson_id,
+	CONCAT(e.fstnme, '' '', e.lstnme) as salesperson,
+	ar.estemp as estimator_id,
+	CONCAT(est.fstnme, '' '', est.lstnme) as estimator,
 	j.insdte as created_date,
 	j.upddte as last_updated_date,
 	0 as is_deleted,
@@ -75,7 +81,10 @@ LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.csttyp ct on ct.recnum = j.csttyp
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.source s on s.recnum = j.srcnum
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.cstcde cd on cd.recnum = j.cstcde
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.actpay v on v.recnum = j.vndnum
-LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.actrec ar on ar.recnum = j.jobnum;',
+LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.actrec ar on ar.recnum = j.jobnum
+LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.employ es on es.recnum = ar.sprvsr 
+LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.employ e on e.recnum = ar.slsemp
+LEFT JOIN ',QUOTENAME(@Client_DB_Name),N'.dbo.employ est on est.recnum = ar.estemp;',
 --Step 3. Find any values in Temp Table not in Reporting Table, insert them as records flagged as deleted
 'INSERT INTO ',@Reporting_DB_Name,N'.dbo.Job_Cost
 SELECT *, 

@@ -1,4 +1,4 @@
---Version 1.0.0
+--Version 1.0.1
 
 USE [Nvision Reporting]
 GO 
@@ -380,6 +380,12 @@ CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Job_Cost'), '(
 	billing_amount DECIMAL(12,2),
 	overhead_amount DECIMAL(12,2),
 	job_cost_status NVARCHAR(4),
+	supervisor_id BIGINT,
+	supervisor NVARCHAR(100),
+	salesperson_id BIGINT,
+	salesperson NVARCHAR(100),
+	estimator_id BIGINT,	
+	estimator NVARCHAR(100), 
 	created_date DATETIME,
 	last_updated_date DATETIME,
 	is_deleted BIT DEFAULT 0,
@@ -441,6 +447,12 @@ SELECT
 		WHEN 1 THEN ''Open''
 		WHEN 2 THEN ''Void''
 	END as job_cost_status,
+	ar.sprvsr as supervisor_id,
+	CONCAT(es.fstnme, '' '', es.lstnme) as supervisor,
+	ar.slsemp as salesperson_id,
+	CONCAT(e.fstnme, '' '', e.lstnme) as salesperson,
+	ar.estemp as estimator_id,
+	CONCAT(est.fstnme, '' '', est.lstnme) as estimator,
 	j.insdte as created_date,
 	j.upddte as last_updated_date,
 	0 as is_deleted,
@@ -450,7 +462,10 @@ LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.csttyp ct on ct.recnum = j.csttyp
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.source s on s.recnum = j.srcnum
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.cstcde cd on cd.recnum = j.cstcde
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.actpay v on v.recnum = j.vndnum
-LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.actrec ar on ar.recnum = j.jobnum')
+LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.actrec ar on ar.recnum = j.jobnum
+LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.employ es on es.recnum = ar.sprvsr 
+LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.employ e on e.recnum = ar.slsemp
+LEFT JOIN ',QUOTENAME(@Client_DB_Name),N'.dbo.employ est on est.recnum = ar.estemp')
 
 EXECUTE sp_executesql @SqlInsertCommand
 
