@@ -22,22 +22,32 @@
 # For more information see the manual pages of crontab(5) and cron(8)
 #
 # m h  dom mon dow   command
+# --- Git Pull ---
+0 3 * * * /usr/bin/python3 /home/mike/dev/sage_dw_lite/schedule_git_pull/git_pull.py >> /home/mike/dev/sage_dw_lite/schedule_git_pull/cron_output.log 2>&1
+
+# --- Daily Jobs ---
 30 14 * * * /usr/bin/python3 /home/mike/dev/sage_dw_lite/Vertex/vertex_update_script.py >> /home/mike/dev/sage_dw_lite/Vertex/cron_output.log 2>&1
 15 14 * * * /usr/bin/python3 /home/mike/dev/sage_dw_lite/Nvision/nvision_update_script.py >> /home/mike/dev/sage_dw_lite/Nvision/cron_output.log 2>&1
 0 14 * * * /usr/bin/python3 /home/mike/dev/sage_dw_lite/Burbach/burbach_update_script.py >> /home/mike/dev/sage_dw_lite/Burbach/cron_output.log 2>&1
 45 13 * * * /usr/bin/python3 /home/mike/dev/sage_dw_lite/Brekhus/brekhus_update_script.py >> /home/mike/dev/sage_dw_lite/Brekhus/cron_output.log 2>&1
 40 12 * * * /usr/bin/python3 /home/mike/dev/sage_dw_lite/IPWLC/IPWLC_update_script.py >> /home/mike/dev/sage_dw_lite/IPWLC/cron_output.log 2>&1
 0 13 * * * /usr/bin/python3 /home/mike/dev/sage_dw_lite/SageXcel/sagexcel_update_script.py >> /home/mike/dev/sage_dw_lite/SageXcel/cron_output.log 2>&1
-0 3 * * * /usr/bin/python3 /home/mike/dev/sage_dw_lite/schedule_git_pull/git_pull.py >> /home/mike/dev/sage_dw_lite/schedule_git_pull/cron_output.log 2>&1
+0 12 * * * /usr/bin/python3 /home/mike/dev/sage_dw_lite/PCGOC/pcgoc_update_script.py >> /home/mike/dev/sage_dw_lite/PCGOC/cron_output_daily.log 2>&1
+
+# --- Weekly Jobs ---
 15 4 * * 0 /usr/bin/python3 /home/mike/dev/sage_dw_lite/Vertex/vertex_update_snapshot_weekly.py >> /home/mike/dev/sage_dw_lite/Vertex/cron_output_weekly.log 2>&1
 0 4 * * 0 /usr/bin/python3 /home/mike/dev/sage_dw_lite/Nvision/nvision_update_snapshot_weekly.py >> /home/mike/dev/sage_dw_lite/Nvision/cron_output_weekly.log 2>&1
 0 5 * * 0 /usr/bin/python3 /home/mike/dev/sage_dw_lite/Burbach/burbach_update_snapshot_weekly.py >> /home/mike/dev/sage_dw_lite/Burbach/cron_output_weekly.log 2>&1
 45 5 * * 0 /usr/bin/python3 /home/mike/dev/sage_dw_lite/Brekhus/brekhus_update_snapshot_weekly.py >> /home/mike/dev/sage_dw_lite/Brekhus/cron_output_weekly.log 2>&1
 30 5 * * 0 /usr/bin/python3 /home/mike/dev/sage_dw_lite/IPWLC/IPWLC_update_snapshot_weekly.py >> /home/mike/dev/sage_dw_lite/IPWLC/cron_output_weekly.log 2>&1
 0 2 * * 0 /usr/bin/python3 /home/mike/dev/sage_dw_lite/SageXcel/sagexcel_update_snapshot_weekly.py >> /home/mike/dev/sage_dw_lite/SageXcel/cron_output_weekly.log 2>&1
+45 3 * * 0 /usr/bin/python3 /home/mike/dev/sage_dw_lite/PCGOC/pcgoc_update_snapshot_weekly.py >> /home/mike/dev/sage_dw_lite/PCGOC/cron_output_weekly.log 2>&1
+
+# --- Monthly Jobs ---
 15 7 1 * * /usr/bin/python3 /home/mike/dev/sage_dw_lite/Nvision/nvision_update_snapshot_monthly.py >> /home/mike/dev/sage_dw_lite/Nvision/cron_output_monthly.log 2>&1
 30 7 1 * * /usr/bin/python3 /home/mike/dev/sage_dw_lite/Vertex/vertex_update_snapshot_monthly.py >> /home/mike/dev/sage_dw_lite/Vertex/cron_output_monthly.log 2>&1
 45 6 1 * * /usr/bin/python3 /home/mike/dev/sage_dw_lite/Burbach/burbach_update_snapshot_monthly.py >> /home/mike/dev/sage_dw_lite/Burbach/cron_output_monthly.log 2>&1
 30 6 1 * * /usr/bin/python3 /home/mike/dev/sage_dw_lite/Brekhus/brekhus_update_snapshot_monthly.py >> /home/mike/dev/sage_dw_lite/Brekhus/cron_output_monthly.log 2>&1
 15 6 1 * * /usr/bin/python3 /home/mike/dev/sage_dw_lite/IPWLC/IPWLC_update_snapshot_monthly.py >> /home/mike/dev/sage_dw_lite/IPWLC/cron_output_monthly.log 2>&1
-0 3 1 * * /usr/bin/python3 /home/mike/dev/sage_dw_lite/SageXcel/sagexcel_update_snapshot_monthly.py >> /home/mike/dev/sage_dw_lite/SageXcel/cron_output_monthly.log 2>&1i
+0 3 1 * * /usr/bin/python3 /home/mike/dev/sage_dw_lite/SageXcel/sagexcel_update_snapshot_monthly.py >> /home/mike/dev/sage_dw_lite/SageXcel/cron_output_monthly.log 2>&1
+45 5 1 * * /usr/bin/python3 /home/mike/dev/sage_dw_lite/PCGOC/pcgoc_update_snapshot_monthly.py >> /home/mike/dev/sage_dw_lite/PCGOC/cron_output_monthly.log 2>&1
