@@ -106,6 +106,7 @@ try:
         logger.info(f"Processing SQL script for database: {db_name}")
         # replace ~ with a space
         db_name = db_name.replace("~", " ")
+        db_name = db_name.replace("^", ",")
 
         # Replace placeholders with actual database name
         modified_sql_content = sql_content.replace(client_db_placeholder, db_name)
