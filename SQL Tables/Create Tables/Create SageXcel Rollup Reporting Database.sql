@@ -1,3 +1,5 @@
+--Version 1.0.1
+
 -- Specify Rollup DB Name
 DECLARE @Reporting_DB_Name NVARCHAR(50) = 'SageXcel Rollup Reporting';
 
@@ -184,6 +186,12 @@ CREATE TABLE ', QUOTENAME(@Reporting_DB_Name),'.dbo.',QUOTENAME('Job_Cost'), '(
 	billing_amount DECIMAL(12,2),
 	overhead_amount DECIMAL(12,2),
 	job_cost_status NVARCHAR(4),
+	supervisor_id BIGINT,
+	supervisor NVARCHAR(100),
+	salesperson_id BIGINT,
+	salesperson NVARCHAR(100),
+	estimator_id BIGINT,	
+	estimator NVARCHAR(100), 
 	created_date DATETIME,
 	last_updated_date DATETIME,
 	is_deleted BIT DEFAULT 0,
@@ -605,6 +613,8 @@ CREATE TABLE ', QUOTENAME(@Reporting_DB_Name),'.dbo.',QUOTENAME('Change_Order_Li
 	cost_type NVARCHAR(30),
 	approved_change_amount DECIMAL(12,2),
 	change_amount DECIMAL(12,2),
+	approved_change_hours DECIMAL(12,2),
+	approved_change_units DECIMAL(10,4),
 	created_date DATETIME,
 	last_updated_date DATETIME,
 	is_deleted BIT DEFAULT 0,
@@ -654,7 +664,8 @@ CREATE TABLE ', QUOTENAME(@Reporting_DB_Name),'.dbo.',QUOTENAME('Job_Budget_Line
 	cost_code NVARCHAR(50),
 	cost_code_name NVARCHAR(50),
 	cost_type NVARCHAR(30),
-	budget DECIMAL(12,2)
+	budget DECIMAL(12,2),
+	budget_hours DECIMAL(12,2)
 )')
 
 EXECUTE sp_executesql @SqlCreateTableCommand
@@ -695,7 +706,7 @@ CREATE TABLE ', QUOTENAME(@Reporting_DB_Name),'.dbo.',QUOTENAME('Timecards'), '(
 	pay_group_number INT,
 	pay_group_name NVARCHAR(50),
 	pay_rate DECIMAL(9,4),
-	hours_worked DECIMAL(4,2),
+	hours_worked DECIMAL(7,2),
 	comp_code BIGINT,
 	workers_compensation_name NVARCHAR(50),
 	department_id BIGINT,
@@ -791,3 +802,53 @@ FROM dbo.' + QUOTENAME('Change_Orders') + N'; ' +
 ADD snapshot_date DATETIME;';
 
 EXEC sp_executesql @SqlCreateTableCommand;
+
+--Sql Create Ledger_Accounts_by_Month
+SET @SqlCreateTableCommand = CONCAT(N'
+CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Ledger_Accounts_by_Month'), '(
+	db_source NVARCHAR(100),
+	ledger_account_id BIGINT,
+	ledger_account NVARCHAR(50),
+	subsidiary_type NVARCHAR(12),
+	summary_account NVARCHAR(50),
+	cost_type NVARCHAR(30),
+	current_balance DECIMAL(14,2),
+	account_type NVARCHAR(22),
+	debit_or_credit NVARCHAR(6),
+	notes NVARCHAR(MAX),
+	balance_budget_date DATE,
+	balance DECIMAL(14,2),
+	budget DECIMAL(14,2),
+	created_date DATETIME,
+	last_updated_date DATETIME,
+	is_deleted BIT DEFAULT 0,
+	deleted_date DATETIME
+)')
+
+EXECUTE sp_executesql @SqlCreateTableCommand
+
+--Create Version Table
+SET @SqlCreateTableCommand = CONCAT(N'
+CREATE TABLE ',@Reporting_DB_Name,'.dbo.[Version] (
+	db_source NVARCHAR(100),
+	name NVARCHAR(10),
+	update_date DATETIME NOT NULL DEFAULT GETDATE(),
+	update_user CHAR(50) NOT NULL DEFAULT CURRENT_USER
+	);
+')
+
+EXECUTE sp_executesql @SqlCreateTableCommand
+
+--Create Update Log Table
+SET @SqlCreateTableCommand = CONCAT(N'
+CREATE TABLE ',@Reporting_DB_Name,'.dbo.[Update_Log] (
+	db_source NVARCHAR(100),
+	version_name NVARCHAR(10),
+	run_date DATETIME NOT NULL DEFAULT GETDATE(),
+	update_user CHAR(50) NOT NULL DEFAULT CURRENT_USER
+	);
+')
+
+EXECUTE sp_executesql @SqlCreateTableCommand
+
+

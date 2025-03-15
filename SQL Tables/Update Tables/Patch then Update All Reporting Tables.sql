@@ -16,7 +16,7 @@ DECLARE @SqlPatchQuery NVARCHAR(MAX);
 DECLARE @SqlPatchQuery1 NVARCHAR(MAX);
 DECLARE @SqlPatchQuery2 NVARCHAR(MAX);
 DECLARE @DropConstraints NVARCHAR(MAX);
-DECLARE @TranName VARCHAR(20);
+DECLARE @TranName NVARCHAR(30);
 DECLARE @ErrorMessage NVARCHAR(4000);  
 DECLARE @ErrorSeverity INT;  
 DECLARE @ErrorState INT;  
@@ -25,48 +25,48 @@ DECLARE @ErrorState INT;
 --Check for Version.  Assume anything without a version is Version 0.0.0.
 --If Version table does not exist, create it.
 SET NOCOUNT ON
-SET @SqlPatchQuery = N'
-IF OBJECT_ID(''[Version]'',''U'') IS NULL
+SET @SqlPatchQuery = CONCAT(N'
+IF OBJECT_ID(''',@Reporting_DB_Name,N'.dbo.[Version]'',''U'') IS NULL
 BEGIN
-	CREATE TABLE [Version] (
+	CREATE TABLE ',@Reporting_DB_Name,N'.dbo.[Version] (
 		name NVARCHAR(10),
 		update_date DATETIME NOT NULL DEFAULT GETDATE(),
 		update_user CHAR(50) NOT NULL DEFAULT CURRENT_USER
 	);
-	INSERT [Version] (name)
+	INSERT ',@Reporting_DB_Name,N'.dbo.[Version] (name)
 	VALUES (''0.0.0'');
-END'
+END')
 EXECUTE sp_executesql @SqlPatchQuery
 
 
 --Version 1.0.0 patch
 
 --Create Update Log Table
-SET @SqlPatchQuery = N' 
-IF (SELECT [Name] FROM [Version]) = ''0.0.0'' 
+SET @SqlPatchQuery = CONCAT(N' 
+IF (SELECT [Name] FROM  ',@Reporting_DB_Name,N'.dbo.[Version]) = ''0.0.0'' 
 BEGIN
-	CREATE TABLE [Update_Log] (
+	CREATE TABLE  ',@Reporting_DB_Name,N'.dbo.[Update_Log] (
 		version_name NVARCHAR(10),
 		run_date DATETIME NOT NULL DEFAULT GETDATE(),
 		update_user CHAR(50) NOT NULL DEFAULT CURRENT_USER 
 	);
-END'
+END')
 EXECUTE sp_executesql @SqlPatchQuery
 
 --Wrap up Patch Run by updating version
-SET @SqlPatchQuery = N' 
-IF (SELECT [Name] FROM [Version]) = ''0.0.0'' 
+SET @SqlPatchQuery = CONCAT(N' 
+IF (SELECT [Name] FROM  ',@Reporting_DB_Name,N'.dbo.[Version]) = ''0.0.0'' 
 BEGIN
 	UPDATE [Version]
 	SET name = ''1.0.0''
-END;'
+END;')
 EXECUTE sp_executesql @SqlPatchQuery
 
 --Version 1.0.1 patch
 --Remove constraint on is_deleted if supervisor doesn't exist in Job Cost
 SET @DropConstraints = CONCAT(N'
 DECLARE @NestedSQL NVARCHAR(MAX);
-IF COL_LENGTH(''',@Reporting_DB_Name,N'.dbo.Job_Cost'', ''approved_change_hours'') IS NULL
+IF COL_LENGTH(''',@Reporting_DB_Name,N'.dbo.Job_Cost'', ''supervisor'') IS NULL
 BEGIN
 	SELECT TOP 1 @NestedSQL = N''ALTER TABLE ',@Reporting_DB_Name,N'.dbo.[Job_Cost] drop constraint [''+dc.name+N'']''
 	FROM sys.default_constraints dc
@@ -189,6 +189,18 @@ BEGIN
 	UPDATE [Version]
 	SET name = ''1.0.1''
 END;'
+EXECUTE sp_executesql @SqlPatchQuery
+
+--Alter TimeCard table to accept larger hours per day
+SET @SqlPatchQuery = CONCAT(N'
+IF(
+	SELECT NUMERIC_PRECISION
+	FROM ',@Reporting_DB_Name,'.INFORMATION_SCHEMA.COLUMNS 
+	WHERE TABLE_NAME = ''Timecards'' AND COLUMN_NAME = ''hours_worked'') = ''4''
+BEGIN
+	ALTER TABLE ',@Reporting_DB_Name,'.dbo.Timecards ALTER COLUMN hours_worked DECIMAL (7,2);
+END
+')
 EXECUTE sp_executesql @SqlPatchQuery
 
 SET NOCOUNT OFF

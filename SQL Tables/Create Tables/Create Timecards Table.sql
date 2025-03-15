@@ -39,7 +39,7 @@ CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Timecards'), '(
 	pay_group_number INT,
 	pay_group_name NVARCHAR(50),
 	pay_rate DECIMAL(9,4),
-	hours_worked DECIMAL(4,2),
+	hours_worked DECIMAL(7,2),
 	comp_code BIGINT,
 	workers_compensation_name NVARCHAR(50),
 	department_id BIGINT,

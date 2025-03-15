@@ -1,3 +1,5 @@
+--Version 1.0.1
+
 --Specify Client DB Name
 DECLARE @Client_DB_Name NVARCHAR(50) = QUOTENAME('[CLIENT_DB_NAME]' + ' Reporting');
 --Specify Reporting DB Name
@@ -130,4 +132,22 @@ EXECUTE sp_executesql @SqlInsertQuery
 SET @SqlInsertQuery = CONCAT(N'
 INSERT INTO ',@Reporting_DB_Name,N'.dbo.Timecards
 SELECT ''[CLIENT_DB_NAME]'' as db_source, * FROM ',@Client_DB_Name,N'.dbo.Timecards')
+EXECUTE sp_executesql @SqlInsertQuery
+
+--Update Ledger Accounts by Month Table
+SET @SqlInsertQuery = CONCAT(N'
+INSERT INTO ',@Reporting_DB_Name,N'.dbo.Ledger_Accounts_by_Month
+SELECT ''[CLIENT_DB_NAME]'' as db_source, * FROM ',@Client_DB_Name,N'.dbo.Ledger_Accounts_by_Month')
+EXECUTE sp_executesql @SqlInsertQuery
+
+--Update Update_Log Table
+SET @SqlInsertQuery = CONCAT(N'
+INSERT INTO ',@Reporting_DB_Name,N'.dbo.Update_Log
+SELECT ''[CLIENT_DB_NAME]'' as db_source, * FROM ',@Client_DB_Name,N'.dbo.Update_Log')
+EXECUTE sp_executesql @SqlInsertQuery
+
+--Update Version Table
+SET @SqlInsertQuery = CONCAT(N'
+INSERT INTO ',@Reporting_DB_Name,N'.dbo.Version
+SELECT ''[CLIENT_DB_NAME]'' as db_source, * FROM ',@Client_DB_Name,N'.dbo.Version')
 EXECUTE sp_executesql @SqlInsertQuery
