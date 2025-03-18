@@ -804,8 +804,8 @@ ADD snapshot_date DATETIME;';
 EXEC sp_executesql @SqlCreateTableCommand;
 
 --Sql Create Ledger_Accounts_by_Month
-SET @SqlCreateTableCommand = CONCAT(N'
-CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Ledger_Accounts_by_Month'), '(
+SET @SqlCreateTableCommand = N'
+CREATE TABLE ' + QUOTENAME(@Reporting_DB_Name) + '.dbo.' + QUOTENAME('Ledger_Accounts_by_Month') + '(
 	db_source NVARCHAR(100),
 	ledger_account_id BIGINT,
 	ledger_account NVARCHAR(50),
@@ -823,31 +823,31 @@ CREATE TABLE ',@Reporting_DB_Name,'.dbo.',QUOTENAME('Ledger_Accounts_by_Month'),
 	last_updated_date DATETIME,
 	is_deleted BIT DEFAULT 0,
 	deleted_date DATETIME
-)')
+)'
 
 EXECUTE sp_executesql @SqlCreateTableCommand
 
 --Create Version Table
-SET @SqlCreateTableCommand = CONCAT(N'
-CREATE TABLE ',@Reporting_DB_Name,'.dbo.[Version] (
+SET @SqlCreateTableCommand = N'
+CREATE TABLE ' + QUOTENAME(@Reporting_DB_Name) + '.dbo.[Version] (
 	db_source NVARCHAR(100),
 	name NVARCHAR(10),
 	update_date DATETIME NOT NULL DEFAULT GETDATE(),
 	update_user CHAR(50) NOT NULL DEFAULT CURRENT_USER
 	);
-')
+'
 
 EXECUTE sp_executesql @SqlCreateTableCommand
 
 --Create Update Log Table
-SET @SqlCreateTableCommand = CONCAT(N'
-CREATE TABLE ',@Reporting_DB_Name,'.dbo.[Update_Log] (
+SET @SqlCreateTableCommand = N'
+CREATE TABLE ' + QUOTENAME(@Reporting_DB_Name) + '.dbo.[Update_Log] (
 	db_source NVARCHAR(100),
 	version_name NVARCHAR(10),
 	run_date DATETIME NOT NULL DEFAULT GETDATE(),
 	update_user CHAR(50) NOT NULL DEFAULT CURRENT_USER
 	);
-')
+'
 
 EXECUTE sp_executesql @SqlCreateTableCommand
 
