@@ -51,3 +51,11 @@
 15 6 1 * * /usr/bin/python3 /home/mike/dev/sage_dw_lite/IPWLC/IPWLC_update_snapshot_monthly.py >> /home/mike/dev/sage_dw_lite/IPWLC/cron_output_monthly.log 2>&1
 0 3 1 * * /usr/bin/python3 /home/mike/dev/sage_dw_lite/SageXcel/sagexcel_update_snapshot_monthly.py >> /home/mike/dev/sage_dw_lite/SageXcel/cron_output_monthly.log 2>&1
 45 5 1 * * /usr/bin/python3 /home/mike/dev/sage_dw_lite/PCGOC/pcgoc_update_snapshot_monthly.py >> /home/mike/dev/sage_dw_lite/PCGOC/cron_output_monthly.log 2>&1
+
+# --- Rollup Reports ---
+0 9 * * * /usr/bin/python3 /home/mike/dev/sage_dw_lite/Burbach/burbach_clear_rollup_tables.py >> /home/mike/dev/sage_dw_lite/Burbach/cron_rollup_output.log 2>&1
+5 9 * * * /usr/bin/python3 /home/mike/dev/sage_dw_lite/Burbach/burbach_update_rollup_tables.py >> /home/mike/dev/sage_dw_lite/Burbach/cron_rollup_output.log 2>&1
+10 9 * * * /usr/bin/python3 /home/mike/dev/sage_dw_lite/PCGOC/pcgoc_clear_rollup_tables.py >> /home/mike/dev/sage_dw_lite/PCGOC/cron_rollup_output.log 2>&1
+15 9 * * * /usr/bin/python3 /home/mike/dev/sage_dw_lite/PCGOC/pcgoc_update_rollup_tables.py >> /home/mike/dev/sage_dw_lite/PCGOC/cron_rollup_output.log 2>&1
+20 9 * * * /usr/bin/python3 /home/mike/dev/sage_dw_lite/ASG/asg_clear_rollup_tables.py >> /home/mike/dev/sage_dw_lite/ASG/cron_rollup_output.log 2>&1
+25 9 * * * /usr/bin/python3 /home/mike/dev/sage_dw_lite/ASG/asg_update_rollup_tables.py >> /home/mike/dev/sage_dw_lite/ASG/cron_rollup_output.log 2>&1
