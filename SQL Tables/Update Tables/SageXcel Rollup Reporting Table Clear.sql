@@ -131,10 +131,10 @@ END CATCH
 SET @SqlPatchQuery = N'
 IF(
 	SELECT NUMERIC_PRECISION
-	FROM [SageXcel Demo Reporting].INFORMATION_SCHEMA.COLUMNS 
+	FROM [SageXcel Rollup Reporting].INFORMATION_SCHEMA.COLUMNS
 	WHERE TABLE_NAME = ''Timecards'' AND COLUMN_NAME = ''hours_worked'') = ''4''
 BEGIN
-	ALTER TABLE [SageXcel Demo Reporting].dbo.Timecards ALTER COLUMN hours_worked DECIMAL (7,2);
+	ALTER TABLE [SageXcel Rollup Reporting].dbo.Timecards ALTER COLUMN hours_worked DECIMAL (7,2);
 END'
 
 EXECUTE sp_executesql @SqlPatchQuery
