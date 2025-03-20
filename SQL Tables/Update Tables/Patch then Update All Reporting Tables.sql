@@ -239,12 +239,14 @@ BEGIN
 	[subsidiary_type] NVARCHAR(12),
 	[debit_or_credit] NVARCHAR(6),
 	[cost_type] NVARCHAR(30),
+	[status] NVARCHAR(1),
 	created_date DATETIME, last_updated_date DATETIME, is_deleted BIT DEFAULT 0, deleted_date DATETIME;
     UPDATE a
 	SET a.account_type = cl.account_type,
 		a.subsidiary_type = cl.subsidiary_type,
 		a.debit_or_credit = cl.debit_or_credit,
 		a.cost_type = cl.cost_type,
+		a.status = cl.status,
 		a.created_date = meta.created_date,
 		a.last_updated_date = meta.last_updated_date,
 		a.is_deleted = meta.is_deleted,
@@ -283,7 +285,8 @@ BEGIN
 				WHEN 2 THEN ''Credit''
 				ELSE ''Other''
 			END as debit_or_credit,
-			ct.typnme as cost_type
+			ct.typnme as cost_type,
+			lt.status
 		FROM ',QUOTENAME(@Client_DB_Name),'.dbo.lgrtrn lt
 		LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.lgtnln ltl on lt.recnum = ltl.recnum
 		LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.lgract la on la.recnum = ltl.lgract

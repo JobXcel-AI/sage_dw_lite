@@ -70,6 +70,7 @@ SELECT
 		ELSE ''Other''
 	END as debit_or_credit,
 	ct.typnme as cost_type,
+	lt.status,
 	lt.insdte as created_date,
 	lt.upddte as last_updated_date,
 	0 as is_deleted,

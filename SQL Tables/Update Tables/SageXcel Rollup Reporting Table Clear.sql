@@ -249,6 +249,7 @@ BEGIN
 	[subsidiary_type] NVARCHAR(12),
 	[debit_or_credit] NVARCHAR(6),
 	[cost_type] NVARCHAR(30),
+	[status] NVARCHAR(1),
 	created_date DATETIME, last_updated_date DATETIME, is_deleted BIT DEFAULT 0, deleted_date DATETIME;
 END
 '
