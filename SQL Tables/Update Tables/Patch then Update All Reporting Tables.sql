@@ -1,4 +1,4 @@
---Version 1.0.1
+--Version 1.0.2
 USE [[CLIENT_DB_NAME] Reporting]
 GO
 --Specify Client DB Name
@@ -57,7 +57,7 @@ EXECUTE sp_executesql @SqlPatchQuery
 SET @SqlPatchQuery = CONCAT(N' 
 IF (SELECT [Name] FROM  ',@Reporting_DB_Name,N'.dbo.[Version]) = ''0.0.0'' 
 BEGIN
-	UPDATE [Version]
+	UPDATE ',@Reporting_DB_Name,N'.dbo.[Version]
 	SET name = ''1.0.0''
 END;')
 EXECUTE sp_executesql @SqlPatchQuery
@@ -182,15 +182,6 @@ BEGIN
 END')
 EXECUTE sp_executesql @SqlPatchQuery
 
---Wrap up Patch Run by updating version
-SET @SqlPatchQuery = N' 
-IF (SELECT [Name] FROM [Version]) = ''1.0.0'' 
-BEGIN
-	UPDATE [Version]
-	SET name = ''1.0.1''
-END;'
-EXECUTE sp_executesql @SqlPatchQuery
-
 --Alter TimeCard table to accept larger hours per day
 SET @SqlPatchQuery = CONCAT(N'
 IF(
@@ -203,7 +194,129 @@ END
 ')
 EXECUTE sp_executesql @SqlPatchQuery
 
+--Version 1.0.2 Patch
+
+--Remove constraint on is_deleted if supervisor doesn't exist in Ledger Transaction Lines
+SET @DropConstraints = CONCAT(N'
+DECLARE @NestedSQL NVARCHAR(MAX);
+IF COL_LENGTH(''',@Reporting_DB_Name,N'.dbo.Ledger_Transaction_Lines'', ''account_type'') IS NULL
+BEGIN
+	SELECT TOP 1 @NestedSQL = N''ALTER TABLE ',@Reporting_DB_Name,N'.dbo.[Ledger_Transaction_Lines] drop constraint [''+dc.name+N'']''
+	FROM sys.default_constraints dc
+	JOIN sys.columns c ON c.default_object_id = dc.object_id
+	WHERE dc.parent_object_id = OBJECT_ID(''',@Reporting_DB_Name,N'.dbo.Ledger_Transaction_Lines'') AND c.name = ''is_deleted''
+	EXECUTE sp_executesql @NestedSQL
+END
+')
+SELECT @TranName = 'Ledger_Transaction_Lines_Drop_Constraint_Is_Deleted';
+BEGIN TRY
+	BEGIN TRANSACTION @TranName;
+
+	EXECUTE sp_executesql @DropConstraints
+
+	COMMIT TRANSACTION @TranName
+END TRY
+BEGIN CATCH
+	IF @@TRANCOUNT > 0
+		ROLLBACK TRANSACTION @TranName
+	SELECT   
+	@ErrorMessage = ERROR_MESSAGE(),  
+	@ErrorSeverity = ERROR_SEVERITY(),  
+	@ErrorState = ERROR_STATE();  
+	RAISERROR (@ErrorMessage, @ErrorSeverity, @ErrorState); 
+END CATCH
+
+--Insert account_type, subsidiary_type, debit_or_credit, cost_type into Ledger_Transaction_Lines.  
+--Also places it 5th-8th from the last, temporarily removing and readding the last 4 columns in LTL
+SET @SqlPatchQuery = CONCAT(N'
+IF COL_LENGTH(''',@Reporting_DB_Name,N'.dbo.Ledger_Transaction_Lines'', ''account_type'') IS NULL
+BEGIN
+    SELECT ledger_transaction_id, created_date, last_updated_date, is_deleted, deleted_date INTO #TempTbl FROM ',@Reporting_DB_Name,N'.dbo.Ledger_Transaction_Lines;
+	ALTER TABLE ',@Reporting_DB_Name,N'.dbo.Ledger_Transaction_Lines
+	DROP COLUMN created_date, last_updated_date, is_deleted, deleted_date;
+	ALTER TABLE ',@Reporting_DB_Name,N'.dbo.Ledger_Transaction_Lines
+    ADD [account_type] NVARCHAR(22),
+	[subsidiary_type] NVARCHAR(12),
+	[debit_or_credit] NVARCHAR(6),
+	[cost_type] NVARCHAR(30),
+	created_date DATETIME, last_updated_date DATETIME, is_deleted BIT DEFAULT 0, deleted_date DATETIME;
+    UPDATE a
+	SET a.account_type = cl.account_type,
+		a.subsidiary_type = cl.subsidiary_type,
+		a.debit_or_credit = cl.debit_or_credit,
+		a.cost_type = cl.cost_type,
+		a.created_date = meta.created_date,
+		a.last_updated_date = meta.last_updated_date,
+		a.is_deleted = meta.is_deleted,
+		a.deleted_date = meta.deleted_date
+	FROM ',@Reporting_DB_Name,N'.dbo.Ledger_Transaction_Lines a
+	LEFT JOIN (
+		SELECT
+			lt.recnum as ledger_transaction_id,
+			CASE la.acttyp 
+				WHEN 1 THEN ''Cash Accounts''
+				WHEN 2 THEN ''Current Assets''
+				WHEN 3 THEN ''WIP Assets''
+				WHEN 4 THEN ''Other Assets''
+				WHEN 5 THEN ''Fixed Assets''
+				WHEN 6 THEN ''Depreciation''
+				WHEN 7 THEN ''Current Liabilities''
+				WHEN 8 THEN ''Long Term Liabilities''
+				WHEN 9 THEN ''Equity''
+				WHEN 11 THEN ''Operating Income''
+				WHEN 12 THEN ''Other Income''
+				WHEN 13 THEN ''Direct Expense''
+				WHEN 14 THEN ''Equip/Shop Expense''
+				WHEN 15 THEN ''Overhead Expense''
+				WHEN 16 THEN ''Administrative Expense''
+				WHEN 17 THEN ''After Tax Inc/Expense''
+				ELSE ''Other''
+			END as account_type,
+			CASE la.subact
+				WHEN 0 THEN ''None''
+				WHEN 1 THEN ''Subaccounts''
+				WHEN 2 THEN ''Departments''
+				ELSE ''Other''
+			END as subsidiary_type,
+			CASE la.dbtcrd
+				WHEN 1 THEN ''Debit''
+				WHEN 2 THEN ''Credit''
+				ELSE ''Other''
+			END as debit_or_credit,
+			ct.typnme as cost_type
+		FROM ',QUOTENAME(@Client_DB_Name),'.dbo.lgrtrn lt
+		LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.lgtnln ltl on lt.recnum = ltl.recnum
+		LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.lgract la on la.recnum = ltl.lgract
+		LEFT JOIN ',QUOTENAME(@Client_DB_Name),N'.dbo.csttyp ct on ct.recnum = la.csttyp
+	) cl ON a.ledger_transaction_id = cl.ledger_transaction_id
+	LEFT JOIN #TempTbl meta ON meta.ledger_transaction_id = a.ledger_transaction_id
+END
+')
+
+SELECT @TranName = 'Ledger_Transaction_Line_AccountType_add';
+BEGIN TRY
+	BEGIN TRANSACTION @TranName;
+
+	EXECUTE sp_executesql @SqlPatchQuery
+
+	COMMIT TRANSACTION @TranName
+END TRY
+BEGIN CATCH
+	IF @@TRANCOUNT > 0
+		ROLLBACK TRANSACTION @TranName
+	SELECT   
+	@ErrorMessage = ERROR_MESSAGE(),  
+	@ErrorSeverity = ERROR_SEVERITY(),  
+	@ErrorState = ERROR_STATE();  
+	RAISERROR (@ErrorMessage, @ErrorSeverity, @ErrorState); 
+END CATCH
+
 SET NOCOUNT OFF
+
+--Wrap up Patch Run by updating version
+SET @SqlPatchQuery = CONCAT(N' 
+UPDATE ',@Reporting_DB_Name,'.dbo.','[Version] SET name = ''1.0.2'';')
+EXECUTE sp_executesql @SqlPatchQuery
 
 
 --Start data refresh
@@ -1757,6 +1870,37 @@ SELECT
 	lt.entdte as entered_date,
 	lt.actprd as month_id,
 	lt.postyr as posting_year,
+	CASE la.acttyp 
+		WHEN 1 THEN ''Cash Accounts''
+		WHEN 2 THEN ''Current Assets''
+		WHEN 3 THEN ''WIP Assets''
+		WHEN 4 THEN ''Other Assets''
+		WHEN 5 THEN ''Fixed Assets''
+		WHEN 6 THEN ''Depreciation''
+		WHEN 7 THEN ''Current Liabilities''
+		WHEN 8 THEN ''Long Term Liabilities''
+		WHEN 9 THEN ''Equity''
+		WHEN 11 THEN ''Operating Income''
+		WHEN 12 THEN ''Other Income''
+		WHEN 13 THEN ''Direct Expense''
+		WHEN 14 THEN ''Equip/Shop Expense''
+		WHEN 15 THEN ''Overhead Expense''
+		WHEN 16 THEN ''Administrative Expense''
+		WHEN 17 THEN ''After Tax Inc/Expense''
+		ELSE ''Other''
+	END as account_type,
+	CASE la.subact
+		WHEN 0 THEN ''None''
+		WHEN 1 THEN ''Subaccounts''
+		WHEN 2 THEN ''Departments''
+		ELSE ''Other''
+	END as subsidiary_type,
+	CASE la.dbtcrd
+		WHEN 1 THEN ''Debit''
+		WHEN 2 THEN ''Credit''
+		ELSE ''Other''
+	END as debit_or_credit,
+	ct.typnme as cost_type,
 	lt.insdte as created_date,
 	lt.upddte as last_updated_date,
 	0 as is_deleted,
@@ -1765,6 +1909,7 @@ FROM ',QUOTENAME(@Client_DB_Name),'.dbo.lgrtrn lt
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.lgtnln ltl on lt.recnum = ltl.recnum
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.lgract la on la.recnum = ltl.lgract
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.actpay v on v.recnum = lt.vndnum
+LEFT JOIN ',QUOTENAME(@Client_DB_Name),N'.dbo.csttyp ct on ct.recnum = la.csttyp
 LEFT JOIN 
 (
 	SELECT

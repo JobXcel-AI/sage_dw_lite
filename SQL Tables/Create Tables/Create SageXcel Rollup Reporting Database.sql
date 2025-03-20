@@ -1,4 +1,4 @@
---Version 1.0.1
+--Version 1.0.2
 
 -- Specify Rollup DB Name
 DECLARE @Reporting_DB_Name NVARCHAR(50) = 'SageXcel Rollup Reporting';
@@ -444,6 +444,10 @@ CREATE TABLE ', QUOTENAME(@Reporting_DB_Name),'.dbo.',QUOTENAME('Ledger_Transact
 	entered_date DATE,
 	month_id INT,
 	posting_year INT,
+	account_type NVARCHAR(22),
+	subsidiary_type NVARCHAR(12),
+	debit_or_credit NVARCHAR(6),
+	cost_type NVARCHAR(30),
 	created_date DATETIME,
 	last_updated_date DATETIME,
 	is_deleted BIT DEFAULT 0,

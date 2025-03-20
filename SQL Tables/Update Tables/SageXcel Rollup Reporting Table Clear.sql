@@ -1,4 +1,4 @@
---Version 1.0.1
+--Version 1.0.2
 
 --Specify Client DB Name
 DECLARE @Client_DB_Name NVARCHAR(50) = '[CLIENT_DB_NAME]';
@@ -131,7 +131,7 @@ END CATCH
 SET @SqlPatchQuery = N'
 IF(
 	SELECT NUMERIC_PRECISION
-	FROM [SageXcel Rollup Reporting].INFORMATION_SCHEMA.COLUMNS
+	FROM [SageXcel Rollup Reporting].INFORMATION_SCHEMA.COLUMNS 
 	WHERE TABLE_NAME = ''Timecards'' AND COLUMN_NAME = ''hours_worked'') = ''4''
 BEGIN
 	ALTER TABLE [SageXcel Rollup Reporting].dbo.Timecards ALTER COLUMN hours_worked DECIMAL (7,2);
@@ -155,8 +155,8 @@ DECLARE @NestedSQL NVARCHAR(MAX);
 IF COL_LENGTH(''[SageXcel Rollup Reporting].dbo.Change_Order_Lines'', ''approved_change_hours'') IS NULL
 BEGIN
 	SELECT TOP 1 @NestedSQL = N''ALTER TABLE [SageXcel Rollup Reporting].dbo.[Change_Order_Lines] drop constraint [''+dc.name+N'']''
-	FROM sys.default_constraints dc
-	JOIN sys.columns c ON c.default_object_id = dc.object_id
+	FROM [SageXcel Rollup Reporting].sys.default_constraints dc
+	JOIN [SageXcel Rollup Reporting].sys.columns c ON c.default_object_id = dc.object_id
 	WHERE dc.parent_object_id = OBJECT_ID(''[SageXcel Rollup Reporting].dbo.Change_Order_Lines'') AND c.name = ''is_deleted''
 	EXECUTE sp_executesql @NestedSQL
 END'
@@ -182,7 +182,6 @@ END CATCH
 SET @SqlPatchQuery = N'
 IF COL_LENGTH(''[SageXcel Rollup Reporting].dbo.Change_Order_Lines'', ''approved_change_hours'') IS NULL
 BEGIN
-    SELECT change_order_id, created_date, last_updated_date, is_deleted, deleted_date INTO #TempTbl FROM [SageXcel Rollup Reporting].dbo.Change_Order_Lines;
 	ALTER TABLE [SageXcel Rollup Reporting].dbo.Change_Order_Lines
 	DROP COLUMN created_date, last_updated_date, is_deleted, deleted_date;
 	ALTER TABLE [SageXcel Rollup Reporting].dbo.Change_Order_Lines
@@ -207,6 +206,72 @@ BEGIN CATCH
 	@ErrorState = ERROR_STATE();  
 	RAISERROR (@ErrorMessage, @ErrorSeverity, @ErrorState); 
 END CATCH
+
+--Remove constraint on is_deleted if account_type doesn't exist in Ledger Transaction Lines
+SET @DropConstraints = N'
+DECLARE @NestedSQL NVARCHAR(MAX);
+IF COL_LENGTH(''[SageXcel Rollup Reporting].dbo.Ledger_Transaction_Lines'', ''account_type'') IS NULL
+BEGIN
+	SELECT TOP 1 @NestedSQL = N''ALTER TABLE [SageXcel Rollup Reporting].dbo.[Ledger_Transaction_Lines] drop constraint [''+dc.name+N'']''
+	FROM [SageXcel Rollup Reporting].sys.default_constraints dc
+	JOIN [SageXcel Rollup Reporting].sys.columns c ON c.default_object_id = dc.object_id
+	WHERE dc.parent_object_id = OBJECT_ID(''[SageXcel Rollup Reporting].dbo.Ledger_Transaction_Lines'') AND c.name = ''is_deleted''
+	EXECUTE sp_executesql @NestedSQL
+END
+'
+SELECT @TranName = 'Ledger_Transaction_Lines_Drop_Constraint_Is_Deleted';
+BEGIN TRY
+	BEGIN TRANSACTION @TranName;
+
+	EXECUTE sp_executesql @DropConstraints
+
+	COMMIT TRANSACTION @TranName
+END TRY
+BEGIN CATCH
+	IF @@TRANCOUNT > 0
+		ROLLBACK TRANSACTION @TranName
+	SELECT   
+	@ErrorMessage = ERROR_MESSAGE(),  
+	@ErrorSeverity = ERROR_SEVERITY(),  
+	@ErrorState = ERROR_STATE();  
+	RAISERROR (@ErrorMessage, @ErrorSeverity, @ErrorState); 
+END CATCH
+
+--Insert account_type, subsidiary_type, debit_or_credit, cost_type into Ledger_Transaction_Lines.  
+--Also places it 5th-8th from the last, temporarily removing and readding the last 4 columns in LTL
+SET @SqlPatchQuery = N'
+IF COL_LENGTH(''[SageXcel Rollup Reporting].dbo.Ledger_Transaction_Lines'', ''account_type'') IS NULL
+BEGIN
+	ALTER TABLE [SageXcel Rollup Reporting].dbo.Ledger_Transaction_Lines
+	DROP COLUMN created_date, last_updated_date, is_deleted, deleted_date;
+	ALTER TABLE [SageXcel Rollup Reporting].dbo.Ledger_Transaction_Lines
+    ADD [account_type] NVARCHAR(22),
+	[subsidiary_type] NVARCHAR(12),
+	[debit_or_credit] NVARCHAR(6),
+	[cost_type] NVARCHAR(30),
+	created_date DATETIME, last_updated_date DATETIME, is_deleted BIT DEFAULT 0, deleted_date DATETIME;
+END
+'
+
+SELECT @TranName = 'Ledger_Transaction_Line_AccountType_add';
+BEGIN TRY
+	BEGIN TRANSACTION @TranName;
+
+	EXECUTE sp_executesql @SqlPatchQuery
+
+	COMMIT TRANSACTION @TranName
+END TRY
+BEGIN CATCH
+	IF @@TRANCOUNT > 0
+		ROLLBACK TRANSACTION @TranName
+	SELECT   
+	@ErrorMessage = ERROR_MESSAGE(),  
+	@ErrorSeverity = ERROR_SEVERITY(),  
+	@ErrorState = ERROR_STATE();  
+	RAISERROR (@ErrorMessage, @ErrorSeverity, @ErrorState); 
+END CATCH
+
+
 
 
 --Clear out SageXcel Rollup database

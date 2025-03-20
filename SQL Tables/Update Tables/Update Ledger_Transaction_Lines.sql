@@ -1,3 +1,5 @@
+--Version 1.0.2
+
 --Specify Client DB Name
 DECLARE @Client_DB_Name NVARCHAR(50) = 'Nvision';  
 --Specify Reporting DB Name
@@ -37,6 +39,37 @@ SELECT
 	lt.entdte as entered_date,
 	lt.actprd as month_id,
 	lt.postyr as posting_year,
+	CASE la.acttyp 
+		WHEN 1 THEN ''Cash Accounts''
+		WHEN 2 THEN ''Current Assets''
+		WHEN 3 THEN ''WIP Assets''
+		WHEN 4 THEN ''Other Assets''
+		WHEN 5 THEN ''Fixed Assets''
+		WHEN 6 THEN ''Depreciation''
+		WHEN 7 THEN ''Current Liabilities''
+		WHEN 8 THEN ''Long Term Liabilities''
+		WHEN 9 THEN ''Equity''
+		WHEN 11 THEN ''Operating Income''
+		WHEN 12 THEN ''Other Income''
+		WHEN 13 THEN ''Direct Expense''
+		WHEN 14 THEN ''Equip/Shop Expense''
+		WHEN 15 THEN ''Overhead Expense''
+		WHEN 16 THEN ''Administrative Expense''
+		WHEN 17 THEN ''After Tax Inc/Expense''
+		ELSE ''Other''
+	END as account_type,
+	CASE la.subact
+		WHEN 0 THEN ''None''
+		WHEN 1 THEN ''Subaccounts''
+		WHEN 2 THEN ''Departments''
+		ELSE ''Other''
+	END as subsidiary_type,
+	CASE la.dbtcrd
+		WHEN 1 THEN ''Debit''
+		WHEN 2 THEN ''Credit''
+		ELSE ''Other''
+	END as debit_or_credit,
+	ct.typnme as cost_type,
 	lt.insdte as created_date,
 	lt.upddte as last_updated_date,
 	0 as is_deleted,
@@ -45,6 +78,7 @@ FROM ',QUOTENAME(@Client_DB_Name),'.dbo.lgrtrn lt
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.lgtnln ltl on lt.recnum = ltl.recnum
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.lgract la on la.recnum = ltl.lgract
 LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.actpay v on v.recnum = lt.vndnum
+LEFT JOIN ',QUOTENAME(@Client_DB_Name),N'.dbo.csttyp ct on ct.recnum = la.csttyp
 LEFT JOIN 
 (
 	SELECT
