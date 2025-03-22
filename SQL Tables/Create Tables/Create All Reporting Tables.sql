@@ -2557,7 +2557,7 @@ CREATE TABLE ',@Reporting_DB_Name,'.dbo.[Version] (
 	update_date DATETIME NOT NULL DEFAULT GETDATE(),
 	update_user CHAR(50) NOT NULL DEFAULT CURRENT_USER
 );
-INSERT [Version] (name)
+INSERT ',@Reporting_DB_Name,'.dbo.[Version] (name)
 VALUES (''1.0.2'');')
 
 EXECUTE sp_executesql @SqlCreateTableCommand
