@@ -103,7 +103,7 @@ SELECT *,
 	1 as is_deleted,
 	GETDATE() as deleted_date
 FROM #TempTbl t 
-WHERE t.ledger_transaction_id NOT IN (SELECT ledger_transaction_id FROM ',@Reporting_DB_Name,N'.dbo.Ledger_Transaction_Lines)
+WHERE CONCAT(t.ledger_transaction_id,t.ledger_account_id) NOT IN (SELECT CONCAT(ledger_transaction_id,ledger_account_id) FROM ',@Reporting_DB_Name,N'.dbo.Ledger_Transaction_Lines)
 UNION ALL 
 SELECT * FROM #DeletedRecords
 ')
