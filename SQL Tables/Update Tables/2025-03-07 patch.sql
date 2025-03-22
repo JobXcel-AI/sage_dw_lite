@@ -16,8 +16,8 @@ DECLARE @NestedSQL NVARCHAR(MAX);
 IF COL_LENGTH(''',@Reporting_DB_Name,N'.dbo.Change_Order_Lines'', ''approved_change_hours'') IS NULL
 BEGIN
 	SELECT TOP 1 @NestedSQL = N''ALTER TABLE ',@Reporting_DB_Name,N'.dbo.[Change_Order_Lines] drop constraint [''+dc.name+N'']''
-	FROM sys.default_constraints dc
-	JOIN sys.columns c ON c.default_object_id = dc.object_id
+	FROM ',@Reporting_DB_Name,N'.sys.default_constraints dc
+	JOIN ',@Reporting_DB_Name,N'.sys.columns c ON c.default_object_id = dc.object_id
 	WHERE dc.parent_object_id = OBJECT_ID(''',@Reporting_DB_Name,N'.dbo.Change_Order_Lines'') AND c.name = ''is_deleted''
 	EXECUTE sp_executesql @NestedSQL
 END
