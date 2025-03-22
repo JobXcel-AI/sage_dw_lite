@@ -254,7 +254,7 @@ BEGIN
 	FROM ',@Reporting_DB_Name,N'.dbo.Ledger_Transaction_Lines a
 	LEFT JOIN (
 		SELECT
-			lt.recnum as ledger_transaction_id,
+			CONCAT(lt.recnum,la.recnum) as join_id,
 			CASE la.acttyp 
 				WHEN 1 THEN ''Cash Accounts''
 				WHEN 2 THEN ''Current Assets''
@@ -291,8 +291,8 @@ BEGIN
 		LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.lgtnln ltl on lt.recnum = ltl.recnum
 		LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.lgract la on la.recnum = ltl.lgract
 		LEFT JOIN ',QUOTENAME(@Client_DB_Name),N'.dbo.csttyp ct on ct.recnum = la.csttyp
-	) cl ON a.ledger_transaction_id = cl.ledger_transaction_id
-	LEFT JOIN #TempTbl meta ON meta.ledger_transaction_id = a.ledger_transaction_id
+	) cl ON CONCAT(a.ledger_transaction_id,a.ledger_account_id) = cl.join_id
+	LEFT JOIN #TempTbl meta ON CONCAT(meta.ledger_transaction_id,meta.ledger_account_id) = CONCAT(a.ledger_transaction_id,a.ledger_account_id)
 END
 ')
 
