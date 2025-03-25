@@ -281,8 +281,8 @@ DECLARE @NestedSQL NVARCHAR(MAX);
 IF COL_LENGTH(''[SageXcel Rollup Reporting].dbo.Jobs'', ''type_9_cost'') IS NULL
 BEGIN
 	SELECT TOP 1 @NestedSQL = N''ALTER TABLE [SageXcel Rollup Reporting].dbo.[Jobs] drop constraint [''+dc.name+N'']''
-	FROM sys.default_constraints dc
-	JOIN sys.columns c ON c.default_object_id = dc.object_id
+	FROM [SageXcel Rollup Reporting].dbo.sys.default_constraints dc
+	JOIN [SageXcel Rollup Reporting].dbo.sys.columns c ON c.default_object_id = dc.object_id
 	WHERE dc.parent_object_id = OBJECT_ID(''[SageXcel Rollup Reporting].dbo.Jobs'') AND c.name = ''is_deleted''
 	EXECUTE sp_executesql @NestedSQL
 END
