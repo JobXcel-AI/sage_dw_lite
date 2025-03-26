@@ -1,4 +1,4 @@
---Version 1.0.2
+--Version 1.0.3
 
 -- Specify Rollup DB Name
 DECLARE @Reporting_DB_Name NVARCHAR(50) = 'SageXcel Rollup Reporting';
@@ -400,6 +400,18 @@ CREATE TABLE ', QUOTENAME(@Reporting_DB_Name),'.dbo.',QUOTENAME('Jobs'), '(
 	original_budget_amount DECIMAL(14,2),
 	total_budget_amount DECIMAL(14,2),
 	estimated_gross_profit DECIMAL(14,2),
+	first_invoice_id BIGINT,
+	first_invoice_date DATETIME,
+	first_invoice_paid_date DATETIME,
+	final_invoice_id BIGINT,
+	final_invoice_date DATETIME,
+	final_invoice_paid_date DATETIME,
+	subcontract_cost DECIMAL (14,2),
+	type_6_cost DECIMAL (14,2),
+	type_7_cost DECIMAL (14,2),
+	type_8_cost DECIMAL (14,2),
+	type_9_cost DECIMAL (14,2),
+	total_cost DECIMAL (14,2),
 	created_date DATETIME,
 	last_updated_date DATETIME,
 	is_deleted BIT DEFAULT 0,

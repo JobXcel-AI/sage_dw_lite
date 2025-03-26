@@ -1,3 +1,5 @@
+--Version 1.0.3
+
 --Specify Client DB Name
 DECLARE @Client_DB_Name NVARCHAR(50) = 'Nvision';  
 --Specify Reporting DB Name
@@ -70,7 +72,7 @@ SELECT
 	ISNULL(i.retain,0) as retention,
 	ISNULL(i.invnet,0) as invoice_net_due,
 	ISNULL(i.invbal,0) as invoice_balance,
-	i.chkdte as last_payment_received_date,
+	i.max_chkdte as last_payment_received_date,
 	ISNULL(tkof.ext_cost_excl_labor,0) as takeoff_ext_cost_excl_labor, 
 	ISNULL(tkof.sales_tax_excl_labor,0) as takeoff_sales_tax_excl_labor, 
 	ISNULL(tkof.overhead_amount_excl_labor,0) as takeoff_overhead_amount_excl_labor, 
@@ -89,6 +91,19 @@ SELECT
 	ISNULL(jb.budget,0) as original_budget_amount,
 	ISNULL(jb.budget,0) + ISNULL(co.approved_budget,0) as total_budget_amount,
 	ISNULL(a.cntrct,0) + ISNULL(co.appamt,0) - ISNULL(jb.budget,0) - ISNULL(co.approved_budget,0) as estimated_gross_profit,
+	i.first_invoice_id,
+	i.first_invoice_date,
+	i.first_invoice_paid_date,
+	i.final_invoice_id,
+	i.final_invoice_date,
+	i.final_invoice_paid_date,
+	ISNULL(jc.subcontract_cost,0) as subcontract_cost,
+	ISNULL(jc.type_6_cost,0) as type_6_cost,
+	ISNULL(jc.type_6_cost,0) as type_7_cost,
+	ISNULL(jc.type_7_cost,0) as type_8_cost,
+	ISNULL(jc.type_9_cost,0) as type_9_cost,
+	ISNULL(jc.type_6_cost,0) + ISNULL(jc.type_7_cost,0) + ISNULL(jc.type_8_cost,0) + ISNULL(jc.type_9_cost,0) + ISNULL(jc.subcontract_cost,0) + 
+	ISNULL(jc.other_cost,0) + ISNULL(jc.material_cost,0) + ISNULL(jc.labor_cost,0) + ISNULL(jc.equipment_cost,0) as total_cost,
 	a.insdte as created_date,
 	a.upddte as last_updated_date,
 	0 as is_deleted,
@@ -139,40 +154,91 @@ LEFT JOIN (
 			ELSE 0 
 		END) as equipment_cost,
 		SUM(CASE 
+			WHEN ct.typnme = ''Subcontract'' THEN cstamt 
+			ELSE 0 
+		END) as subcontract_cost,
+		SUM(CASE 
 			WHEN ct.typnme = ''Other'' THEN cstamt 
 			ELSE 0 
 		END) as other_cost,
+		SUM(CASE 
+			WHEN ct.recnum = 6 THEN cstamt 
+			ELSE 0 
+		END) as type_6_cost,
+		SUM(CASE 
+			WHEN ct.recnum = 7 THEN cstamt 
+			ELSE 0 
+		END) as type_7_cost,
+		SUM(CASE 
+			WHEN ct.recnum = 8 THEN cstamt 
+			ELSE 0 
+		END) as type_8_cost,
+		SUM(CASE 
+			WHEN ct.recnum = 9 THEN cstamt 
+			ELSE 0 
+		END) as type_9_cost,
 		SUM(jcst.ovhamt) as overhead_amount
 	FROM ',QUOTENAME(@Client_DB_Name),'.dbo.jobcst jcst
 	INNER JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.csttyp ct on ct.recnum = jcst.csttyp
 	WHERE jcst.status = 1
 	GROUP BY jobnum
 ) jc on jc.jobnum = a.recnum
+')
+SET @SqlInsertCommand3 = CONCAT(N'
 LEFT JOIN (
 	SELECT 
-		jobnum,
+		acrinv.jobnum,
+		MIN(acrinv.recnum) as first_invoice_id,
+		MIN(first_acrinv.invdte) as first_invoice_date,
+		MIN(first_acrinv_pmt.chkdte) as first_invoice_paid_date,
+		MAX(acrinv.recnum) as final_invoice_id,
+		MIN(final_acrinv.invdte) as final_invoice_date,
+		MIN(final_acrinv_pmt.chkdte) as final_invoice_paid_date,
 		SUM(acrinv.invttl) as invttl,
 		SUM(acrinv.amtpad) as amtpad,
 		SUM(acrinv.slstax) as slstax,
 		SUM(acrinv.retain) as retain,
 		SUM(acrinv.invnet) as invnet,
 		SUM(acrinv.invbal) as invbal,
-		MAX(payments.chkdte) as chkdte
+		MAX(payments.max_chkdte) as max_chkdte
 	FROM ',QUOTENAME(@Client_DB_Name),'.dbo.acrinv acrinv
+	LEFT JOIN (
+		SELECT
+			recnum,
+			MAX(chkdte) as max_chkdte
+		FROM ',QUOTENAME(@Client_DB_Name),'.dbo.acrpmt
+		GROUP BY recnum
+	) payments on payments.recnum = acrinv.recnum
+	LEFT JOIN (
+		SELECT
+			jobnum,
+			MIN(recnum) as min_recnum,
+			MAX(recnum) as max_recnum
+		FROM ',QUOTENAME(@Client_DB_Name),'.dbo.acrinv
+		WHERE invtyp = 1 AND status != 5
+		GROUP BY jobnum
+	) invoice_ids on invoice_ids.jobnum = acrinv.jobnum
+	LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.acrinv first_acrinv on first_acrinv.recnum = invoice_ids.min_recnum
+	LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.acrinv final_acrinv on final_acrinv.recnum = invoice_ids.max_recnum
 	LEFT JOIN (
 		SELECT
 			recnum,
 			MAX(chkdte) as chkdte
 		FROM ',QUOTENAME(@Client_DB_Name),'.dbo.acrpmt
 		GROUP BY recnum
-	) payments on payments.recnum = acrinv.recnum
+	) first_acrinv_pmt on first_acrinv_pmt.recnum = first_acrinv.recnum
+	LEFT JOIN (
+		SELECT
+			recnum,
+			MAX(chkdte) as chkdte
+		FROM ',QUOTENAME(@Client_DB_Name),'.dbo.acrpmt
+		GROUP BY recnum
+	) final_acrinv_pmt on final_acrinv_pmt.recnum = final_acrinv.recnum
 	WHERE 
-		invtyp = 1
-		AND status != 5
-	GROUP BY jobnum
+		acrinv.invtyp = 1
+		AND acrinv.status != 5 
+	GROUP BY acrinv.jobnum, acrinv.status
 ) as i on a.recnum = i.jobnum
-')
-SET @SqlInsertQuery3 = CONCAT(N'
 LEFT JOIN 
 (
 	SELECT 

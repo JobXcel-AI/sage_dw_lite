@@ -1,4 +1,4 @@
---Version 1.0.2
+--Version 1.0.3
 
 --Specify Client DB Name
 DECLARE @Client_DB_Name NVARCHAR(50) = '[CLIENT_DB_NAME]';
@@ -273,6 +273,80 @@ BEGIN CATCH
 END CATCH
 
 
+--Version 1.0.3 patch
+
+--Remove constraint on is_deleted if type_9_cost doesn't exist in Jobs
+SET @DropConstraints = CONCAT(N'
+DECLARE @NestedSQL NVARCHAR(MAX);
+IF COL_LENGTH(''[SageXcel Rollup Reporting].dbo.Jobs'', ''type_9_cost'') IS NULL
+BEGIN
+	SELECT TOP 1 @NestedSQL = N''ALTER TABLE [SageXcel Rollup Reporting].dbo.[Jobs] drop constraint [''+dc.name+N'']''
+	FROM [SageXcel Rollup Reporting].dbo.sys.default_constraints dc
+	JOIN [SageXcel Rollup Reporting].dbo.sys.columns c ON c.default_object_id = dc.object_id
+	WHERE dc.parent_object_id = OBJECT_ID(''[SageXcel Rollup Reporting].dbo.Jobs'') AND c.name = ''is_deleted''
+	EXECUTE sp_executesql @NestedSQL
+END
+')
+SELECT @TranName = 'Jobs_Drop_Constraint_Is_Deleted';
+BEGIN TRY
+	BEGIN TRANSACTION @TranName;
+
+	EXECUTE sp_executesql @DropConstraints
+
+	COMMIT TRANSACTION @TranName
+END TRY
+BEGIN CATCH
+	IF @@TRANCOUNT > 0
+		ROLLBACK TRANSACTION @TranName
+	SELECT   
+	@ErrorMessage = ERROR_MESSAGE(),  
+	@ErrorSeverity = ERROR_SEVERITY(),  
+	@ErrorState = ERROR_STATE();  
+	RAISERROR (@ErrorMessage, @ErrorSeverity, @ErrorState); 
+END CATCH
+
+
+--Insert new fields into Jobs table 
+--Also places it 5th-13th from the last, temporarily removing and readding the last 4 columns in Jobs
+SET @SqlPatchQuery = CONCAT(N'
+IF COL_LENGTH(''[SageXcel Rollup Reporting].dbo.Jobs'', ''type_9_cost'') IS NULL
+BEGIN
+	ALTER TABLE [SageXcel Rollup Reporting].dbo.Jobs
+	DROP COLUMN created_date, last_updated_date, is_deleted, deleted_date;
+	ALTER TABLE [SageXcel Rollup Reporting].dbo.Jobs
+    ADD [first_invoice_id] BIGINT,
+	[first_invoice_date] DATETIME,
+	[first_invoice_paid_date] DATETIME,
+	[final_invoice_id] BIGINT,
+	[final_invoice_date] DATETIME,
+	[final_invoice_paid_date] DATETIME,
+	[subcontract_cost] DECIMAL (14,2),
+	[type_6_cost] DECIMAL (14,2),
+	[type_7_cost] DECIMAL (14,2),
+	[type_8_cost] DECIMAL (14,2),
+	[type_9_cost] DECIMAL (14,2),
+	[total_cost] DECIMAL (14,2),
+	created_date DATETIME, last_updated_date DATETIME, is_deleted BIT DEFAULT 0, deleted_date DATETIME;
+END
+')
+
+SELECT @TranName = 'Jobs_New_fields_add';
+BEGIN TRY
+	BEGIN TRANSACTION @TranName;
+
+	EXECUTE sp_executesql @SqlPatchQuery
+
+	COMMIT TRANSACTION @TranName
+END TRY
+BEGIN CATCH
+	IF @@TRANCOUNT > 0
+		ROLLBACK TRANSACTION @TranName
+	SELECT   
+	@ErrorMessage = ERROR_MESSAGE(),  
+	@ErrorSeverity = ERROR_SEVERITY(),  
+	@ErrorState = ERROR_STATE();  
+	RAISERROR (@ErrorMessage, @ErrorSeverity, @ErrorState); 
+END CATCH
 
 
 --Clear out SageXcel Rollup database
