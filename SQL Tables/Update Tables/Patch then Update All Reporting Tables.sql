@@ -1994,14 +1994,7 @@ END CATCH
 
 --Update Ledger Transaction Lines
 SET @SqlInsertQuery = CONCAT(
---Step 1. Temp table containing reporting table
-N'SELECT * INTO #TempTbl FROM ',@Reporting_DB_Name,N'.dbo.Ledger_Transaction_Lines;
-SELECT * INTO #DeletedRecords FROM #TempTbl WHERE is_deleted = 1;
-DELETE FROM #TempTbl WHERE is_deleted = 1;
-ALTER TABLE #TempTbl
-DROP COLUMN is_deleted, deleted_date;',
---Step 2. delete existing reporting table data and replace with updated values
-'DELETE FROM ',@Reporting_DB_Name,N'.dbo.Ledger_Transaction_Lines;
+N'DELETE FROM ',@Reporting_DB_Name,N'.dbo.Ledger_Transaction_Lines;
 INSERT INTO ',@Reporting_DB_Name,N'.dbo.Ledger_Transaction_Lines
 SELECT 
 	ltl.dscrpt ledger_transaction_description,
@@ -2081,17 +2074,7 @@ LEFT JOIN
 	FROM ',QUOTENAME(@Client_DB_Name),'.dbo.eqpcst 
 	GROUP BY vndnum
 ) ec on ec.vndnum = v.recnum
-LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.source s on s.recnum = lt.srcnum;',
---Step 3. Find any values in Temp Table not in Reporting Table, insert them as records flagged as deleted
-'INSERT INTO ',@Reporting_DB_Name,N'.dbo.Ledger_Transaction_Lines
-SELECT *, 
-	1 as is_deleted,
-	GETDATE() as deleted_date
-FROM #TempTbl t 
-WHERE CONCAT(t.ledger_transaction_id,t.ledger_account_id) NOT IN (SELECT CONCAT(ledger_transaction_id,ledger_account_id) FROM ',@Reporting_DB_Name,N'.dbo.Ledger_Transaction_Lines)
-UNION ALL 
-SELECT * FROM #DeletedRecords
-')
+LEFT JOIN ',QUOTENAME(@Client_DB_Name),'.dbo.source s on s.recnum = lt.srcnum;')
 
 SELECT 'Ledger_Transaction_Lines', getdate();
 SELECT @TranName = 'Ledger_Transaction_Lines';
