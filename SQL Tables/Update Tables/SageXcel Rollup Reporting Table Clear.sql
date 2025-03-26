@@ -276,7 +276,7 @@ END CATCH
 --Version 1.0.3 patch
 
 --Remove constraint on is_deleted if type_9_cost doesn't exist in Jobs
-SET @DropConstraints = CONCAT(N'
+SET @DropConstraints = N'
 DECLARE @NestedSQL NVARCHAR(MAX);
 IF COL_LENGTH(''[SageXcel Rollup Reporting].dbo.Jobs'', ''type_9_cost'') IS NULL
 BEGIN
@@ -286,7 +286,7 @@ BEGIN
 	WHERE dc.parent_object_id = OBJECT_ID(''[SageXcel Rollup Reporting].dbo.Jobs'') AND c.name = ''is_deleted''
 	EXECUTE sp_executesql @NestedSQL
 END
-')
+'
 SELECT @TranName = 'Jobs_Drop_Constraint_Is_Deleted';
 BEGIN TRY
 	BEGIN TRANSACTION @TranName;
@@ -308,7 +308,7 @@ END CATCH
 
 --Insert new fields into Jobs table 
 --Also places it 5th-13th from the last, temporarily removing and readding the last 4 columns in Jobs
-SET @SqlPatchQuery = CONCAT(N'
+SET @SqlPatchQuery = N'
 IF COL_LENGTH(''[SageXcel Rollup Reporting].dbo.Jobs'', ''type_9_cost'') IS NULL
 BEGIN
 	ALTER TABLE [SageXcel Rollup Reporting].dbo.Jobs
@@ -328,7 +328,7 @@ BEGIN
 	[total_cost] DECIMAL (14,2),
 	created_date DATETIME, last_updated_date DATETIME, is_deleted BIT DEFAULT 0, deleted_date DATETIME;
 END
-')
+'
 
 SELECT @TranName = 'Jobs_New_fields_add';
 BEGIN TRY
